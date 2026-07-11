@@ -118,6 +118,44 @@ No dedicated stats table — always derived via SQL views / RPC functions over
 `matches` + `match_players` (and `competition_matches` for competitions): matches won,
 points won, win %, points %, score differential. Scoped per club, per meet, or global.
 
+### Skill Rating
+- `player_ratings` (user_id, rating numeric, matches_played, last_updated) — Elo-style rating,
+  updated by a Postgres trigger/RPC whenever a `matches` row gets a final score. Backs the
+  `min_level`/`max_level` filters on meets with a real, moving number instead of a static
+  self-reported field.
+
+### Social / Network
+- `follows` (follower_id, followee_id, created_at) — PK (follower_id, followee_id). Powers
+  "My Network": follow players, see a feed of meets your followees are joining/hosting,
+  quick-invite them to a new meet.
+
+### Sharing
+- `meets.public_share_slug` and `competitions.public_share_slug` (unique, short, nullable —
+  generated on demand) — a public, read-only RLS policy exposes meet/competition details +
+  live standings to anyone with the link, no login required. Same mechanism backs the
+  **TV/Big-screen mode** (a route that renders just the standings/bracket full-screen,
+  auto-refreshing via Realtime, meant to be opened on a venue's TV/monitor during play).
+
+### Gamification (advanced)
+- `xp_events` (id, user_id, source: meet_played|meet_won|hosted_meet|competition_played|
+  referral|challenge_completed, amount, meta jsonb, created_at) — append-only XP ledger.
+- `level_thresholds` (level, title, min_xp) — static reference table (e.g. Rookie → Amateur →
+  Pro → Legend); a player's level is `level_thresholds` looked up against `sum(xp_events.amount)`,
+  not stored redundantly.
+- `achievements` (id, key, name, description, tier: bronze|silver|gold|platinum, icon,
+  unlock_criteria jsonb) — e.g. "Win 5 in a row", "Play your first Americano", "Host 10 meets".
+- `player_achievements` (user_id, achievement_id, unlocked_at) — evaluated by a Postgres
+  function run after each match/meet completion.
+- `seasons` (id, name, starts_at, ends_at) — season-scoped leaderboards are a derived query
+  (stats view filtered to a season's date range), not a separate stored leaderboard.
+- `challenges` (id, key, title, description, period: weekly|monthly, target_criteria jsonb,
+  xp_reward, starts_at, ends_at) + `player_challenge_progress` (challenge_id, user_id,
+  progress numeric, completed_at) — e.g. "Play 3 meets this week."
+- **Head-to-head rivalry** and **MVP per meet** are pure derived queries (no dedicated
+  table): rivalry = win/loss aggregation over `match_players` for two specific users across
+  all their shared matches; MVP = highest win% within a single meet's `match_session`,
+  computed once the session completes and cached on `meets.mvp_user_id` for fast display.
+
 ## 4. Key Flows
 
 ### Create Meet wizard (mirrors Reclub)
@@ -186,6 +224,48 @@ burst / glow pulse on reveal, per `DESIGN.md` §1B–1D). An **Export** action r
 current standings (podium + full list) to a shareable PNG image (client-side, e.g.
 `html-to-image` against an off-screen styled component) — no server round-trip needed.
 
+### Shareable public link & TV mode
+Any meet or competition can generate a `public_share_slug`. Visiting `/#/s/:slug` (no auth)
+shows a read-only view of details + live standings/bracket, updating via Realtime. A "TV
+mode" variant of the same route strips chrome/nav and renders standings/bracket full-screen
+and larger — meant to be opened on a venue TV/monitor during play, matching what
+Americano Padel App / PadelMix offer with their shareable live links.
+
+### Add to calendar
+Meet detail exposes an "Add to calendar" action that generates a `.ics` file client-side
+from the meet's schedule/venue/title — no external calendar API integration needed.
+
+### Share match result as an image
+After a match's score is finalized, a "Share result" action renders that single match
+(players, score, court) to a shareable PNG (same `html-to-image` utility as the leaderboard
+export), story-format sized for IG/WhatsApp sharing — distinct from the full leaderboard
+export, scoped to one match.
+
+### Search & filter meets
+Home/discovery view supports filtering meets by venue, date range, format
+(Social/Americano/Mexicano), and skill level range — needed once multiple clubs and meets
+accumulate.
+
+### PWA installability
+A web app manifest + icon set make the app installable ("Add to Home Screen") on
+mobile/desktop for an app-like feel, without service-worker push (see Non-Goals) — just
+installability and a standalone display mode.
+
+### Gamification (advanced)
+- **XP & levels:** players earn XP for playing, winning, hosting, and completing challenges;
+  level/title (Rookie → Amateur → Pro → Legend) shown on their profile.
+- **Achievements:** tiered (bronze/silver/gold/platinum) badges unlocked automatically after
+  matches/meets complete, with an unlock animation consistent with Lithium's signature
+  moments (scale-in + glow + confetti, per `DESIGN.md` §1B–1D). Profile has a badge showcase.
+- **Weekly/monthly challenges:** e.g. "Play 3 meets this week" — progress tracked, XP awarded
+  on completion.
+- **Seasons:** leaderboards can be scoped to a season (auto-resetting) alongside an
+  always-on all-time leaderboard.
+- **Head-to-head rivalry:** on a player's profile or before a match, show your historical
+  record against a specific opponent.
+- **MVP per meet:** auto-computed and highlighted on the meet's Matches tab once the session
+  completes.
+
 ## 5. Build Phases
 
 Each phase is its own spec → plan → build → review cycle; this document covers the overall
@@ -193,25 +273,32 @@ architecture/data model, detailed phase specs are written just-in-time as each p
 
 1. **Foundation** — repo init, Vite+Vue3 scaffold, GitHub Actions deploy pipeline, Supabase
    project wiring (schema + RLS baseline), Lithium design system port, Allo Bank branding +
-   new PADEL BROW logo design, base nav/layout, hash-mode router.
-2. **Identity & Clubs** — auth (email + Google), profile, create/browse/join clubs, roles.
+   new PADEL BROW logo design, base nav/layout, hash-mode router, PWA manifest/installability.
+2. **Identity & Clubs** — auth (email + Google), profile, create/browse/join clubs, roles,
+   My Network (follow players, see their upcoming meets).
 3. **Meets** — create-meet wizard, meet detail (Details/Participants/Chat), RSVP/waitlist,
-   in-app notifications.
+   in-app notifications, search/filter meets, add-to-calendar export, shareable public link.
 4. **Match Engine** — Americano/Mexicano/Team Americano/Singles generator, courts, live
-   scoring, standings.
+   scoring, standings, skill rating updates, share-match-result image, TV/big-screen mode.
 5. **Payments** — fee config, proof-of-payment upload, organizer confirmation.
-6. **Competitions** — registration, seeding, bracket/draw, multi-day tracking.
+6. **Competitions** — registration, seeding, bracket/draw, multi-day tracking, shareable
+   public link + TV mode reused from Phase 3/4.
 7. **Feed** — rich posts (photo/video), likes, comments, per-club and global feed.
 8. **Stats, History & Leaderboard Export** — aggregate stats, personal history, podium-style
    leaderboard export.
+9. **Advanced Gamification** — XP & levels, tiered achievements with unlock animations,
+   weekly/monthly challenges, seasonal + all-time leaderboards, head-to-head rivalry stats,
+   MVP per meet.
 
 ## 6. Non-Goals (for now)
 
 - Real payment gateway integration (Midtrans/Xendit/etc.) — manual proof-of-payment only.
-- Push notifications requiring service worker/PWA install — in-app notification center only.
+- Push notifications requiring a push service/VAPID/edge-function trigger — in-app
+  notification center only. (The app is PWA-installable per Phase 1, but installability is
+  not the same as push — no background notifications when the app is closed.)
 - Court/venue booking against real venue inventory (no venue-partner API integration) — venue
   is free-text + map link, as in Reclub's own meets.
-- Native mobile apps — web SPA only (mobile-responsive).
+- Native mobile apps — web SPA only (mobile-responsive, installable as a PWA).
 
 ## 7. Open Items to Confirm During Phase 1
 
