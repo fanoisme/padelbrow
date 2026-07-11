@@ -1,5 +1,9 @@
 <template>
-  <router-view />
+  <AppLayout>
+    <router-view />
+  </AppLayout>
 </template>
 
-<script setup></script>
+<script setup>
+import AppLayout from './layouts/AppLayout.vue'
+</script>
