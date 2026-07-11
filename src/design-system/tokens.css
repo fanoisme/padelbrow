@@ -1,0 +1,734 @@
+/*
+  General Lithium (1.0) Unified Tokens
+  Derived from Claude's GoldenPaws and AG's Lithium Kit 1.0
+
+  ══════════════════════════════════════════════════════════════
+  RICH EVERYTHING — Smooth animations, organic motion, ambient depth
+  ══════════════════════════════════════════════════════════════
+*/
+
+:root {
+  /* ══════════════════════════════════════════════════════════════
+     COLOR PRIMITIVES
+     ══════════════════════════════════════════════════════════════ */
+
+  /* Gray — Text & Surfaces */
+  --color-gray-900:  #333333;
+  --color-gray-800:  #4D4D4D;
+  --color-gray-700:  #666666;
+  --color-gray-600:  #808080;
+  --color-gray-500:  #999999;
+  --color-gray-400:  #B3B3B3;
+  --color-gray-300:  #CCCCCC;
+  --color-gray-200:  #E6E6E6;
+  --color-gray-100:  #F2F2F2;
+  --color-gray-0:    #FFFFFF;
+
+  /* Brand */
+  --color-brand:     #FFAF03;
+
+  /* Yellow — UI accents & Primary Buttons */
+  --color-yellow-500:  #F4A600;
+  --color-yellow-400:  #F9C700;
+  --color-yellow-300:  #FDDD00;
+  --color-yellow-200:  #FFEB3B;
+  --color-yellow-100:  #FFF3D6;
+
+  /* Orange — Warnings */
+  --color-orange-500:  #FF3000;
+  --color-orange-400:  #FF6B00;
+  --color-orange-300:  #FF8C00;
+  --color-orange-200:  #FFA726;
+  --color-orange-100:  #FFB700;
+
+  /* Red — Danger & Errors */
+  --color-red-500:  #A33129;
+  --color-red-400:  #C83E3B;
+  --color-red-300:  #D4735F;
+  --color-red-200:  #E57373;
+  --color-red-100:  #F6D0CB;
+
+  /* Green — Positive & Success */
+  --color-green-500:  #059669;
+  --color-green-400:  #10B981;
+  --color-green-300:  #34D399;
+  --color-green-200:  #6EE7B7;
+  --color-green-100:  #D7F9E9;
+
+  /* Blue — Informative & Links */
+  --color-blue-500:  #0047B2;
+  --color-blue-400:  #2563EB;
+  --color-blue-300:  #3B82F6;
+  --color-blue-200:  #60A5FA;
+  --color-blue-100:  #E6E6FF;
+
+  /* Special Surfaces */
+  --color-overlay:     #222233CC;
+  --color-page-bg:     #E6E6E6;
+  --color-section-bg:  #F5F7FA;
+  --color-bg-dark:     #212324;
+
+  /* ══════════════════════════════════════════════════════════════
+     SEMANTIC ALIASES
+     ══════════════════════════════════════════════════════════════ */
+
+  --color-on-surface:          var(--color-gray-900);
+  --color-on-surface-variant:  var(--color-gray-600);
+  --color-on-surface-muted:    var(--color-gray-500);
+  --color-surface:             var(--color-gray-100);
+  --color-surface-bright:      var(--color-gray-0);
+  --color-surface-disabled:    #EDF0F2;
+
+  --color-success:             var(--color-green-400);
+  --color-success-container:   var(--color-green-100);
+  --color-on-success-container: var(--color-green-500);
+
+  --color-info:                var(--color-blue-400);
+  --color-info-container:      var(--color-blue-100);
+  --color-on-info-container:   var(--color-blue-500);
+
+  --color-warning:             var(--color-orange-400);
+  --color-warning-container:   var(--color-yellow-100);
+  --color-on-warning-container: var(--color-orange-500);
+
+  --color-error:               var(--color-red-400);
+  --color-error-container:     #FDECEE;
+  --color-on-error-container:  var(--color-red-500);
+
+  --color-outline:             var(--color-gray-300);
+  --color-outline-variant:     var(--color-gray-200);
+
+  /* CTA Button Tokens */
+  --cta-primary-bg:       #FFBC25;
+  --cta-primary-text:     #1E1E1E;
+  --cta-primary-hover:    #FFB60A;
+  --cta-secondary-border: #D0D6DD;
+  --cta-secondary-text:   #333333;
+  --cta-danger-bg:        #DA473F;
+  --cta-danger-text:      #FFFFFF;
+  --cta-ghost-text:       #808080;
+  --cta-ghost-hover-bg:   #EDF0F2;
+
+  /* View-level semantic tokens (--li-* namespace) — generic page/content
+     surfaces (docs-style cards, code blocks) not covered by component tokens */
+  --li-text-muted:  #64748b;
+  --li-text-subtle: #94a3b8;
+  --li-border:      #e2e8f0;
+  --li-bg-card:     #ffffff;
+  --li-bg-code:     #f1f5f9;
+  --li-primary:     #3b82f6;
+
+  /* ══════════════════════════════════════════════════════════════
+     GRADIENT PRESETS — Rich, expressive gradients
+     ══════════════════════════════════════════════════════════════ */
+
+  /* Brand gradient — gold to warm orange */
+  --gradient-brand:        linear-gradient(135deg, #FFAF03 0%, #FF8C00 50%, #FF6B00 100%);
+  --gradient-brand-soft:   linear-gradient(135deg, #FFD54F 0%, #FFB300 50%, #FF8F00 100%);
+  --gradient-brand-subtle: linear-gradient(135deg, #FFF3D6 0%, #FFE082 50%, #FFD54F 100%);
+
+  /* Mesh gradient presets for backgrounds */
+  --gradient-mesh-warm:    radial-gradient(ellipse at 20% 50%, rgba(255,175,3,0.15) 0%, transparent 50%),
+                           radial-gradient(ellipse at 80% 20%, rgba(255,140,0,0.1) 0%, transparent 50%),
+                           radial-gradient(ellipse at 50% 80%, rgba(255,107,0,0.08) 0%, transparent 50%);
+  --gradient-mesh-cool:    radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.1) 0%, transparent 50%),
+                           radial-gradient(ellipse at 80% 20%, rgba(99,102,241,0.08) 0%, transparent 50%),
+                           radial-gradient(ellipse at 50% 80%, rgba(139,92,246,0.06) 0%, transparent 50%);
+  --gradient-mesh-success: radial-gradient(ellipse at 30% 40%, rgba(16,185,129,0.12) 0%, transparent 50%),
+                           radial-gradient(ellipse at 70% 70%, rgba(52,211,153,0.08) 0%, transparent 50%);
+
+  /* Surface gradients */
+  --gradient-glass-shine:  linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+  --gradient-glass-depth:  linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.02) 100%);
+  --gradient-card-hover:   linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+
+  /* Text gradients */
+  --gradient-text-brand:   linear-gradient(135deg, #FFAF03, #FF6B00);
+  --gradient-text-cool:    linear-gradient(135deg, #3B82F6, #8B5CF6);
+  --gradient-text-warm:    linear-gradient(135deg, #F4A600, #FF3000);
+
+  /* ══════════════════════════════════════════════════════════════
+     SPACING
+     ══════════════════════════════════════════════════════════════ */
+
+  /* Macro Layout */
+  --space-xs:  4px;
+  --space-s:   8px;
+  --space-m:   12px;
+  --space-l:   16px;
+  --space-xl:  24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+  --space-4xl: 64px;
+  --space-5xl: 96px;
+
+  /* Legacy AG Tokens (from original tokens.css) — kept for SP-lite parity */
+  --space-100:  8px;
+  --space-200:  16px;
+  --space-500:  40px;
+  --space-1000: 80px;
+
+  /* Micro Spatial */
+  --spatial-space25:  2px;
+  --spatial-space50:  4px;
+  --spatial-space100: 8px;
+  --spatial-space300: 24px;
+  --spatial-space500: 40px;
+
+  /* Fluid Spacing (responsive, organic) */
+  --fluid-xs:   clamp(4px, 0.5vw, 8px);
+  --fluid-s:    clamp(8px, 1vw, 16px);
+  --fluid-m:    clamp(12px, 1.5vw, 24px);
+  --fluid-l:    clamp(16px, 2vw, 32px);
+  --fluid-xl:   clamp(24px, 3vw, 48px);
+  --fluid-2xl:  clamp(32px, 4vw, 64px);
+  --fluid-3xl:  clamp(48px, 6vw, 96px);
+
+  /* ══════════════════════════════════════════════════════════════
+     RADIUS — Organic & Fluid
+     ══════════════════════════════════════════════════════════════ */
+
+  --radius-xs:   8px;
+  --radius-sm:   12px;
+  --radius-md:   16px;
+  --radius-lg:   24px;
+  --radius-xl:   32px;
+  --radius-2xl:  48px;
+  --radius-3xl:  64px;
+  --radius-pill: 999px;
+  --border-radius-radius50: 8px;
+  --border-width-width150: 0px;
+
+  /* ══════════════════════════════════════════════════════════════
+     TYPOGRAPHY
+     ══════════════════════════════════════════════════════════════ */
+
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Variable font axes for fluid weight transitions */
+  --font-weight-min:   400;
+  --font-weight-max:   700;
+  --font-weight-hover: 600;
+
+  /* ══════════════════════════════════════════════════════════════
+     EASING — Expressive Curves
+     ══════════════════════════════════════════════════════════════ */
+
+  /* Core curves */
+  --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-snap:   cubic-bezier(0.6, 0, 0.2, 1);
+
+  /* Advanced spring physics */
+  --ease-spring-gentle:  cubic-bezier(0.25, 1.2, 0.5, 1);
+  --ease-spring-bouncy:  cubic-bezier(0.34, 1.8, 0.64, 1);
+  --ease-spring-wild:    cubic-bezier(0.2, 2.0, 0.5, 1);
+
+  /* Organic movement curves */
+  --ease-out-expo:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart:   cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-back:    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-out-sine: cubic-bezier(0.37, 0, 0.63, 1);
+
+  /* Dramatic entrances */
+  --ease-dramatic:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-elastic:     cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-bounce:      cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* Exit curves — always faster than entrance */
+  --ease-exit:        cubic-bezier(0.4, 0, 1, 1);
+  --ease-exit-smooth: cubic-bezier(0.5, 0, 0.8, 0.25);
+
+  /* ══════════════════════════════════════════════════════════════
+     DURATION — Expanded Scale
+     ══════════════════════════════════════════════════════════════ */
+
+  --dur-instant:    80ms;
+  --dur-micro:      120ms;
+  --dur-short:      200ms;
+  --dur-medium:     300ms;
+  --dur-long:       500ms;
+  --dur-hero:       800ms;
+  --dur-epic:       1200ms;
+  --dur-cinematic:  2000ms;
+
+  /* Stagger durations — for sequential reveals */
+  --stagger-fast:    50ms;
+  --stagger-normal:  80ms;
+  --stagger-slow:    120ms;
+  --stagger-dramatic: 160ms;
+
+  /* ══════════════════════════════════════════════════════════════
+     3D & SPATIAL DEPTH
+     ══════════════════════════════════════════════════════════════ */
+
+  --perspective-base:     1000px;
+  --perspective-close:    600px;
+  --perspective-deep:     1500px;
+  --rotate-subtle:        2deg;
+  --rotate-medium:        4deg;
+  --rotate-dynamic:       8deg;
+  --rotate-flip:          180deg;
+  --translate-z-near:     20px;
+  --translate-z-mid:      40px;
+  --translate-z-far:      80px;
+
+  /* 3D transform presets */
+  --transform-tilt-hover:    perspective(1000px) rotateX(var(--rotate-subtle)) rotateY(var(--rotate-subtle)) translateZ(var(--translate-z-near));
+  --transform-tilt-active:   perspective(1000px) rotateX(calc(var(--rotate-subtle) * -1)) rotateY(calc(var(--rotate-subtle) * -1)) translateZ(calc(var(--translate-z-near) * -1));
+  --transform-float:         translateZ(var(--translate-z-far)) translateY(-4px);
+  --transform-press:         scale(0.96) translateZ(-2px);
+
+  /* ══════════════════════════════════════════════════════════════
+     LAYERED SHADOWS — Soft & Diffused
+     ══════════════════════════════════════════════════════════════ */
+
+  /* Resting shadows */
+  --shadow-sm:    0 2px 8px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.02);
+  --shadow-md:    0 4px 16px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.04);
+  --shadow-lg:    0 8px 32px rgba(0,0,0,0.08), 0 16px 48px rgba(0,0,0,0.06);
+  --shadow-xl:    0 16px 48px rgba(0,0,0,0.1), 0 32px 80px rgba(0,0,0,0.08);
+  --shadow-2xl:   0 24px 64px rgba(0,0,0,0.12), 0 48px 120px rgba(0,0,0,0.1);
+
+  /* Glow shadows — brand-tinted */
+  --shadow-glow:           0 0 24px rgba(255, 188, 37, 0.25), 0 0 64px rgba(255, 188, 37, 0.08);
+  --shadow-glow-intense:   0 0 32px rgba(255, 188, 37, 0.4), 0 0 88px rgba(255, 188, 37, 0.15);
+  --shadow-glow-subtle:    0 0 16px rgba(255, 188, 37, 0.12), 0 0 48px rgba(255, 188, 37, 0.04);
+  --shadow-glow-pulse:     0 0 40px rgba(255, 188, 37, 0.35), 0 0 100px rgba(255, 188, 37, 0.12);
+
+  /* Semantic glow colors */
+  --shadow-glow-success:   0 0 24px rgba(16, 185, 129, 0.25), 0 0 64px rgba(16, 185, 129, 0.08);
+  --shadow-glow-error:     0 0 24px rgba(200, 62, 59, 0.25), 0 0 64px rgba(200, 62, 59, 0.08);
+  --shadow-glow-info:      0 0 24px rgba(37, 99, 235, 0.25), 0 0 64px rgba(37, 99, 235, 0.08);
+
+  /* Floating & elevated */
+  --shadow-float:    0 8px 32px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-elevated: 0 16px 48px rgba(0,0,0,0.1), 0 4px 16px rgba(0,0,0,0.06);
+
+  /* Interactive state shadows */
+  --shadow-hover:    0 8px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-active:   0 2px 8px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-focus:    0 0 0 3px rgba(255, 188, 37, 0.3);
+
+  /* Color-tinted shadows */
+  --shadow-tint-yellow:  0 8px 32px rgba(255, 188, 37, 0.15), 0 2px 8px rgba(255, 188, 37, 0.08);
+  --shadow-tint-blue:    0 8px 32px rgba(59, 130, 246, 0.15), 0 2px 8px rgba(59, 130, 246, 0.08);
+  --shadow-tint-green:   0 8px 32px rgba(16, 185, 129, 0.15), 0 2px 8px rgba(16, 185, 129, 0.08);
+
+  /* ══════════════════════════════════════════════════════════════
+     GLASS SURFACES — Fluid & Organic
+     ══════════════════════════════════════════════════════════════ */
+
+  --glass-blur:          blur(20px);
+  --glass-blur-light:    blur(12px);
+  --glass-blur-heavy:    blur(32px);
+  --glass-blur-hover:    blur(24px);
+  --glass-saturate:      saturate(1.6);
+  --glass-saturate-high: saturate(2.0);
+  --glass-bg-light:      rgba(255, 255, 255, 0.5);
+  --glass-bg-light-soft: rgba(255, 255, 255, 0.35);
+  --glass-bg-dark:       rgba(33, 35, 36, 0.6);
+  --glass-bg-dark-soft:  rgba(33, 35, 36, 0.4);
+  --glass-border:        rgba(255, 255, 255, 0.12);
+  --glass-border-hover:  rgba(255, 255, 255, 0.2);
+  --glass-highlight:     rgba(255, 255, 255, 0.1);
+  --glass-edge-glow:     rgba(255, 255, 255, 0.2);
+  --glass-noise-opacity: 0.03;
+
+  /* Glass tint presets */
+  --glass-tint-warm:     rgba(255, 175, 3, 0.05);
+  --glass-tint-cool:     rgba(59, 130, 246, 0.05);
+  --glass-tint-success:  rgba(16, 185, 129, 0.05);
+  --glass-tint-danger:   rgba(200, 62, 59, 0.05);
+
+  /* ══════════════════════════════════════════════════════════════
+     AMBIENT & EFFECTS
+     ══════════════════════════════════════════════════════════════ */
+
+  /* Cursor spotlight */
+  --spotlight-size:    200px;
+  --spotlight-color:   rgba(255, 188, 37, 0.05);
+  --spotlight-blur:    80px;
+
+  /* Ambient cycles */
+  --pulse-duration:    3s;
+  --breathe-duration:  8s;
+  --drift-duration:    25s;
+  --shimmer-duration:  1.5s;
+
+  /* Particle system tokens */
+  --particle-count:        12;
+  --particle-lifespan:     600ms;
+  --particle-spread:       360deg;
+  --particle-gravity:      0.3;
+  --particle-size-min:     4px;
+  --particle-size-max:     12px;
+  --particle-fade-start:   70%;
+
+  /* Confetti tokens */
+  --confetti-count:        20;
+  --confetti-lifespan:     1200ms;
+  --confetti-color-1:      var(--color-yellow-400);
+  --confetti-color-2:      var(--color-orange-300);
+  --confetti-color-3:      var(--color-brand);
+  --confetti-rotation:     720deg;
+
+  /* Sparkle tokens */
+  --sparkle-size:          6px;
+  --sparkle-duration:      800ms;
+  --sparkle-count:         6;
+  --sparkle-color:         rgba(255, 255, 255, 0.9);
+
+  /* Ripple effect */
+  --ripple-color:          rgba(255, 188, 37, 0.2);
+  --ripple-duration:       600ms;
+  --ripple-ease:           cubic-bezier(0, 0, 0.2, 1);
+
+  /* ══════════════════════════════════════════════════════════════
+     SCROLL CHOREOGRAPHY
+     ══════════════════════════════════════════════════════════════ */
+
+  --reveal-stagger:      80ms;
+  --reveal-duration:     700ms;
+  --cascade-bg:          0ms;
+  --cascade-title:       100ms;
+  --cascade-content:     200ms;
+  --cascade-cta:         300ms;
+
+  /* Parallax speed presets */
+  --parallax-far:        0.2;
+  --parallax-mid:        0.5;
+  --parallax-near:       0.8;
+  --parallax-hero:       0.3;
+
+  /* Scroll-linked effects */
+  --scroll-fade-distance: 100px;
+  --scroll-fade-min:      0.8;
+
+  /* ══════════════════════════════════════════════════════════════
+     Z-INDEX LAYERS
+     ══════════════════════════════════════════════════════════════ */
+
+  --z-base:      0;
+  --z-content:   10;
+  --z-glass:     20;
+  --z-sticky:    30;
+  --z-dropdown:  35;
+  --z-overlay:   40;
+  --z-modal:     50;
+  --z-toast:     60;
+  --z-cursor:    70;
+
+  /* ══════════════════════════════════════════════════════════════
+     ORGANIC SHAPES & FLUID DESIGN
+     ══════════════════════════════════════════════════════════════ */
+
+  --shape-blob-1: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+  --shape-blob-2: polygon(50% 0%, 80% 10%, 100% 35%, 100% 70%, 80% 90%, 50% 100%, 20% 90%, 0% 70%, 0% 35%, 20% 10%);
+  --shape-soft-rect: polygon(4% 0%, 96% 0%, 100% 4%, 100% 96%, 96% 100%, 4% 100%, 0% 96%, 0% 4%);
+  --shape-diamond: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  --shape-hexagon: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+
+  /* Organic border treatments */
+  --border-subtle: 1px solid rgba(0, 0, 0, 0.04);
+  --border-ghost:  1px solid rgba(0, 0, 0, 0.02);
+  --border-none:   none;
+
+  /* ══════════════════════════════════════════════════════════════
+     TRANSITION PRESETS — Ready-to-use combos
+     ══════════════════════════════════════════════════════════════ */
+
+  /* Hover lift — standard card/button hover */
+  --transition-hover-lift: transform var(--dur-short) var(--ease-smooth),
+                           box-shadow var(--dur-short) var(--ease-out);
+
+  /* Hover glow — CTA buttons */
+  --transition-hover-glow: box-shadow var(--dur-medium) var(--ease-out),
+                           transform var(--dur-short) var(--ease-spring);
+
+  /* Focus ring */
+  --transition-focus: box-shadow var(--dur-instant) var(--ease-out),
+                      border-color var(--dur-instant) var(--ease-out);
+
+  /* Page enter — dramatic */
+  --transition-page-enter: opacity var(--dur-hero) var(--ease-smooth),
+                           transform var(--dur-hero) var(--ease-dramatic);
+
+  /* Page exit — quick */
+  --transition-page-exit: opacity var(--dur-medium) var(--ease-exit),
+                          transform var(--dur-medium) var(--ease-exit-smooth);
+
+  /* Modal */
+  --transition-modal: opacity var(--dur-medium) var(--ease-out),
+                      transform var(--dur-medium) var(--ease-smooth);
+
+  /* Bottom sheet */
+  --transition-sheet-enter: transform var(--dur-long) var(--ease-smooth);
+  --transition-sheet-exit:  transform var(--dur-medium) var(--ease-out);
+
+  /* Stagger container — apply to parent, children inherit */
+  --transition-stagger: opacity var(--reveal-duration) var(--ease-smooth),
+                        transform var(--reveal-duration) var(--ease-smooth);
+
+  /* Skeleton shimmer */
+  --transition-shimmer: background-position var(--shimmer-duration) ease-in-out infinite;
+
+  /* ══════════════════════════════════════════════════════════════
+     REDUCED MOTION — Accessibility fallbacks
+     ══════════════════════════════════════════════════════════════ */
+
+  /* These are applied via @media (prefers-reduced-motion: reduce) */
+  --dur-reduced-instant: 0ms;
+  --dur-reduced-short:   0ms;
+  --dur-reduced-medium:  0ms;
+  --dur-reduced-long:    0ms;
+  --ease-reduced:        linear;
+  --stagger-reduced:     0ms;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DARK MODE — data-theme="dark" overrides
+   Introduced by the HRIS frontend (frontend/src/design/tokens.css);
+   not covered by earlier Lithium spec revisions. Toggle by setting
+   data-theme="dark" on a root ancestor element.
+   ══════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] {
+  /* Surface colors flip */
+  --color-gray-900:  #F0F0F0;
+  --color-gray-800:  #E0E0E0;
+  --color-gray-700:  #C0C0C0;
+  --color-gray-600:  #A0A0A0;
+  --color-gray-500:  #808080;
+  --color-gray-400:  #606060;
+  --color-gray-300:  #404040;
+  --color-gray-200:  #2A2A2A;
+  --color-gray-100:  #1E1E1E;
+  --color-gray-0:    #141414;
+
+  /* Semantic surface */
+  --color-on-surface:          #F0F0F0;
+  --color-on-surface-variant:  #A0A0A0;
+  --color-on-surface-muted:    #808080;
+  --color-surface:             #1A1A1A;
+  --color-surface-bright:      #222222;
+  --color-surface-disabled:    #2A2A2A;
+
+  --color-warning-container:   #2A2210;
+  --color-on-warning-container: #FFB700;
+  --color-error-container:     #2A1515;
+  --color-on-error-container:  #E57373;
+  --color-success-container:   #102A1A;
+  --color-on-success-container: #6EE7B7;
+  --color-info-container:      #151A2A;
+  --color-on-info-container:   #60A5FA;
+
+  --color-outline:             #404040;
+  --color-outline-variant:     #2A2A2A;
+  --color-section-bg:          #1A1A1A;
+  --color-page-bg:             #111111;
+  --color-bg-dark:             #F0F0F0;
+
+  /* CTA buttons — slightly brighter on dark */
+  --cta-primary-bg:       #FFBC25;
+  --cta-primary-text:     #1E1E1E;
+  --cta-secondary-border: #555555;
+  --cta-secondary-text:   #E0E0E0;
+  --cta-ghost-text:       #A0A0A0;
+  --cta-ghost-hover-bg:   #2A2A2A;
+
+  /* Shadows — more subtle on dark */
+  --shadow-sm:    0 2px 8px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.15);
+  --shadow-md:    0 4px 16px rgba(0,0,0,0.25), 0 8px 32px rgba(0,0,0,0.2);
+  --shadow-lg:    0 8px 32px rgba(0,0,0,0.3), 0 16px 48px rgba(0,0,0,0.25);
+
+  /* Glass surfaces */
+  --glass-bg-light:      rgba(30, 30, 30, 0.7);
+  --glass-bg-light-soft: rgba(30, 30, 30, 0.5);
+  --glass-border:        rgba(255, 255, 255, 0.06);
+
+  /* Borders */
+  --border-subtle: 1px solid rgba(255, 255, 255, 0.06);
+  --border-ghost:  1px solid rgba(255, 255, 255, 0.03);
+
+  /* View-level semantic tokens */
+  --li-text-muted:  #94a3b8;
+  --li-text-subtle: #64748b;
+  --li-border:      #333333;
+  --li-bg-card:     #1E1E1E;
+  --li-bg-code:     #2A2A2A;
+  --li-primary:     #60a5fa;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REDUCED MOTION MEDIA QUERY
+   Overrides all motion for users who prefer reduced motion
+   ══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-instant:    0ms;
+    --dur-micro:      0ms;
+    --dur-short:      0ms;
+    --dur-medium:     0ms;
+    --dur-long:       0ms;
+    --dur-hero:       0ms;
+    --dur-epic:       0ms;
+    --dur-cinematic:  0ms;
+    --stagger-fast:   0ms;
+    --stagger-normal: 0ms;
+    --stagger-slow:   0ms;
+    --reveal-stagger: 0ms;
+    --reveal-duration: 0ms;
+    --pulse-duration:  0ms;
+    --breathe-duration: 0ms;
+    --drift-duration:  0ms;
+    --shimmer-duration: 0ms;
+    --particle-lifespan: 0ms;
+    --confetti-lifespan: 0ms;
+    --sparkle-duration:  0ms;
+    --ripple-duration:   0ms;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   KEYFRAME ANIMATIONS — Reusable motion primitives
+   ══════════════════════════════════════════════════════════════ */
+
+@keyframes lith-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lith-fade-down {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lith-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes lith-scale-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes lith-slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes lith-slide-right {
+  from { transform: translateX(-30px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes lith-glow-pulse {
+  0%, 100% { box-shadow: var(--shadow-glow); }
+  50%      { box-shadow: var(--shadow-glow-intense); }
+}
+
+@keyframes lith-breathe {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 0.65; }
+}
+
+@keyframes lith-float {
+  0%, 100% { transform: translateY(0) translateZ(var(--translate-z-far)); }
+  50%      { transform: translateY(-8px) translateZ(var(--translate-z-far)); }
+}
+
+@keyframes lith-drift {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  33%  { transform: translate(10px, -15px) rotate(2deg); }
+  66%  { transform: translate(-8px, 10px) rotate(-1deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes lith-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes lith-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes lith-shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-4px); }
+  40%      { transform: translateX(4px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(2px); }
+}
+
+@keyframes lith-pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes lith-spring-in {
+  0%   { transform: scale(0.6); opacity: 0; }
+  50%  { transform: scale(1.08); opacity: 1; }
+  75%  { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+@keyframes lith-ripple-expand {
+  to { transform: scale(4); opacity: 0; }
+}
+
+@keyframes lith-confetti-fall {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100px) rotate(var(--confetti-rotation)); opacity: 0; }
+}
+
+@keyframes lith-sparkle {
+  0%, 100% { transform: scale(0) rotate(0deg); opacity: 0; }
+  50%      { transform: scale(1) rotate(180deg); opacity: 1; }
+}
+
+@keyframes lith-count-up-glow {
+  0%   { text-shadow: 0 0 0 rgba(255, 188, 37, 0); }
+  50%  { text-shadow: 0 0 16px rgba(255, 188, 37, 0.3); }
+  100% { text-shadow: 0 0 0 rgba(255, 188, 37, 0); }
+}
+
+@keyframes lith-orb-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25%      { transform: translate(30px, -20px) scale(1.05); }
+  50%      { transform: translate(-15px, 25px) scale(0.95); }
+  75%      { transform: translate(20px, 10px) scale(1.02); }
+}
+
+@keyframes lith-orb-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25%      { transform: translate(-25px, 15px) scale(0.98); }
+  50%      { transform: translate(20px, -30px) scale(1.04); }
+  75%      { transform: translate(-10px, -15px) scale(0.96); }
+}
+
+@keyframes lith-mesh-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+@keyframes lith-edge-glow {
+  0%, 100% { opacity: 0; }
+  50%      { opacity: 1; }
+}
+
+@keyframes lith-progress-fill {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+@keyframes lith-skeleton-wave {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
