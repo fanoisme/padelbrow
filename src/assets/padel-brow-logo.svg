@@ -1,0 +1,24 @@
+<svg viewBox="0 0 360 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pbGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD166"/>
+      <stop offset="100%" stop-color="#FFAF03"/>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="46" fill="url(#pbGrad2)" stroke="#333333" stroke-width="2.5"/>
+  <ellipse cx="44" cy="40" rx="17" ry="20" fill="none" stroke="#333333" stroke-width="3"/>
+  <g stroke="#333333" stroke-width="1.2" opacity="0.55">
+    <line x1="33" y1="27" x2="33" y2="53"/>
+    <line x1="39" y1="22" x2="39" y2="58"/>
+    <line x1="45" y1="20" x2="45" y2="60"/>
+    <line x1="51" y1="22" x2="51" y2="58"/>
+    <line x1="57" y1="27" x2="57" y2="53"/>
+    <line x1="28" y1="40" x2="60" y2="40"/>
+    <line x1="30" y1="33" x2="58" y2="33"/>
+    <line x1="30" y1="47" x2="58" y2="47"/>
+  </g>
+  <rect x="40" y="56" width="8" height="20" rx="4" fill="#333333"/>
+  <circle cx="68" cy="64" r="11" fill="#F5F0E6" stroke="#333333" stroke-width="2.5"/>
+  <text x="112" y="46" font-family="Inter, sans-serif" font-weight="800" font-size="30" fill="#333333">PADEL</text>
+  <text x="112" y="80" font-family="Inter, sans-serif" font-weight="800" font-size="30" fill="#FFAF03">BROW</text>
+</svg>

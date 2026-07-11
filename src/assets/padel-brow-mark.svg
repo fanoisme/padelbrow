@@ -1,0 +1,24 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pbGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD166"/>
+      <stop offset="100%" stop-color="#FFAF03"/>
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="58" fill="url(#pbGrad)" stroke="#333333" stroke-width="3"/>
+  <ellipse cx="52" cy="46" rx="22" ry="26" fill="none" stroke="#333333" stroke-width="4"/>
+  <g stroke="#333333" stroke-width="1.6" opacity="0.55">
+    <line x1="38" y1="30" x2="38" y2="62"/>
+    <line x1="46" y1="24" x2="46" y2="68"/>
+    <line x1="54" y1="22" x2="54" y2="70"/>
+    <line x1="62" y1="24" x2="62" y2="68"/>
+    <line x1="70" y1="30" x2="70" y2="62"/>
+    <line x1="32" y1="46" x2="72" y2="46"/>
+    <line x1="34" y1="38" x2="70" y2="38"/>
+    <line x1="34" y1="54" x2="70" y2="54"/>
+  </g>
+  <rect x="47" y="68" width="10" height="26" rx="5" fill="#333333"/>
+  <circle cx="82" cy="78" r="14" fill="#F5F0E6" stroke="#333333" stroke-width="3"/>
+  <path d="M72 72 Q82 78 72 84" fill="none" stroke="#333333" stroke-width="1.6"/>
+  <path d="M92 72 Q82 78 92 84" fill="none" stroke="#333333" stroke-width="1.6"/>
+</svg>
