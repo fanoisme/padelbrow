@@ -53,13 +53,22 @@ app-level checks.
 
 ### Identity
 - `profiles` (id = auth.users.id, full_name, avatar_url, phone, gender, birthdate,
-  skill_level, created_at)
+  skill_level, home_area — free-text city/area used for lightweight location-based player
+  discovery, created_at)
+- `blocks` (blocker_id, blocked_id, created_at) — PK (blocker_id, blocked_id); blocked users'
+  content/DMs/invites are filtered out by RLS + query-level exclusion.
 
 ### Clubs
 - `clubs` (id, name, slug unique, avatar_url, description, visibility: public|private,
   owner_id → profiles, created_at)
 - `club_members` (club_id, user_id, role: owner|organizer|member, tags text[], joined_at) —
   PK (club_id, user_id)
+- `club_memberships` (id, club_id, name, price, period: monthly|quarterly|annual,
+  perks jsonb, created_at) — recurring pass tiers a club can offer (e.g. priority slot
+  booking, fee discount).
+- `club_membership_subscriptions` (id, membership_id, user_id, status: active|expired|
+  cancelled, started_at, expires_at, payment_id → `payments`) — renewal is manual
+  proof-of-payment like everything else in Phase 5, just recurring.
 
 ### Meets
 - `meets` (id, club_id nullable, creator_id, sport: padel|billiards|football|…,
@@ -70,8 +79,12 @@ app-level checks.
   auto_approve bool, allow_plus_one bool, notes text, status: scheduled|completed|cancelled,
   created_at)
 - `meet_participants` (id, meet_id, user_id, role: organizer|player,
-  status: confirmed|waitlisted|invited|declined, is_plus_one bool, joined_at,
-  payment_status: none|pending|proof_uploaded|confirmed)
+  status: confirmed|waitlisted|invited|declined, invited_by nullable → profiles,
+  is_plus_one bool, joined_at, payment_status: none|pending|proof_uploaded|confirmed) —
+  `invited_by` lets an organizer query their own invite history/response-rate across meets.
+- `meet_polls` (id, meet_id, question, type: mvp_vote|best_moment|custom, closes_at,
+  created_at) + `meet_poll_votes` (poll_id, voter_id, choice_user_id nullable,
+  choice_text nullable) — PK (poll_id, voter_id), one vote per user per poll.
 
 ### Match engine
 - `match_sessions` (id, meet_id, format: americano|mexicano|team_americano|singles,
@@ -93,9 +106,16 @@ app-level checks.
   team_b_id, score_a, score_b, court, scheduled_at, status)
 
 ### Payments
-- `payments` (id, meet_id nullable, competition_id nullable, user_id, amount,
-  proof_url — Supabase Storage path, status: pending|confirmed|rejected, confirmed_by,
-  confirmed_at, created_at)
+- `meet_expenses` (id, meet_id, label — e.g. "Court fee", "Ball rental", total_amount,
+  split_method: equal|custom, created_at) — an itemized cost to divide among participants.
+- `meet_expense_shares` (id, meet_expense_id, user_id, amount_owed) — one row per
+  participant per expense; equal split computes `amount_owed` at creation, custom split is
+  entered manually by the organizer.
+- `payments` (id, meet_id nullable, competition_id nullable, membership_subscription_id
+  nullable, expense_share_id nullable, user_id, amount, proof_url — Supabase Storage path,
+  status: pending|confirmed|rejected, confirmed_by, confirmed_at, created_at) — the actual
+  settle-up record (proof upload + organizer confirmation) against any of: a meet's flat fee,
+  a specific `meet_expense_shares` row, a competition fee, or a membership renewal.
 
 ### Feed (rich)
 - `feed_posts` (id, club_id nullable, meet_id nullable, author_id, caption,
@@ -112,6 +132,14 @@ app-level checks.
 ### Chat
 - `chat_messages` (id, meet_id, author_id, body, created_at) — realtime via Supabase
   Realtime (Postgres changes) on this table, one channel per meet.
+- `dm_threads` (id, user_a, user_b, created_at) — one thread per unordered pair of users —
+  and `dm_messages` (id, thread_id, author_id, body, created_at), same Realtime pattern as
+  `chat_messages`. Blocked users (`blocks`) cannot open/send to a thread.
+
+### Moderation
+- `reports` (id, reporter_id, target_type: feed_post|feed_comment|chat_message|dm_message|
+  user, target_id, reason, status: pending|reviewed|actioned, created_at) — club
+  owners/organizers (for club-scoped content) or the target user's reports review queue.
 
 ### Stats / Leaderboard
 No dedicated stats table — always derived via SQL views / RPC functions over
@@ -119,10 +147,13 @@ No dedicated stats table — always derived via SQL views / RPC functions over
 points won, win %, points %, score differential. Scoped per club, per meet, or global.
 
 ### Skill Rating
-- `player_ratings` (user_id, rating numeric, matches_played, last_updated) — Elo-style rating,
-  updated by a Postgres trigger/RPC whenever a `matches` row gets a final score. Backs the
-  `min_level`/`max_level` filters on meets with a real, moving number instead of a static
-  self-reported field.
+- `player_ratings` (user_id, rating numeric, matches_played, reliability_pct, last_updated) —
+  Elo-style rating, updated by a Postgres trigger/RPC whenever a `matches` row gets a final
+  score. Backs the `min_level`/`max_level` filters on meets with a real, moving number instead
+  of a static self-reported field. `reliability_pct` climbs asymptotically with
+  `matches_played` (e.g. towards 100% around ~20-30 logged matches) and is shown next to the
+  rating so others can tell "provisional" from "stable" (mirrors Playtomic's reliability
+  concept).
 
 ### Social / Network
 - `follows` (follower_id, followee_id, created_at) — PK (follower_id, followee_id). Powers
@@ -190,11 +221,14 @@ toggle, organizers, confirmed/waitlisted list with tags) / **Matches** (match en
 - Standings view: sortable by wins / points / win% / points% (`By Wins`, `By Points`, etc.),
   each row shows wins (and match count), score differential.
 
-### Payments (manual proof-of-payment)
-Organizer sets a fee on the meet/competition. Participant uploads a payment proof image to
-Supabase Storage; a `payments` row is created as `pending`. Organizer reviews and marks
-`confirmed`/`rejected` from the Participants panel. `meet_participants.payment_status`
-mirrors this for quick list rendering.
+### Payments (manual proof-of-payment + split)
+Organizer sets a fee on the meet/competition, and/or adds itemized `meet_expenses` (court
+fee, ball rental, extra guest fee) split equally or custom across participants, producing
+`meet_expense_shares`. Each participant uploads a payment proof image to Supabase Storage
+against their flat fee or their specific share; a `payments` row is created as `pending`.
+Organizer reviews and marks `confirmed`/`rejected` from the Participants panel, with an
+outstanding-balance view (who's settled, who hasn't) and a one-tap reminder
+(creates a `notifications` row for that user).
 
 ### Competitions (formal tournaments)
 Separate creation flow from Meet: name, format (single/double elimination, round robin, or
@@ -265,6 +299,45 @@ installability and a standalone display mode.
   record against a specific opponent.
 - **MVP per meet:** auto-computed and highlighted on the meet's Matches tab once the session
   completes.
+- **MVP vote / best-moment poll:** organizer can additionally open a `meet_polls` vote (e.g.
+  "who was tonight's MVP?", "best moment") once the meet completes — a community-voted
+  complement to the auto-computed MVP, not a replacement.
+
+### Reliability score
+Shown alongside skill rating everywhere it appears (profile, meet min/max level filter,
+player discovery) as a small "provisional"/"stable" indicator so a brand-new player's
+untested rating isn't weighted the same as someone with 30 logged matches.
+
+### Player discovery
+A directory view lets players search/filter other players by skill-level range and
+`home_area`, independent of any specific club or meet — for finding a new partner or
+opponent. Respects `blocks` (blocked users excluded both ways).
+
+### Direct messages
+1:1 chat (`dm_threads`/`dm_messages`, Realtime) reachable from a player's profile — separate
+from per-meet group chat. Blocked users can't start or continue a thread.
+
+### Invite tracking
+Because `meet_participants.invited_by` is recorded, an organizer's profile/club dashboard can
+show "people I've invited" with their latest response (joined/declined/no response) across
+all their meets, so they know who to invite again vs. skip next time.
+
+### Next booking home widget
+The home screen surfaces a single "Up Next" card for the user's soonest confirmed meet
+(date/time, venue, quick link into the meet) above the full list — no need to scroll/search
+for something you already know you're attending.
+
+### Membership / recurring pass
+A club can define `club_memberships` (e.g. "Monthly Regular — Rp150.000/month — priority
+RSVP + 10% meet fee discount"). Members subscribe (`club_membership_subscriptions`), paying
+via the same manual proof-of-payment flow, renewed manually each period (no recurring-billing
+automation — consistent with no payment-gateway integration).
+
+### Report & block
+Any feed post/comment, chat message, DM message, or user profile can be reported
+(`reports`), landing in a review queue for the relevant club's owner/organizer (club-scoped
+content) or a lightweight self-service block for direct harassment (`blocks` — hides that
+user's content/DMs/invites immediately, no review needed).
 
 ## 5. Build Phases
 
@@ -275,20 +348,25 @@ architecture/data model, detailed phase specs are written just-in-time as each p
    project wiring (schema + RLS baseline), Lithium design system port, Allo Bank branding +
    new PADEL BROW logo design, base nav/layout, hash-mode router, PWA manifest/installability.
 2. **Identity & Clubs** — auth (email + Google), profile, create/browse/join clubs, roles,
-   My Network (follow players, see their upcoming meets).
+   My Network (follow players, see their upcoming meets), player discovery (level + area
+   search), club memberships/recurring passes.
 3. **Meets** — create-meet wizard, meet detail (Details/Participants/Chat), RSVP/waitlist,
-   in-app notifications, search/filter meets, add-to-calendar export, shareable public link.
+   in-app notifications, search/filter meets, add-to-calendar export, shareable public link,
+   "Up Next" home widget, direct messages, invite tracking.
 4. **Match Engine** — Americano/Mexicano/Team Americano/Singles generator, courts, live
-   scoring, standings, skill rating updates, share-match-result image, TV/big-screen mode.
-5. **Payments** — fee config, proof-of-payment upload, organizer confirmation.
+   scoring, standings, skill rating + reliability score updates, share-match-result image,
+   TV/big-screen mode.
+5. **Payments** — fee config, itemized/split expenses, proof-of-payment upload, organizer
+   confirmation + outstanding-balance reminders.
 6. **Competitions** — registration, seeding, bracket/draw, multi-day tracking, shareable
    public link + TV mode reused from Phase 3/4.
-7. **Feed** — rich posts (photo/video), likes, comments, per-club and global feed.
+7. **Feed** — rich posts (photo/video), likes, comments, per-club and global feed, report &
+   block (covers feed/chat/DM content by this point).
 8. **Stats, History & Leaderboard Export** — aggregate stats, personal history, podium-style
    leaderboard export.
 9. **Advanced Gamification** — XP & levels, tiered achievements with unlock animations,
    weekly/monthly challenges, seasonal + all-time leaderboards, head-to-head rivalry stats,
-   MVP per meet.
+   MVP per meet + MVP/best-moment voting.
 
 ## 6. Non-Goals (for now)
 
