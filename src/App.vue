@@ -1,5 +1,5 @@
 <template>
-  <div id="app-root">PADEL BROW</div>
+  <router-view />
 </template>
 
 <script setup></script>
