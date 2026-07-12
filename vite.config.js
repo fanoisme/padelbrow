@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/padelbroowww/',
+  base: '/padelbrow/',
   plugins: [
     vue(),
     VitePWA({
@@ -16,8 +16,8 @@ export default defineConfig({
         theme_color: '#FFAF03',
         background_color: '#FFFFFF',
         display: 'standalone',
-        start_url: '/padelbroowww/#/',
-        scope: '/padelbroowww/',
+        start_url: '/padelbrow/#/',
+        scope: '/padelbrow/',
         icons: [
           { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' }
