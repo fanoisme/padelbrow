@@ -913,6 +913,7 @@ git commit -m "Add ProfileView and profile route"
 **Files:**
 - Modify: `src/layouts/AppLayout.vue`
 - Modify: `src/layouts/AppLayout.spec.js`
+- Modify: `src/App.spec.js` (fixes a transitive regression this task introduces — see Step 4)
 
 **Interfaces:**
 - Consumes: `useAuth()` (Task 1).
@@ -924,22 +925,26 @@ git commit -m "Add ProfileView and profile route"
 ```js
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { ref } from 'vue'
 import AppLayout from './AppLayout.vue'
 
 const signOut = vi.fn().mockResolvedValue()
+// Renders slot content so link text is visible in wrapper.text() — the
+// default `RouterLink: true` stub does not render its default slot.
+const RouterLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
 
 vi.mock('../composables/useAuth.js', () => ({
-  useAuth: vi.fn(() => ({ user: { value: null }, signOut })),
+  useAuth: vi.fn(() => ({ user: ref(null), signOut })),
 }))
 
 import { useAuth } from '../composables/useAuth.js'
 
 describe('AppLayout', () => {
   it('renders the PADEL BROW mark, Allo Bank logo, title, and slot content', () => {
-    useAuth.mockReturnValue({ user: { value: null }, signOut })
+    useAuth.mockReturnValue({ user: ref(null), signOut })
     const wrapper = mount(AppLayout, {
       slots: { default: '<p>page content</p>' },
-      global: { stubs: { RouterLink: true } },
+      global: { stubs: { RouterLink: RouterLinkStub } },
     })
     expect(wrapper.text()).toContain('PADEL BROW')
     expect(wrapper.find('img.app-header__mark').exists()).toBe(true)
@@ -948,14 +953,14 @@ describe('AppLayout', () => {
   })
 
   it('shows a sign-in link when logged out', () => {
-    useAuth.mockReturnValue({ user: { value: null }, signOut })
-    const wrapper = mount(AppLayout, { global: { stubs: { RouterLink: true } } })
+    useAuth.mockReturnValue({ user: ref(null), signOut })
+    const wrapper = mount(AppLayout, { global: { stubs: { RouterLink: RouterLinkStub } } })
     expect(wrapper.text()).toContain('Sign in')
   })
 
   it('shows nav links and a sign-out button when logged in', () => {
-    useAuth.mockReturnValue({ user: { value: { id: 'u1' } }, signOut })
-    const wrapper = mount(AppLayout, { global: { stubs: { RouterLink: true } } })
+    useAuth.mockReturnValue({ user: ref({ id: 'u1' }), signOut })
+    const wrapper = mount(AppLayout, { global: { stubs: { RouterLink: RouterLinkStub } } })
     expect(wrapper.text()).toContain('Clubs')
     expect(wrapper.text()).toContain('Network')
     expect(wrapper.text()).toContain('Profile')
@@ -963,6 +968,8 @@ describe('AppLayout', () => {
   })
 })
 ```
+
+**Note on the mock shape:** `useAuth()` returns a real Vue `ref` for `user` in production, and Vue templates auto-unwrap top-level refs referenced directly (`v-if="user"` behaves as `v-if="user.value"`). The mock must return an actual `ref(...)`, not a plain `{ value: ... }` object, or `v-if="user"` will always be truthy (a plain object is truthy regardless of its `.value`).
 
 - [ ] **Step 2: Run test to verify it fails**
 
@@ -1061,20 +1068,51 @@ async function handleSignOut() {
 </style>
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [ ] **Step 4: Fix the transitive `App.spec.js` regression**
+
+`AppLayout.vue` now imports `useAuth.js`, which imports the real `src/lib/supabase.js` client. `src/App.spec.js` mounts `App` (which renders `AppLayout`) without mocking either, so it will now fail with "Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY" (the real client throws at import time when env vars are unset, which they are in this repo/CI). Fix by mocking `useAuth.js` in `App.spec.js` the same way `AppLayout.spec.js` does. Replace `src/App.spec.js` with:
+
+```js
+import { describe, it, expect, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
+import { createRouter, createWebHashHistory } from 'vue-router'
+import { ref } from 'vue'
+import HomeView from './views/HomeView.vue'
+
+vi.mock('./composables/useAuth.js', () => ({
+  useAuth: vi.fn(() => ({ user: ref(null), signOut: vi.fn() })),
+}))
+
+import App from './App.vue'
+
+describe('App', () => {
+  it('renders the home view through the router', async () => {
+    const router = createRouter({
+      history: createWebHashHistory(),
+      routes: [{ path: '/', name: 'home', component: HomeView }]
+    })
+    router.push('/')
+    await router.isReady()
+    const wrapper = mount(App, { global: { plugins: [router] } })
+    expect(wrapper.text()).toContain('Welcome to PADEL BROW')
+  })
+})
+```
+
+- [ ] **Step 5: Run tests to verify they pass**
 
 Run: `npm test`
-Expected: PASS.
+Expected: PASS — full suite, including the fixed `App.spec.js`.
 
-- [ ] **Step 5: Verify the build still works**
+- [ ] **Step 6: Verify the build still works**
 
 Run: `npm run build`
 Expected: exits 0.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add src/layouts/AppLayout.vue src/layouts/AppLayout.spec.js
+git add src/layouts/AppLayout.vue src/layouts/AppLayout.spec.js src/App.spec.js
 git commit -m "Add auth-aware navigation to AppLayout"
 ```
 
