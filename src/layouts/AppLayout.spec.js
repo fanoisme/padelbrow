@@ -19,7 +19,7 @@ describe('AppLayout', () => {
     useAuth.mockReturnValue({ user: ref(null), signOut })
     const wrapper = mount(AppLayout, {
       slots: { default: '<p>page content</p>' },
-      global: { stubs: { RouterLink: RouterLinkStub } },
+      global: { stubs: { RouterLink: RouterLinkStub, NotificationsBell: true } },
     })
     expect(wrapper.text()).toContain('PADEL BROW')
     expect(wrapper.find('img.app-header__mark').exists()).toBe(true)
@@ -29,13 +29,13 @@ describe('AppLayout', () => {
 
   it('shows a sign-in link when logged out', () => {
     useAuth.mockReturnValue({ user: ref(null), signOut })
-    const wrapper = mount(AppLayout, { global: { stubs: { RouterLink: RouterLinkStub } } })
+    const wrapper = mount(AppLayout, { global: { stubs: { RouterLink: RouterLinkStub, NotificationsBell: true } } })
     expect(wrapper.text()).toContain('Sign in')
   })
 
   it('shows nav links and a sign-out button when logged in', () => {
     useAuth.mockReturnValue({ user: ref({ id: 'u1' }), signOut })
-    const wrapper = mount(AppLayout, { global: { stubs: { RouterLink: RouterLinkStub } } })
+    const wrapper = mount(AppLayout, { global: { stubs: { RouterLink: RouterLinkStub, NotificationsBell: true } } })
     expect(wrapper.text()).toContain('Clubs')
     expect(wrapper.text()).toContain('Network')
     expect(wrapper.text()).toContain('Profile')

@@ -8,6 +8,7 @@
         <router-link to="/clubs">Clubs</router-link>
         <router-link to="/network">Network</router-link>
         <router-link to="/profile">Profile</router-link>
+        <NotificationsBell />
         <button class="app-header__signout" @click="handleSignOut">Sign out</button>
       </nav>
       <nav v-else class="app-header__nav">
@@ -23,6 +24,7 @@
 
 <script setup>
 import { useAuth } from '../composables/useAuth.js'
+import NotificationsBell from '../components/notifications/NotificationsBell.vue'
 
 const { user, signOut } = useAuth()
 
