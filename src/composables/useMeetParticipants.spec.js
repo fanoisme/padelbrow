@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-vi.mock('../lib/supabase.js', () => ({ supabase: { from: vi.fn() } }))
+vi.mock('../lib/supabase.js', () => ({ supabase: { from: vi.fn(), rpc: vi.fn() } }))
 
 import { supabase } from '../lib/supabase.js'
 import { useMeetParticipants } from './useMeetParticipants.js'
@@ -54,31 +54,48 @@ describe('useMeetParticipants', () => {
     expect(result).toEqual({ id: 'p2', status: 'waitlisted' })
   })
 
-  it('promoteNext updates the earliest waitlisted participant to confirmed', async () => {
-    // Impl does two calls: a find (select→eq→eq→order→limit→maybeSingle) then an
-    // update (update→eq→select→single). from() exposes both .select and .update.
-    const maybeSingle = vi.fn().mockResolvedValue({ data: { id: 'p3' }, error: null })
-    const limit = vi.fn(() => ({ maybeSingle }))
-    const order = vi.fn(() => ({ limit }))
-    const statusEq = vi.fn(() => ({ order }))
-    const eq = vi.fn(() => ({ eq: statusEq }))
-    const select = vi.fn(() => ({ eq }))
+  it('joinMeet falls back to waitlisted when a confirmed insert is rejected by the capacity race', async () => {
+    // count=3 looks like there's room, but the confirmed insert rejects (the DB
+    // capacity trigger caught a concurrent filler). joinMeet retries as waitlisted.
+    const countEq2 = vi.fn().mockResolvedValue({ count: 3, error: null })
+    const countEq = vi.fn(() => ({ eq: countEq2 }))
+    const countSelect = vi.fn(() => ({ eq: countEq }))
 
-    const updateSingle = vi.fn().mockResolvedValue({ data: { id: 'p3', status: 'confirmed' }, error: null })
-    const updateSelect = vi.fn(() => ({ single: updateSingle }))
-    const updateEq = vi.fn(() => ({ select: updateSelect }))
-    const update = vi.fn(() => ({ eq: updateEq }))
+    let insertCall = 0
+    const pSingle = vi.fn().mockImplementation(() => {
+      insertCall += 1
+      if (insertCall === 1) return Promise.resolve({ data: null, error: { message: 'Meet is at capacity' } })
+      return Promise.resolve({ data: { id: 'p2', status: 'waitlisted' }, error: null })
+    })
+    const pSelect = vi.fn(() => ({ single: pSingle }))
+    const pInsert = vi.fn(() => ({ select: pSelect }))
 
-    supabase.from.mockReturnValue({ select, update })
+    supabase.from.mockReturnValue({ select: countSelect, insert: pInsert })
+
+    const { joinMeet } = useMeetParticipants()
+    const result = await joinMeet({ id: 'm1', max_players: 4 }, 'u9')
+
+    expect(pInsert).toHaveBeenNthCalledWith(1, { meet_id: 'm1', user_id: 'u9', role: 'player', status: 'confirmed' })
+    expect(pInsert).toHaveBeenNthCalledWith(2, { meet_id: 'm1', user_id: 'u9', role: 'player', status: 'waitlisted' })
+    expect(result).toEqual({ id: 'p2', status: 'waitlisted' })
+  })
+
+  it('promoteNext calls the promote_next_meet_participant RPC and returns the promoted row', async () => {
+    supabase.rpc.mockResolvedValue({ data: { id: 'p3', status: 'confirmed' }, error: null })
 
     const { promoteNext } = useMeetParticipants()
     const result = await promoteNext('m1')
 
-    expect(eq).toHaveBeenCalledWith('meet_id', 'm1')
-    expect(statusEq).toHaveBeenCalledWith('status', 'waitlisted')
-    expect(order).toHaveBeenCalledWith('joined_at', { ascending: true })
-    expect(limit).toHaveBeenCalledWith(1)
-    expect(update).toHaveBeenCalledWith({ status: 'confirmed' })
+    expect(supabase.rpc).toHaveBeenCalledWith('promote_next_meet_participant', { p_meet_id: 'm1' })
     expect(result).toEqual({ id: 'p3', status: 'confirmed' })
+  })
+
+  it('promoteNext returns null when the RPC finds no one to promote', async () => {
+    supabase.rpc.mockResolvedValue({ data: null, error: null })
+
+    const { promoteNext } = useMeetParticipants()
+    const result = await promoteNext('m1')
+
+    expect(result).toBeNull()
   })
 })

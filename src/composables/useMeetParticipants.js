@@ -21,16 +21,30 @@ export function useMeetParticipants() {
     return count ?? 0
   }
 
-  async function joinMeet(meet, userId) {
-    const confirmed = await countConfirmed(meet.id)
-    const status = confirmed < (meet.max_players ?? 4) ? 'confirmed' : 'waitlisted'
+  async function insertParticipant(meetId, userId, status) {
     const { data, error } = await supabase
       .from('meet_participants')
-      .insert({ meet_id: meet.id, user_id: userId, role: 'player', status })
+      .insert({ meet_id: meetId, user_id: userId, role: 'player', status })
       .select()
       .single()
     if (error) throw error
     return data
+  }
+
+  async function joinMeet(meet, userId) {
+    const confirmed = await countConfirmed(meet.id)
+    const preferred = confirmed < (meet.max_players ?? 4) ? 'confirmed' : 'waitlisted'
+    try {
+      return await insertParticipant(meet.id, userId, preferred)
+    } catch (err) {
+      // Race: another user took the last confirmed slot between our count and
+      // insert (the DB capacity trigger rejected the over-fill). Fall back to
+      // waitlisted rather than surfacing a capacity error to the user.
+      if (preferred === 'confirmed') {
+        return await insertParticipant(meet.id, userId, 'waitlisted')
+      }
+      throw err
+    }
   }
 
   async function leaveMeet(meetId, userId) {
@@ -57,27 +71,11 @@ export function useMeetParticipants() {
   }
 
   async function promoteNext(meetId) {
-    // Update the earliest waitlisted participant to confirmed. Using an
-    // update-through-select: select the one earliest waitlisted row, then
-    // update by its key. Supabase's builder doesn't support UPDATE ... WHERE
-    // id IN (SELECT ...) directly, so we read-then-update by id.
-    const { data: next, error: findErr } = await supabase
-      .from('meet_participants')
-      .select('id')
-      .eq('meet_id', meetId)
-      .eq('status', 'waitlisted')
-      .order('joined_at', { ascending: true })
-      .limit(1)
-      .maybeSingle()
-    if (findErr) throw findErr
-    if (!next) return null
-
-    const { data, error } = await supabase
-      .from('meet_participants')
-      .update({ status: 'confirmed' })
-      .eq('id', next.id)
-      .select()
-      .single()
+    // Server-side atomic promotion via SECURITY DEFINER RPC: only promotes if
+    // confirmed < max_players, and runs as the table owner so a non-creator
+    // leaver can promote another user's waitlisted row (the tightened update
+    // policy otherwise blocks that). Returns the promoted row or null.
+    const { data, error } = await supabase.rpc('promote_next_meet_participant', { p_meet_id: meetId })
     if (error) throw error
     return data
   }
