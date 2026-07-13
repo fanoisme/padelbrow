@@ -15,3 +15,16 @@ if (typeof window !== 'undefined' && !window.matchMedia) {
     }
   }
 }
+
+// jsdom also lacks IntersectionObserver, which LiRevealOnScroll uses to reveal
+// content on scroll. Polyfill: fire isIntersecting immediately so above-the-fold
+// content renders visible in tests.
+if (typeof window !== 'undefined' && !window.IntersectionObserver) {
+  window.IntersectionObserver = class IntersectionObserver {
+    constructor(cb) { this.cb = cb }
+    observe(el) { this.cb([{ isIntersecting: true, target: el }], this) }
+    unobserve() {}
+    disconnect() {}
+    takeRecords() { return [] }
+  }
+}

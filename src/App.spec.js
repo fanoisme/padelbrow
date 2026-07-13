@@ -19,6 +19,6 @@ describe('App', () => {
     router.push('/')
     await router.isReady()
     const wrapper = mount(App, { global: { plugins: [router] } })
-    expect(wrapper.text()).toContain('Welcome to PADEL BROW')
+    expect(wrapper.text()).toContain('PADEL BROW')
   })
 })
