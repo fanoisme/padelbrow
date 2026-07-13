@@ -5,6 +5,7 @@ import LoginView from '../views/auth/LoginView.vue'
 import SignUpView from '../views/auth/SignUpView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import ClubsView from '../views/ClubsView.vue'
+import ClubDetailView from '../views/ClubDetailView.vue'
 import { useAuth } from '../composables/useAuth.js'
 
 const router = createRouter({
@@ -15,6 +16,7 @@ const router = createRouter({
     { path: '/signup', name: 'signup', component: SignUpView },
     { path: '/profile', name: 'profile', component: ProfileView, meta: { requiresAuth: true } },
     { path: '/clubs', name: 'clubs', component: ClubsView, meta: { requiresAuth: true } },
+    { path: '/clubs/:id', name: 'club-detail', component: ClubDetailView, meta: { requiresAuth: true } },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundView }
   ]
 })
