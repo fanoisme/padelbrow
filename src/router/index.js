@@ -11,6 +11,7 @@ const router = createRouter({
     { path: '/clubs', name: 'clubs', component: () => import('../views/ClubsView.vue'), meta: { requiresAuth: true } },
     { path: '/clubs/:id', name: 'club-detail', component: () => import('../views/ClubDetailView.vue'), meta: { requiresAuth: true } },
     { path: '/network', name: 'network', component: () => import('../views/NetworkView.vue'), meta: { requiresAuth: true } },
+    { path: '/meets', name: 'meets', component: () => import('../views/meets/MeetsListView.vue'), meta: { requiresAuth: true } },
     { path: '/meets/new', name: 'meet-new', component: () => import('../views/meets/CreateMeetView.vue'), meta: { requiresAuth: true } },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('../views/NotFoundView.vue') }
   ]
