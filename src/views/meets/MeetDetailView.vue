@@ -27,13 +27,19 @@
         </ul>
       </div>
 
-      <!-- Matches (Phase 4 placeholder) -->
+      <!-- Payments -->
       <div v-show="activeTab === 2">
+        <ExpensesPanel :meet-id="meet.id" :is-organizer="isOrganizer" />
+        <PaymentsPanel :meet-id="meet.id" :is-organizer="isOrganizer" :fee-amount="meet.fee_amount" />
+      </div>
+
+      <!-- Matches (Phase 4 placeholder) -->
+      <div v-show="activeTab === 3">
         <LiEmptyState title="Matches open in Phase 4" icon="trophy" />
       </div>
 
       <!-- Chat -->
-      <div v-show="activeTab === 3">
+      <div v-show="activeTab === 4">
         <MeetChat :meet-id="meet.id" />
       </div>
     </div>
@@ -48,6 +54,8 @@ import { useAuth } from '../../composables/useAuth.js'
 import { useMeets } from '../../composables/useMeets.js'
 import { useMeetParticipants } from '../../composables/useMeetParticipants.js'
 import MeetChat from '../../components/meets/MeetChat.vue'
+import ExpensesPanel from '../../components/payments/ExpensesPanel.vue'
+import PaymentsPanel from '../../components/payments/PaymentsPanel.vue'
 
 const route = useRoute()
 const { user } = useAuth()
@@ -61,6 +69,7 @@ const activeTab = ref(0)
 const tabs = [
   { label: 'Details' },
   { label: 'Participants' },
+  { label: 'Payments' },
   { label: 'Matches' },
   { label: 'Chat' },
 ]
@@ -70,6 +79,8 @@ const myParticipation = computed(() => {
   if (!mine) return 'none'
   return mine.status
 })
+
+const isOrganizer = computed(() => meet.value?.creator_id === user.value?.id)
 
 async function reloadParticipants() {
   participants.value = await listParticipants(route.params.id)

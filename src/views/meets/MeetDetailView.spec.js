@@ -25,6 +25,28 @@ vi.mock('../../composables/useChat.js', () => ({
   useChat: vi.fn(() => ({ messages: ref([]), send: vi.fn(), subscribe: () => () => {} })),
 }))
 
+vi.mock('../../composables/useExpenses.js', () => ({
+  useExpenses: vi.fn(() => ({
+    addExpense: vi.fn(),
+    listExpensesWithShares: vi.fn().mockResolvedValue([]),
+    deleteExpense: vi.fn(),
+  })),
+}))
+
+vi.mock('../../composables/usePayments.js', () => ({
+  usePayments: vi.fn(() => ({
+    createPayment: vi.fn(),
+    listPaymentsForMeet: vi.fn().mockResolvedValue([]),
+    confirmPayment: vi.fn(),
+    rejectPayment: vi.fn(),
+    remindUser: vi.fn(),
+  })),
+}))
+
+vi.mock('../../composables/useStorage.js', () => ({
+  useStorage: vi.fn(() => ({ uploadPaymentProof: vi.fn(), uploadFeedMedia: vi.fn() })),
+}))
+
 import MeetDetailView from './MeetDetailView.vue'
 
 describe('MeetDetailView', () => {
