@@ -32,7 +32,7 @@ describe('NetworkView', () => {
   it('searches players and shows a Follow button for each result', async () => {
     const wrapper = mount(NetworkView)
     await flushPromises()
-    await wrapper.find('input[data-testid="discovery-search"]').setValue('Dio')
+    await wrapper.find('input[placeholder="Search by area..."]').setValue('Dio')
     await wrapper.find('form[data-testid="discovery-form"]').trigger('submit')
     await flushPromises()
     expect(searchPlayers).toHaveBeenCalledWith(expect.objectContaining({ currentUserId: 'u1' }))

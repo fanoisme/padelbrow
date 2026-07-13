@@ -7,10 +7,9 @@
         <slot name="prefix">{{ prefix }}</slot>
       </span>
       
-      <textarea
+      <textarea 
         v-if="type === 'area'"
         ref="inputRef"
-        v-bind="$attrs"
         class="li-textfield-input li-textfield-textarea"
         :value="modelValue"
         :placeholder="placeholder"
@@ -20,10 +19,9 @@
         @focus="onFocus"
         @blur="onBlur"
       ></textarea>
-      <input
+      <input 
         v-else
         ref="inputRef"
-        v-bind="$attrs"
         class="li-textfield-input"
         :type="type"
         :value="modelValue"
@@ -47,8 +45,6 @@
 
 <script setup>
 import { ref } from 'vue';
-
-defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
   modelValue: [String, Number],

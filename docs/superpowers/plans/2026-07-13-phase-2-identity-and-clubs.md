@@ -12,6 +12,7 @@
 
 - Vue 3 Composition API with `<script setup>` for every component (per spec §2).
 - Never hardcode colors/spacing/radius outside `var(--token-name, <fallback>)` — use `Li*` components from `src/design-system/components/index.js` wherever one fits, rather than building raw HTML controls.
+- Never edit files under `src/design-system/` (the vendored Lithium library) to satisfy a test selector or page-specific need — if a test can't select what it needs through a `Li*` component's existing props/DOM (e.g. `LiTextField` doesn't forward extra attributes like `data-testid` to its inner `<input>`, only its own declared props), change the test's selector strategy (e.g. select by `placeholder`, by a wrapping element, or via `findComponent`) instead of adding `inheritAttrs: false`/`v-bind="$attrs"` or any other edit to the vendored component.
 - All database access goes through `src/lib/supabase.js`'s exported `supabase` client — RLS on the Supabase side is the real security boundary, so composables don't need to re-implement authorization checks the database already enforces (e.g. don't bother client-side-checking "am I the club owner" before calling an update — let a failed RLS policy surface as a Postgres error instead).
 - Router stays in hash mode (`createWebHashHistory`, already set up in `src/router/index.js`).
 - Existing files not to break: `src/App.vue`, `src/main.js`, `src/layouts/AppLayout.vue`, `src/router/index.js`, `src/views/HomeView.vue`, `src/views/NotFoundView.vue` and their `.spec.js` siblings — all already committed and tested; this plan modifies several of them incrementally, never wholesale-rewrites in a way that drops prior tests.
@@ -2342,7 +2343,7 @@ describe('NetworkView', () => {
   it('searches players and shows a Follow button for each result', async () => {
     const wrapper = mount(NetworkView)
     await flushPromises()
-    await wrapper.find('input[data-testid="discovery-search"]').setValue('Dio')
+    await wrapper.find('input[placeholder="Search by area..."]').setValue('Dio')
     await wrapper.find('form[data-testid="discovery-form"]').trigger('submit')
     await flushPromises()
     expect(searchPlayers).toHaveBeenCalledWith(expect.objectContaining({ currentUserId: 'u1' }))
@@ -2378,7 +2379,7 @@ Expected: FAIL — `NetworkView.vue` does not exist.
     <div class="network-view__section">
       <h2>Discover players</h2>
       <form data-testid="discovery-form" @submit.prevent="handleSearch">
-        <LiTextField data-testid="discovery-search" v-model="searchArea" placeholder="Search by area..." />
+        <LiTextField v-model="searchArea" placeholder="Search by area..." />
         <LiButton type="submit">Search</LiButton>
       </form>
       <ul class="network-view__list">

@@ -16,7 +16,7 @@
     <div class="network-view__section">
       <h2>Discover players</h2>
       <form data-testid="discovery-form" @submit.prevent="handleSearch">
-        <LiTextField data-testid="discovery-search" v-model="searchArea" placeholder="Search by area..." />
+        <LiTextField v-model="searchArea" placeholder="Search by area..." />
         <LiButton type="submit">Search</LiButton>
       </form>
       <ul class="network-view__list">
