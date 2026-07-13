@@ -22,7 +22,9 @@ export function useFeed() {
         meet_id: payload.meetId ?? null,
         author_id: authorId,
       })
-      .select()
+      // Embed author so PostCard can render post.author.* on the just-created row
+      // (bare .select() returns table columns only, no relation).
+      .select('*, author:profiles(id, full_name, avatar_url)')
       .single()
     if (error) throw error
     return data

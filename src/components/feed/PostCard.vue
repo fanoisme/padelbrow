@@ -12,7 +12,10 @@
     <p v-if="post.caption" class="post-card__caption">{{ post.caption }}</p>
 
     <div v-if="post.media_urls?.length" class="post-card__media">
-      <img v-for="(url, i) in post.media_urls" :key="i" :src="url" alt="" />
+      <template v-for="(url, i) in post.media_urls" :key="i">
+        <video v-if="isVideo(url)" :src="url" controls></video>
+        <img v-else :src="url" alt="" />
+      </template>
     </div>
 
     <div class="post-card__actions">
@@ -133,6 +136,12 @@ async function handleBlock() {
 function formatWhen(iso) {
   if (!iso) return ''
   return new Date(iso).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })
+}
+
+// media_urls are Supabase Storage public URLs preserving the original extension,
+// so an extension check is enough to pick <video> vs <img>.
+function isVideo(url) {
+  return /\.(mp4|webm|mov|m4v|ogg)(\?|$)/i.test(url)
 }
 </script>
 

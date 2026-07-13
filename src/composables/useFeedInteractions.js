@@ -15,7 +15,8 @@ export function useFeedInteractions() {
     const { data, error } = await supabase
       .from('feed_comments')
       .insert({ post_id: postId, body, author_id: authorId })
-      .select()
+      // Embed author so the just-added comment shows a name without a remount.
+      .select('*, author:profiles(id, full_name, avatar_url)')
       .single()
     if (error) throw error
     return data
