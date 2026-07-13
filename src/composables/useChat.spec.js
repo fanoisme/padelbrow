@@ -50,4 +50,22 @@ describe('useChat', () => {
 
     expect(insert).toHaveBeenCalledWith({ meet_id: 'm1', author_id: 'u1', body: 'hello court 1' })
   })
+
+  it('the realtime callback appends incoming INSERTs to messages', async () => {
+    const order = vi.fn().mockResolvedValue({ data: [], error: null })
+    const eq = vi.fn(() => ({ order }))
+    const select = vi.fn(() => ({ eq }))
+    supabase.from.mockReturnValue({ select })
+
+    const { messages, subscribe } = useChat('m1')
+    subscribe()
+    await new Promise((r) => setTimeout(r, 0))
+
+    // Grab the realtime callback (3rd arg of .on()) and fire it with a fake payload.
+    const onChange = channelOn.mock.calls[0][2]
+    onChange({ new: { id: 'c9', author_id: 'u2', body: 'live message', created_at: '2026-07-14T00:00:00Z' } })
+
+    expect(messages.value.map((m) => m.id)).toContain('c9')
+    expect(messages.value.map((m) => m.body)).toContain('live message')
+  })
 })

@@ -76,8 +76,12 @@ async function reloadParticipants() {
 }
 
 onMounted(async () => {
-  meet.value = await getMeet(route.params.id)
-  await reloadParticipants()
+  try {
+    meet.value = await getMeet(route.params.id)
+    await reloadParticipants()
+  } catch (err) {
+    toast.error(err.message || 'Could not load this meet.')
+  }
 })
 
 async function handleJoin() {

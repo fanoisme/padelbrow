@@ -55,4 +55,21 @@ describe('useNotifications', () => {
     expect(is).toHaveBeenCalledWith('read_at', null)
     expect(isEq).toHaveBeenCalledWith('user_id', 'u1')
   })
+
+  it('the realtime callback prepends incoming INSERTs to notifications', async () => {
+    const limit = vi.fn().mockResolvedValue({ data: [], error: null })
+    const order = vi.fn(() => ({ limit }))
+    const eq = vi.fn(() => ({ order }))
+    const select = vi.fn(() => ({ eq }))
+    supabase.from.mockReturnValue({ select })
+
+    const { notifications, subscribe } = useNotifications()
+    subscribe()
+    await new Promise((r) => setTimeout(r, 0))
+
+    const onChange = channelOn.mock.calls[0][2]
+    onChange({ new: { id: 'n9', user_id: 'u1', type: 'meet_join', read_at: null, payload: { meet_title: 'Tue Night' } } })
+
+    expect(notifications.value.map((n) => n.id)).toContain('n9')
+  })
 })
