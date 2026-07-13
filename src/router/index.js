@@ -13,6 +13,7 @@ const router = createRouter({
     { path: '/network', name: 'network', component: () => import('../views/NetworkView.vue'), meta: { requiresAuth: true } },
     { path: '/meets', name: 'meets', component: () => import('../views/meets/MeetsListView.vue'), meta: { requiresAuth: true } },
     { path: '/meets/new', name: 'meet-new', component: () => import('../views/meets/CreateMeetView.vue'), meta: { requiresAuth: true } },
+    { path: '/meets/:id', name: 'meet-detail', component: () => import('../views/meets/MeetDetailView.vue'), meta: { requiresAuth: true } },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('../views/NotFoundView.vue') }
   ]
 })
