@@ -1,9 +1,10 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { ref } from 'vue'
 
 vi.mock('../composables/useAuth.js', () => ({
-  useAuth: vi.fn(() => ({ user: { value: { id: 'u2' } } })),
+  useAuth: vi.fn(() => ({ user: ref({ id: 'u2' }) })),
 }))
 
 const getClub = vi.fn().mockResolvedValue({ id: 'c1', name: 'Padel Brow', description: 'Our club' })

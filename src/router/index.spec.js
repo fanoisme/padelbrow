@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { ref } from 'vue'
 import router from './index.js'
 
 vi.mock('../composables/useAuth.js', () => ({
@@ -81,14 +82,14 @@ describe('router auth guard', () => {
   })
 
   it('redirects to login when the target route requires auth and there is no user', async () => {
-    useAuth.mockReturnValue({ user: { value: null } })
+    useAuth.mockReturnValue({ user: ref(null) })
     await router.push('/login-guard-test-protected')
     expect(router.currentRoute.value.name).toBe('login')
     expect(router.currentRoute.value.query.redirect).toBe('/login-guard-test-protected')
   })
 
   it('allows navigation when a user is present', async () => {
-    useAuth.mockReturnValue({ user: { value: { id: 'u1' } } })
+    useAuth.mockReturnValue({ user: ref({ id: 'u1' }) })
     await router.push('/login-guard-test-protected')
     expect(router.currentRoute.value.name).toBe('protected-test-route')
   })

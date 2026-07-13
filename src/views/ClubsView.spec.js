@@ -1,8 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
+import { ref } from 'vue'
 
 vi.mock('../composables/useAuth.js', () => ({
-  useAuth: vi.fn(() => ({ user: { value: { id: 'u1' } } })),
+  useAuth: vi.fn(() => ({ user: ref({ id: 'u1' }) })),
 }))
 
 const listClubs = vi.fn().mockResolvedValue([{ id: 'c1', name: 'Padel Brow', description: 'Our club', visibility: 'public' }])
