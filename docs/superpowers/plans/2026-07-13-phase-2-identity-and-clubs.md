@@ -1310,9 +1310,14 @@ vi.mock('../composables/useClubs.js', () => ({
 
 import ClubsView from './ClubsView.vue'
 
+// Renders slot content so club name/description are visible in wrapper.text()
+// — the default `RouterLink: true` stub does not render its default slot
+// (this bit Task 6's AppLayout test the same way; same fix here).
+const RouterLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
+
 describe('ClubsView', () => {
   it('lists clubs on mount', async () => {
-    const wrapper = mount(ClubsView, { global: { stubs: { RouterLink: true } } })
+    const wrapper = mount(ClubsView, { global: { stubs: { RouterLink: RouterLinkStub } } })
     await flushPromises()
     expect(listClubs).toHaveBeenCalled()
     expect(wrapper.text()).toContain('Padel Brow')
