@@ -17,6 +17,8 @@ const router = createRouter({
     { path: '/competitions', name: 'competitions', component: () => import('../views/competitions/CompetitionsListView.vue'), meta: { requiresAuth: true } },
     { path: '/competitions/new', name: 'competition-new', component: () => import('../views/competitions/CreateCompetitionView.vue'), meta: { requiresAuth: true } },
     { path: '/competitions/:id', name: 'competition-detail', component: () => import('../views/competitions/CompetitionDetailView.vue'), meta: { requiresAuth: true } },
+    { path: '/feed', name: 'feed', component: () => import('../views/feed/FeedView.vue'), meta: { requiresAuth: true } },
+    { path: '/clubs/:id/feed', name: 'club-feed', component: () => import('../views/feed/FeedView.vue'), meta: { requiresAuth: true }, props: (route) => ({ clubId: route.params.id }) },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('../views/NotFoundView.vue') }
   ]
 })

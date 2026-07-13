@@ -4,6 +4,7 @@
       <img class="app-header__mark" src="../assets/padel-brow-mark.svg" alt="PADEL BROW" />
       <span class="app-header__title">PADEL BROW</span>
       <nav v-if="user" class="app-header__nav">
+        <router-link to="/feed">Feed</router-link>
         <router-link to="/competitions">Competitions</router-link>
         <router-link to="/meets">Meets</router-link>
         <router-link to="/clubs">Clubs</router-link>
