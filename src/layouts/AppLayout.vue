@@ -3,6 +3,15 @@
     <header class="app-header">
       <img class="app-header__mark" src="../assets/padel-brow-mark.svg" alt="PADEL BROW" />
       <span class="app-header__title">PADEL BROW</span>
+      <nav v-if="user" class="app-header__nav">
+        <router-link to="/clubs">Clubs</router-link>
+        <router-link to="/network">Network</router-link>
+        <router-link to="/profile">Profile</router-link>
+        <button class="app-header__signout" @click="handleSignOut">Sign out</button>
+      </nav>
+      <nav v-else class="app-header__nav">
+        <router-link to="/login">Sign in</router-link>
+      </nav>
       <img class="app-header__allo" src="../assets/logo-allo.png" alt="Allo Bank" />
     </header>
     <main class="app-main">
@@ -11,7 +20,15 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { useAuth } from '../composables/useAuth.js'
+
+const { user, signOut } = useAuth()
+
+async function handleSignOut() {
+  await signOut()
+}
+</script>
 
 <style scoped>
 .app-shell {
@@ -40,6 +57,21 @@
   font-size: var(--text-md, 18px);
   color: var(--color-gray-900, #333333);
   flex: 1;
+}
+
+.app-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m, 16px);
+  font-size: var(--text-xs, 14px);
+}
+
+.app-header__signout {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: var(--color-gray-700, #666666);
 }
 
 .app-header__allo {

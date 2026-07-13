@@ -1,7 +1,13 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { ref } from 'vue'
 import HomeView from './views/HomeView.vue'
+
+vi.mock('./composables/useAuth.js', () => ({
+  useAuth: vi.fn(() => ({ user: ref(null), signOut: vi.fn() })),
+}))
+
 import App from './App.vue'
 
 describe('App', () => {
