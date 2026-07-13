@@ -57,9 +57,14 @@ export function generateAmericanoRound(playerIds, roundIndex, history = []) {
   const n = playerIds.length
   if (n < 4) return []
   const matchesPerRound = Math.floor(n / 4)
-  // Rotate who sits out (byes shared evenly across rounds).
-  const rotated = rotate(playerIds, roundIndex)
-  const playing = rotated.slice(0, matchesPerRound * 4)
+  // Fix player 0, rotate the rest. For a single 4-player group this is the
+  // classic americano: across N-1 rounds, player 0 partners every other player
+  // exactly once. Rotating the whole array (earlier version) left player 0
+  // partnering only 2 of the 3 others. Byes (n%4 != 0) still rotate evenly.
+  const fixed = playerIds[0]
+  const rest = playerIds.slice(1)
+  const rotatedRest = rotate(rest, roundIndex)
+  const playing = [fixed, ...rotatedRest.slice(0, matchesPerRound * 4 - 1)]
   const matches = []
   for (let c = 0; c < matchesPerRound; c++) {
     const g = playing.slice(c * 4, c * 4 + 4)

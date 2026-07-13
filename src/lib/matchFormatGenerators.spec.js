@@ -48,6 +48,19 @@ describe('generateAmericanoRound', () => {
     const playing1 = [...r1[0].team_a, ...r1[0].team_b]
     expect(playing1.sort().join(',')).not.toBe(playing.sort().join(','))
   })
+
+  it('gives player 0 full partner coverage across 3 rounds for 4 players', () => {
+    const ids = ['p1', 'p2', 'p3', 'p4']
+    const partners = new Set()
+    for (let r = 0; r < 3; r++) {
+      const round = generateAmericanoRound(ids, r)
+      const teamA = round[0].team_a
+      // player 0 (p1) is always in team_a (fixed); partner is the other team_a member.
+      const partner = teamA.find((id) => id !== 'p1')
+      partners.add(partner)
+    }
+    expect(partners.size).toBe(3) // partnered p2, p3, p4 — everyone once
+  })
 })
 
 describe('generateMexicanoRound', () => {

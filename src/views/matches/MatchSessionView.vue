@@ -39,11 +39,42 @@
       </table>
     </div>
   </section>
+
+  <section v-else class="match-session-view match-session-view__setup">
+    <h1>New match session</h1>
+    <label class="match-session-view__field">
+      Format
+      <select v-model="setup.format">
+        <option value="americano">Americano</option>
+        <option value="mexicano">Mexicano</option>
+        <option value="team_americano">Team Americano</option>
+        <option value="singles">Singles</option>
+      </select>
+    </label>
+    <label class="match-session-view__field">
+      Ranking by
+      <select v-model="setup.ranking_criteria">
+        <option value="matches_won">Matches won</option>
+        <option value="points_won">Points won</option>
+        <option value="win_pct">Win %</option>
+        <option value="points_pct">Points %</option>
+      </select>
+    </label>
+    <label class="match-session-view__field">
+      Courts
+      <input type="number" min="1" v-model.number="setup.num_courts" />
+    </label>
+    <label class="match-session-view__field">
+      Points per set
+      <input type="number" min="1" v-model.number="setup.total_set_points" />
+    </label>
+    <LiButton data-testid="create-session-btn" :loading="creating" @click="handleCreate">Create session</LiButton>
+  </section>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { LiButton, LiBadge, useToast } from '../../design-system/components/index.js'
 import { useMatchSessions } from '../../composables/useMatchSessions.js'
 import { useMatchRounds } from '../../composables/useMatchRounds.js'
@@ -51,8 +82,9 @@ import { useMatchScoring } from '../../composables/useMatchScoring.js'
 import { useMeetParticipants } from '../../composables/useMeetParticipants.js'
 
 const route = useRoute()
+const router = useRouter()
 const toast = useToast()
-const { getSession, setStatus } = useMatchSessions()
+const { getSession, createSession, setStatus } = useMatchSessions()
 const { generateRound, listRoundsWithMatches } = useMatchRounds()
 const { enterScore, finalizeMatch, computeStandingsFor } = useMatchScoring()
 const { listParticipants } = useMeetParticipants()
@@ -61,6 +93,8 @@ const session = ref(null)
 const rounds = ref([])
 const participants = ref([])
 const scoreCache = reactive({})
+const creating = ref(false)
+const setup = ref({ format: 'americano', ranking_criteria: 'matches_won', num_courts: 1, total_set_points: 21 })
 
 const playerIds = computed(() => participants.value.map((p) => p.user_id))
 const standings = computed(() =>
@@ -77,6 +111,9 @@ async function reload() {
 }
 
 onMounted(async () => {
+  // No sessionId → show the setup form (session stays null). Only load when a
+  // session id is present, so the create flow doesn't 404 on getSession(undefined).
+  if (!route.params.sessionId) return
   try {
     session.value = await getSession(route.params.sessionId)
     participants.value = await listParticipants(route.params.meetId)
@@ -85,6 +122,18 @@ onMounted(async () => {
     toast.error(err.message || 'Could not load the match session.')
   }
 })
+
+async function handleCreate() {
+  creating.value = true
+  try {
+    const created = await createSession(setup.value, route.params.meetId)
+    router.push({ name: 'match-session', params: { meetId: route.params.meetId, sessionId: created.id } })
+  } catch (err) {
+    toast.error(err.message || 'Could not create the session.')
+  } finally {
+    creating.value = false
+  }
+}
 
 async function handleGenerateRound() {
   try {

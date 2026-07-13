@@ -8,7 +8,7 @@ vi.mock('../../composables/useAuth.js', () => ({
 }))
 
 const getSession = vi.fn().mockResolvedValue({ id: 'ms1', meet_id: 'meet1', format: 'americano', ranking_criteria: 'matches_won', status: 'in_progress' })
-const createSession = vi.fn()
+const createSession = vi.fn().mockResolvedValue({ id: 'ms-new', meet_id: 'meet1' })
 const setStatus = vi.fn()
 vi.mock('../../composables/useMatchSessions.js', () => ({
   useMatchSessions: vi.fn(() => ({ getSession, createSession, setStatus, listSessionsByMeet: vi.fn() })),
@@ -72,5 +72,27 @@ describe('MatchSessionView', () => {
     expect(generateRound).toHaveBeenCalled()
     const input = generateRound.mock.calls[0][1]
     expect(input.playerIds).toEqual(['p1', 'p2', 'p3', 'p4'])
+  })
+
+  it('shows the setup form + creates a session when no sessionId is given', async () => {
+    const router = createRouter({
+      history: createWebHashHistory(),
+      routes: [{ path: '/meets/:meetId/match-session/:sessionId?', name: 'match-session', component: MatchSessionView }],
+    })
+    router.push('/meets/meet1/match-session')
+    await router.isReady()
+    const wrapper = mount(MatchSessionView, { global: { plugins: [router] } })
+    await flushPromises()
+
+    expect(getSession).not.toHaveBeenCalled()
+    const createBtn = wrapper.find('[data-testid="create-session-btn"]')
+    expect(createBtn.exists()).toBe(true)
+    await createBtn.trigger('click')
+    await flushPromises()
+
+    expect(createSession).toHaveBeenCalled()
+    const payload = createSession.mock.calls[0][0]
+    expect(payload.format).toBe('americano')
+    expect(createSession.mock.calls[0][1]).toBe('meet1')
   })
 })
