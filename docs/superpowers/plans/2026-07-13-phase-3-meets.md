@@ -330,7 +330,9 @@ describe('useMeets', () => {
   })
 
   it('cancelMeet sets status to cancelled', async () => {
-    const eq = vi.fn().mockResolvedValue({ error: null })
+    const single = vi.fn().mockResolvedValue({ data: { id: 'm1', status: 'cancelled' }, error: null })
+    const select = vi.fn(() => ({ single }))
+    const eq = vi.fn(() => ({ select }))
     const update = vi.fn(() => ({ eq }))
     supabase.from.mockReturnValue({ update })
 
