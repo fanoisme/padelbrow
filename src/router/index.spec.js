@@ -18,6 +18,21 @@ vi.mock('../composables/useProfile.js', () => ({
   })),
 }))
 
+// Same issue as above: the router eagerly imports ClubsView.vue, which
+// imports useClubs.js, which imports the real Supabase client. Mock
+// useClubs.js so this route test suite doesn't depend on Supabase
+// configuration.
+vi.mock('../composables/useClubs.js', () => ({
+  useClubs: vi.fn(() => ({
+    listClubs: vi.fn(),
+    searchClubs: vi.fn(),
+    createClub: vi.fn(),
+    joinClub: vi.fn(),
+    leaveClub: vi.fn(),
+    getMyMembership: vi.fn(),
+  })),
+}))
+
 import { useAuth } from '../composables/useAuth.js'
 
 describe('router', () => {
