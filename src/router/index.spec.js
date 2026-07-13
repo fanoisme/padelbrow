@@ -33,6 +33,24 @@ vi.mock('../composables/useClubs.js', () => ({
   })),
 }))
 
+// Same issue as above: the router eagerly imports NetworkView.vue, which
+// imports useFollows.js and usePlayerDiscovery.js, both of which import the
+// real Supabase client. Mock them so this route test suite doesn't depend
+// on Supabase configuration.
+vi.mock('../composables/useFollows.js', () => ({
+  useFollows: vi.fn(() => ({
+    listFollowees: vi.fn(),
+    follow: vi.fn(),
+    unfollow: vi.fn(),
+  })),
+}))
+
+vi.mock('../composables/usePlayerDiscovery.js', () => ({
+  usePlayerDiscovery: vi.fn(() => ({
+    searchPlayers: vi.fn(),
+  })),
+}))
+
 import { useAuth } from '../composables/useAuth.js'
 
 describe('router', () => {
