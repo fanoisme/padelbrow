@@ -16,6 +16,7 @@ const router = createRouter({
     { path: '/meets/:id', name: 'meet-detail', component: () => import('../views/meets/MeetDetailView.vue'), meta: { requiresAuth: true } },
     { path: '/competitions', name: 'competitions', component: () => import('../views/competitions/CompetitionsListView.vue'), meta: { requiresAuth: true } },
     { path: '/competitions/new', name: 'competition-new', component: () => import('../views/competitions/CreateCompetitionView.vue'), meta: { requiresAuth: true } },
+    { path: '/competitions/:id', name: 'competition-detail', component: () => import('../views/competitions/CompetitionDetailView.vue'), meta: { requiresAuth: true } },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('../views/NotFoundView.vue') }
   ]
 })
