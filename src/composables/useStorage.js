@@ -9,5 +9,14 @@ export function useStorage() {
     const { data } = supabase.storage.from('feed-media').getPublicUrl(path)
     return data.publicUrl
   }
-  return { uploadFeedMedia }
+
+  async function uploadPaymentProof(file) {
+    const ext = file.name.split('.').pop()
+    const path = `${crypto.randomUUID()}.${ext}`
+    const { error } = await supabase.storage.from('payment-proofs').upload(path, file, { upsert: false })
+    if (error) throw error
+    const { data } = supabase.storage.from('payment-proofs').getPublicUrl(path)
+    return data.publicUrl
+  }
+  return { uploadFeedMedia, uploadPaymentProof }
 }
