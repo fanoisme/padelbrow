@@ -31,7 +31,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { LiButton, LiTextField, LiEmptyState } from '../design-system/components/index.js'
+import { LiButton, LiTextField, LiEmptyState, useToast } from '../design-system/components/index.js'
 import { useAuth } from '../composables/useAuth.js'
 import { useFollows } from '../composables/useFollows.js'
 import { usePlayerDiscovery } from '../composables/usePlayerDiscovery.js'
@@ -39,6 +39,7 @@ import { usePlayerDiscovery } from '../composables/usePlayerDiscovery.js'
 const { user } = useAuth()
 const { listFollowees, follow, unfollow } = useFollows()
 const { searchPlayers } = usePlayerDiscovery()
+const toast = useToast()
 
 const followees = ref([])
 const searchArea = ref('')
@@ -53,13 +54,21 @@ async function handleSearch() {
 }
 
 async function handleFollow(followeeId) {
-  await follow(user.value.id, followeeId)
-  followees.value = await listFollowees(user.value.id)
+  try {
+    await follow(user.value.id, followeeId)
+    followees.value = await listFollowees(user.value.id)
+  } catch (err) {
+    toast.error(err.message || 'Could not follow that player.')
+  }
 }
 
 async function handleUnfollow(followeeId) {
-  await unfollow(user.value.id, followeeId)
-  followees.value = await listFollowees(user.value.id)
+  try {
+    await unfollow(user.value.id, followeeId)
+    followees.value = await listFollowees(user.value.id)
+  } catch (err) {
+    toast.error(err.message || 'Could not unfollow that player.')
+  }
 }
 </script>
 

@@ -30,7 +30,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { LiCard, LiButton, LiTextField, LiSelect, LiEmptyState } from '../../design-system/components/index.js'
+import { LiCard, LiButton, LiTextField, LiSelect, LiEmptyState, useToast } from '../../design-system/components/index.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { useClubMemberships } from '../../composables/useClubMemberships.js'
 
@@ -41,6 +41,7 @@ const props = defineProps({
 
 const { user } = useAuth()
 const { listMemberships, createMembership, subscribe } = useClubMemberships()
+const toast = useToast()
 
 const memberships = ref([])
 const creating = ref(false)
@@ -51,7 +52,11 @@ onMounted(async () => {
 })
 
 async function handleSubscribe(tier) {
-  await subscribe(tier.id, user.value.id, tier.period)
+  try {
+    await subscribe(tier.id, user.value.id, tier.period)
+  } catch (err) {
+    toast.error(err.message || 'Could not subscribe.')
+  }
 }
 
 async function handleCreate() {
@@ -60,6 +65,8 @@ async function handleCreate() {
     await createMembership(props.clubId, { ...newTier.value })
     newTier.value = { name: '', price: 0, period: 'monthly' }
     memberships.value = await listMemberships(props.clubId)
+  } catch (err) {
+    toast.error(err.message || 'Could not create the tier.')
   } finally {
     creating.value = false
   }

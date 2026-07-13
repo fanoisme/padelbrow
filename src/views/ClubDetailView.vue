@@ -25,7 +25,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { LiButton, LiBadge } from '../design-system/components/index.js'
+import { LiButton, LiBadge, useToast } from '../design-system/components/index.js'
 import { useAuth } from '../composables/useAuth.js'
 import { useClubs } from '../composables/useClubs.js'
 import ClubMembershipsPanel from '../components/clubs/ClubMembershipsPanel.vue'
@@ -33,6 +33,7 @@ import ClubMembershipsPanel from '../components/clubs/ClubMembershipsPanel.vue'
 const route = useRoute()
 const { user } = useAuth()
 const { getClub, listMembers, getMyMembership, joinClub, leaveClub } = useClubs()
+const toast = useToast()
 
 const club = ref(null)
 const members = ref([])
@@ -49,15 +50,23 @@ onMounted(async () => {
 })
 
 async function handleJoin() {
-  await joinClub(route.params.id, user.value.id)
-  members.value = await listMembers(route.params.id)
-  await loadMembership()
+  try {
+    await joinClub(route.params.id, user.value.id)
+    members.value = await listMembers(route.params.id)
+    await loadMembership()
+  } catch (err) {
+    toast.error(err.message || 'Could not join the club.')
+  }
 }
 
 async function handleLeave() {
-  await leaveClub(route.params.id, user.value.id)
-  members.value = await listMembers(route.params.id)
-  await loadMembership()
+  try {
+    await leaveClub(route.params.id, user.value.id)
+    members.value = await listMembers(route.params.id)
+    await loadMembership()
+  } catch (err) {
+    toast.error(err.message || 'Could not leave the club.')
+  }
 }
 </script>
 

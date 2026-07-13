@@ -35,12 +35,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { LiButton, LiTextField, LiCard, LiEmptyState, LiModal, LiSelect } from '../design-system/components/index.js'
+import { LiButton, LiTextField, LiCard, LiEmptyState, LiModal, LiSelect, useToast } from '../design-system/components/index.js'
 import { useAuth } from '../composables/useAuth.js'
 import { useClubs } from '../composables/useClubs.js'
 
 const { user } = useAuth()
 const { listClubs, searchClubs, createClub } = useClubs()
+const toast = useToast()
 
 const clubs = ref([])
 const query = ref('')
@@ -63,6 +64,8 @@ async function handleCreate() {
     showCreateModal.value = false
     newClub.value = { name: '', slug: '', description: '', visibility: 'public' }
     clubs.value = await listClubs()
+  } catch (err) {
+    toast.error(err.message || 'Could not create the club.')
   } finally {
     creating.value = false
   }
