@@ -2,54 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ref } from 'vue'
 import router from './index.js'
 
+// Only useAuth is imported eagerly by the router (the guard calls it), so only
+// it needs mocking. View composables are no longer pulled in at module-load
+// time now that route components are lazy `() => import(...)`.
 vi.mock('../composables/useAuth.js', () => ({
   useAuth: vi.fn(),
-}))
-
-// The router eagerly imports ProfileView.vue, which imports useProfile.js.
-// useProfile.js imports the real Supabase client, which throws at module
-// load time when VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are unset (as
-// they are in this test environment). Mock useProfile.js so this route
-// test suite doesn't depend on Supabase configuration.
-vi.mock('../composables/useProfile.js', () => ({
-  useProfile: vi.fn(() => ({
-    profile: { value: null },
-    fetchProfile: vi.fn(),
-    updateProfile: vi.fn(),
-  })),
-}))
-
-// Same issue as above: the router eagerly imports ClubsView.vue, which
-// imports useClubs.js, which imports the real Supabase client. Mock
-// useClubs.js so this route test suite doesn't depend on Supabase
-// configuration.
-vi.mock('../composables/useClubs.js', () => ({
-  useClubs: vi.fn(() => ({
-    listClubs: vi.fn(),
-    searchClubs: vi.fn(),
-    createClub: vi.fn(),
-    joinClub: vi.fn(),
-    leaveClub: vi.fn(),
-    getMyMembership: vi.fn(),
-  })),
-}))
-
-// Same issue as above: the router eagerly imports NetworkView.vue, which
-// imports useFollows.js and usePlayerDiscovery.js, both of which import the
-// real Supabase client. Mock them so this route test suite doesn't depend
-// on Supabase configuration.
-vi.mock('../composables/useFollows.js', () => ({
-  useFollows: vi.fn(() => ({
-    listFollowees: vi.fn(),
-    follow: vi.fn(),
-    unfollow: vi.fn(),
-  })),
-}))
-
-vi.mock('../composables/usePlayerDiscovery.js', () => ({
-  usePlayerDiscovery: vi.fn(() => ({
-    searchPlayers: vi.fn(),
-  })),
 }))
 
 import { useAuth } from '../composables/useAuth.js'
@@ -75,7 +32,7 @@ describe('router auth guard', () => {
       router.addRoute({
         path: '/login-guard-test-protected',
         name: 'protected-test-route',
-        component: { template: '<div />' },
+        component: () => Promise.resolve({ template: '<div />' }),
         meta: { requiresAuth: true },
       })
     }
