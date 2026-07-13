@@ -60,5 +60,25 @@ export function useClubs() {
     return data
   }
 
-  return { listClubs, searchClubs, createClub, joinClub, leaveClub, getMyMembership }
+  async function getClub(clubId) {
+    const { data, error } = await supabase
+      .from('clubs')
+      .select('*')
+      .eq('id', clubId)
+      .single()
+    if (error) throw error
+    return data
+  }
+
+  async function listMembers(clubId) {
+    const { data, error } = await supabase
+      .from('club_members')
+      .select('user_id, role, tags, joined_at, profiles(id, full_name, avatar_url)')
+      .eq('club_id', clubId)
+      .order('role')
+    if (error) throw error
+    return data
+  }
+
+  return { listClubs, searchClubs, createClub, joinClub, leaveClub, getMyMembership, getClub, listMembers }
 }

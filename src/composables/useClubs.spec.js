@@ -54,4 +54,33 @@ describe('useClubs', () => {
 
     expect(insert).toHaveBeenCalledWith({ club_id: 'c1', user_id: 'u2', role: 'member' })
   })
+
+  it('getClub fetches a single club by id', async () => {
+    const single = vi.fn().mockResolvedValue({ data: { id: 'c1', name: 'Padel Brow' }, error: null })
+    const eq = vi.fn(() => ({ single }))
+    const select = vi.fn(() => ({ eq }))
+    supabase.from.mockReturnValue({ select })
+
+    const { getClub } = useClubs()
+    const result = await getClub('c1')
+
+    expect(eq).toHaveBeenCalledWith('id', 'c1')
+    expect(result).toEqual({ id: 'c1', name: 'Padel Brow' })
+  })
+
+  it('listMembers fetches club_members joined with profile info, ordered by role', async () => {
+    const order = vi.fn().mockResolvedValue({
+      data: [{ user_id: 'u1', role: 'owner', profiles: { id: 'u1', full_name: 'Fano' } }],
+      error: null,
+    })
+    const eq = vi.fn(() => ({ order }))
+    const select = vi.fn(() => ({ eq }))
+    supabase.from.mockReturnValue({ select })
+
+    const { listMembers } = useClubs()
+    const result = await listMembers('c1')
+
+    expect(eq).toHaveBeenCalledWith('club_id', 'c1')
+    expect(result).toEqual([{ user_id: 'u1', role: 'owner', profiles: { id: 'u1', full_name: 'Fano' } }])
+  })
 })
