@@ -41,7 +41,8 @@ describe('useCompetitions', () => {
   })
 
   it('generateMatches runs round-robin for that format, persists, and starts the competition', async () => {
-    const insertMatches = vi.fn().mockResolvedValue({ data: [{ id: 'cm1' }], error: null })
+    const insertSelect = vi.fn().mockResolvedValue({ data: [{ id: 'cm1' }], error: null })
+    const insertMatches = vi.fn(() => ({ select: insertSelect }))
     const matchesTable = { insert: insertMatches }
     const updateEq = vi.fn().mockResolvedValue({ error: null })
     const update = vi.fn(() => ({ eq: updateEq }))

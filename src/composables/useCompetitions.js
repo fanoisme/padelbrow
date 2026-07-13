@@ -68,7 +68,9 @@ export function useCompetitions() {
       team_a_id: m.team_a_id,
       team_b_id: m.team_b_id,
     }))
-    const { data, error } = await supabase.from('competition_matches').insert(rows)
+    // .select() so PostgREST returns the inserted rows (default Prefer: return=minimal
+    // would yield { data: null }); handleGenerate discards them but the contract stays honest.
+    const { data, error } = await supabase.from('competition_matches').insert(rows).select()
     if (error) throw error
 
     const { error: statusError } = await supabase

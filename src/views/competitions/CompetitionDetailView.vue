@@ -12,7 +12,7 @@
         <p>Format: {{ comp.format }}</p>
         <p v-if="comp.registration_opens_at">Registration opens: {{ formatWhen(comp.registration_opens_at) }}</p>
         <p v-if="comp.registration_closes_at">Registration closes: {{ formatWhen(comp.registration_closes_at) }}</p>
-        <div class="comp-detail-view__actions">
+        <div v-if="isOrganizer" class="comp-detail-view__actions">
           <LiButton v-if="comp.status === 'draft'" @click="handleOpenRegistration">Open registration</LiButton>
           <LiButton
             v-if="comp.status === 'registration_open'"
@@ -36,13 +36,29 @@
             <span>{{ reg.competition_teams.name }}</span>
             <LiBadge v-if="reg.status === 'confirmed'" :label="`Seed ${reg.seed}`" variant="success" />
             <LiBadge v-else label="Pending" variant="warning" />
-            <LiButton v-if="reg.status === 'pending'" size="sm" @click="handleConfirm(reg)">Confirm + seed</LiButton>
+            <LiButton v-if="reg.status === 'pending' && isOrganizer" size="sm" @click="handleConfirm(reg)">Confirm + seed</LiButton>
           </li>
         </ul>
       </div>
 
-      <!-- Standings (round_robin) -->
+      <!-- Standings (round_robin): matches with score entry + standings table -->
       <div v-show="activeTab === 2 && comp.format === 'round_robin'">
+        <div v-if="matches.length" class="comp-detail-view__rounds">
+          <div v-for="round in matchesByRound" :key="round.name" class="comp-detail-view__round">
+            <h3>{{ round.name }}</h3>
+            <ul>
+              <li v-for="m in round.matches" :key="m.id" class="comp-detail-view__match">
+                <span>{{ teamName(m.team_a_id) }} vs {{ teamName(m.team_b_id) }}</span>
+                <span v-if="m.status === 'completed'" class="comp-detail-view__match-score">{{ m.score_a }}-{{ m.score_b }}</span>
+                <div v-else-if="isOrganizer && m.team_a_id && m.team_b_id" class="comp-detail-view__score">
+                  <input type="number" class="comp-detail-view__score-input" v-model.number="scoreOf(m).a" placeholder="0" />
+                  <input type="number" class="comp-detail-view__score-input" v-model.number="scoreOf(m).b" placeholder="0" />
+                  <LiButton size="sm" @click="handleScore(m)">Save</LiButton>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
         <table class="comp-detail-view__standings">
           <thead><tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>L</th><th>PF</th><th>PA</th></tr></thead>
           <tbody>
@@ -61,9 +77,14 @@
         <div v-for="round in matchesByRound" :key="round.name" class="comp-detail-view__round">
           <h3>{{ round.name }}</h3>
           <ul>
-            <li v-for="m in round.matches" :key="m.id">
+            <li v-for="m in round.matches" :key="m.id" class="comp-detail-view__match">
               <span>{{ teamName(m.team_a_id) }} vs {{ teamName(m.team_b_id) }}</span>
-              <span v-if="m.status === 'completed'">{{ m.score_a }}-{{ m.score_b }}</span>
+              <span v-if="m.status === 'completed'" class="comp-detail-view__match-score">{{ m.score_a }}-{{ m.score_b }}</span>
+              <div v-else-if="isOrganizer && m.team_a_id && m.team_b_id" class="comp-detail-view__score">
+                <input type="number" class="comp-detail-view__score-input" v-model.number="scoreOf(m).a" placeholder="0" />
+                <input type="number" class="comp-detail-view__score-input" v-model.number="scoreOf(m).b" placeholder="0" />
+                <LiButton size="sm" @click="handleScore(m)">Save</LiButton>
+              </div>
             </li>
           </ul>
         </div>
@@ -73,14 +94,18 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { LiTabs, LiButton, LiBadge, LiTextField, useToast } from '../../design-system/components/index.js'
+import { useAuth } from '../../composables/useAuth.js'
+import { useClubs } from '../../composables/useClubs.js'
 import { useCompetitions } from '../../composables/useCompetitions.js'
 import { useCompetitionRegistrations } from '../../composables/useCompetitionRegistrations.js'
 import { useCompetitionMatches } from '../../composables/useCompetitionMatches.js'
 
 const route = useRoute()
+const { user } = useAuth()
+const { getMyMembership } = useClubs()
 const { getCompetition, openRegistration, generateMatches } = useCompetitions()
 const { listRegistrations, registerTeam, confirmRegistration } = useCompetitionRegistrations()
 const { listMatches, enterScore, computeStandingsFor } = useCompetitionMatches()
@@ -92,6 +117,10 @@ const matches = ref([])
 const activeTab = ref(0)
 const newTeam = ref({ name: '', players: '' })
 const registering = ref(false)
+// best-effort organizer flag for UX (hide organizer-only controls); RLS is the real gate.
+const isOrganizer = ref(false)
+// Per-match score-input cache, lazily created on first render of each match.
+const scoreCache = reactive({})
 
 // ponytail: LiTabs expects tabs as [{ label }], not bare strings — adjusted from brief's string array to match the vendored component's real API.
 const tabs = computed(() => [
@@ -111,19 +140,40 @@ const standings = computed(() =>
   computeStandingsFor(matches.value, registrations.value.map((r) => r.team_id))
 )
 
+// round_name comes back alphabetically from the DB; derive a display ordinal so
+// rounds render in bracket/league order (Quarterfinal → Semifinal → Final,
+// Round 1 → Round 2 → … → Round 10). ponytail: tied to bracketRoundName +
+// generateRoundRobin naming conventions; replace with a round_index column if
+// round names ever diverge.
+function roundOrdinal(name) {
+  if (name === 'Final') return 1e6
+  if (name === 'Semifinal') return 1e6 - 1
+  if (name === 'Quarterfinal') return 1e6 - 2
+  const of = name.match(/Round of (\d+)/)
+  if (of) return -parseInt(of[1], 10)
+  const r = name.match(/Round (\d+)/)
+  if (r) return parseInt(r[1], 10)
+  return 0
+}
+
 const matchesByRound = computed(() => {
   const byRound = {}
   for (const m of matches.value) {
     byRound[m.round_name] = byRound[m.round_name] || { name: m.round_name, matches: [] }
     byRound[m.round_name].matches.push(m)
   }
-  return Object.values(byRound)
+  return Object.values(byRound).sort((a, b) => roundOrdinal(a.name) - roundOrdinal(b.name))
 })
 
 function teamName(id) {
   if (!id) return 'TBD'
   const reg = registrations.value.find((r) => r.team_id === id)
   return reg ? reg.competition_teams.name : '—'
+}
+
+function scoreOf(m) {
+  if (!scoreCache[m.id]) scoreCache[m.id] = { a: m.score_a ?? '', b: m.score_b ?? '' }
+  return scoreCache[m.id]
 }
 
 async function reload() {
@@ -135,6 +185,14 @@ onMounted(async () => {
   try {
     comp.value = await getCompetition(route.params.id)
     await reload()
+    if (user.value && comp.value) {
+      try {
+        const membership = await getMyMembership(comp.value.club_id, user.value.id)
+        isOrganizer.value = membership?.role === 'owner' || membership?.role === 'organizer'
+      } catch {
+        isOrganizer.value = false
+      }
+    }
   } catch (err) {
     toast.error(err.message || 'Could not load this competition.')
   }
@@ -182,6 +240,18 @@ async function handleConfirm(reg) {
     await reload()
   } catch (err) {
     toast.error(err.message || 'Could not confirm the team.')
+  }
+}
+
+async function handleScore(m) {
+  const inputs = scoreOf(m)
+  const a = inputs.a === '' ? null : Number(inputs.a)
+  const b = inputs.b === '' ? null : Number(inputs.b)
+  try {
+    await enterScore(m.id, a, b)
+    await reload()
+  } catch (err) {
+    toast.error(err.message || 'Could not save the score.')
   }
 }
 
@@ -238,10 +308,36 @@ function formatWhen(iso) {
   gap: var(--space-s, 8px);
 }
 
+.comp-detail-view__match {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s, 8px);
+  flex-wrap: wrap;
+}
+
+.comp-detail-view__match-score {
+  font-weight: 600;
+}
+
+.comp-detail-view__score {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs, 4px);
+}
+
+.comp-detail-view__score-input {
+  width: 56px;
+  padding: var(--space-xs, 4px) var(--space-s, 8px);
+  border: 1px solid var(--color-gray-300, #CCC);
+  border-radius: var(--radius-s, 6px);
+  font-size: var(--text-sm, 14px);
+}
+
 .comp-detail-view__standings {
   width: 100%;
   border-collapse: collapse;
   font-size: var(--text-xs, 14px);
+  margin-top: var(--space-m, 16px);
 }
 
 .comp-detail-view__standings th,

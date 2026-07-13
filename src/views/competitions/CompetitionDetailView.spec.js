@@ -7,6 +7,10 @@ vi.mock('../../composables/useAuth.js', () => ({
   useAuth: vi.fn(() => ({ user: ref({ id: 'u1' }) })),
 }))
 
+vi.mock('../../composables/useClubs.js', () => ({
+  useClubs: vi.fn(() => ({ getMyMembership: vi.fn().mockResolvedValue({ role: 'organizer' }) })),
+}))
+
 const getCompetition = vi.fn().mockResolvedValue({ id: 'co1', name: 'Cup', format: 'round_robin', status: 'registration_open', club_id: 'c1' })
 const generateMatches = vi.fn().mockResolvedValue([])
 vi.mock('../../composables/useCompetitions.js', () => ({
