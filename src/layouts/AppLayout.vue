@@ -9,6 +9,7 @@
         <router-link to="/meets">Meets</router-link>
         <router-link to="/clubs">Clubs</router-link>
         <router-link to="/network">Network</router-link>
+        <router-link to="/leaderboard">Leaderboard</router-link>
         <router-link to="/profile">Profile</router-link>
         <NotificationsBell />
         <button class="app-header__signout" @click="handleSignOut">Sign out</button>
