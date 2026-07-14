@@ -1,6 +1,6 @@
 <template>
   <section class="login-view">
-    <LiCard class="login-view__card">
+    <LiGlassCard class="login-view__card">
       <h1>Sign in to PADEL BROW</h1>
       <form @submit.prevent="handleSubmit">
         <LiTextField v-model="email" type="email" label="Email" placeholder="you@example.com" />
@@ -12,14 +12,14 @@
       <p class="login-view__signup-link">
         No account yet? <router-link to="/signup">Sign up</router-link>
       </p>
-    </LiCard>
+    </LiGlassCard>
   </section>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { LiCard, LiTextField, LiButton } from '../../design-system/components/index.js'
+import { LiGlassCard, LiTextField, LiButton } from '../../design-system/components/index.js'
 import { useAuth } from '../../composables/useAuth.js'
 
 const email = ref('')
