@@ -1,6 +1,6 @@
 <template>
   <section class="signup-view">
-    <LiCard class="signup-view__card">
+    <LiGlassCard class="signup-view__card">
       <h1>Create your account</h1>
       <form @submit.prevent="handleSubmit">
         <LiTextField v-model="fullName" label="Full name" placeholder="Your name" />
@@ -12,14 +12,14 @@
       <p class="signup-view__login-link">
         Already have an account? <router-link to="/login">Sign in</router-link>
       </p>
-    </LiCard>
+    </LiGlassCard>
   </section>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { LiCard, LiTextField, LiButton } from '../../design-system/components/index.js'
+import { LiGlassCard, LiTextField, LiButton } from '../../design-system/components/index.js'
 import { useAuth } from '../../composables/useAuth.js'
 
 const fullName = ref('')
