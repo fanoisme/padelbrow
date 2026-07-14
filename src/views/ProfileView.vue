@@ -1,6 +1,6 @@
 <template>
   <section class="profile-view">
-    <LiCard class="profile-view__card">
+    <LiGlassCard class="profile-view__card">
       <h1>My profile</h1>
       <form v-if="form" @submit.prevent="handleSave">
         <LiTextField v-model="form.full_name" label="Full name" />
@@ -20,13 +20,13 @@
         <p v-if="successMessage" class="profile-view__success">{{ successMessage }}</p>
         <LiButton type="submit" :loading="saving">Save changes</LiButton>
       </form>
-    </LiCard>
+    </LiGlassCard>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { LiCard, LiTextField, LiSelect, LiButton } from '../design-system/components/index.js'
+import { LiGlassCard, LiTextField, LiSelect, LiButton } from '../design-system/components/index.js'
 import { useAuth } from '../composables/useAuth.js'
 import { useProfile } from '../composables/useProfile.js'
 
