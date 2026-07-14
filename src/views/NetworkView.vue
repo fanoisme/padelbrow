@@ -1,16 +1,17 @@
 <template>
   <section class="network-view">
-    <h1>My Network</h1>
+    <LiPageHeader title="My Network" subtitle="Players you follow, and new players to discover." />
 
     <div class="network-view__section">
       <h2>Following</h2>
       <LiEmptyState v-if="followees.length === 0" title="You're not following anyone yet" icon="person" />
-      <ul v-else class="network-view__list">
-        <li v-for="person in followees" :key="person.id">
-          <span>{{ person.full_name }}</span>
-          <LiButton variant="secondary" size="sm" @click="handleUnfollow(person.id)">Unfollow</LiButton>
-        </li>
-      </ul>
+      <LiCard v-else flush>
+        <LiListTile v-for="person in followees" :key="person.id" :title="person.full_name">
+          <template #trailing>
+            <LiButton variant="secondary" size="sm" @click="handleUnfollow(person.id)">Unfollow</LiButton>
+          </template>
+        </LiListTile>
+      </LiCard>
     </div>
 
     <div class="network-view__section">
@@ -19,19 +20,25 @@
         <LiTextField v-model="searchArea" placeholder="Search by area..." />
         <LiButton type="submit">Search</LiButton>
       </form>
-      <ul class="network-view__list">
-        <li v-for="person in searchResults" :key="person.id">
-          <span>{{ person.full_name }} (level {{ person.skill_level }})</span>
-          <LiButton size="sm" @click="handleFollow(person.id)">Follow</LiButton>
-        </li>
-      </ul>
+      <LiCard v-if="searchResults.length" flush>
+        <LiListTile
+          v-for="person in searchResults"
+          :key="person.id"
+          :title="person.full_name"
+          :subtitle="`Level ${person.skill_level}`"
+        >
+          <template #trailing>
+            <LiButton size="sm" @click="handleFollow(person.id)">Follow</LiButton>
+          </template>
+        </LiListTile>
+      </LiCard>
     </div>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { LiButton, LiTextField, LiEmptyState, useToast } from '../design-system/components/index.js'
+import { LiButton, LiTextField, LiEmptyState, LiCard, LiListTile, LiPageHeader, useToast } from '../design-system/components/index.js'
 import { useAuth } from '../composables/useAuth.js'
 import { useFollows } from '../composables/useFollows.js'
 import { usePlayerDiscovery } from '../composables/usePlayerDiscovery.js'
@@ -83,20 +90,6 @@ async function handleUnfollow(followeeId) {
   display: flex;
   flex-direction: column;
   gap: var(--space-s, 8px);
-}
-
-.network-view__list {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s, 8px);
-}
-
-.network-view__list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 form {
