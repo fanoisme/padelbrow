@@ -109,14 +109,49 @@ desktop layout that just reflows. This applies across all views in §1, not as a
   `tel`, `number`) so mobile keyboards match the expected input, and long forms
   (`CreateMeetView`, `CreateCompetitionView`) keep the primary submit action reachable
   (sticky bottom action bar) rather than requiring a scroll back up on small screens.
-- **Verification.** In addition to the spec-file check in §5 Hard Constraints, each restyled
+- **Verification.** In addition to the spec-file check in §6 Hard Constraints, each restyled
   view is checked at three widths — 375px (phone), 768px (tablet), 1280px (desktop) — using
   the in-app browser preview, not just eyeballed at one size.
 
-## 5. Hard Constraints
+## 5. Navigation Audit & Fixes
 
-1. **No logic changes.** Composables, Supabase calls, RPCs, computed values, event handlers —
-   untouched. This is a template/style-only pass.
+Code audit against `src/router/index.js` found real navigation defects — orphan routes and a
+dead-end tab — that must be fixed as part of this rework, not just restyled around:
+
+1. `/stats` (`PersonalStatsView`) has **zero nav link anywhere** in the app (not in
+   `AppLayout`'s pill nav, not cross-linked from any other view) — unreachable except by
+   typing the URL directly. Add it to the desktop pill nav and the mobile bottom tab bar /
+   More sheet (§4).
+2. `/challenges` (`ChallengesView`) — same defect, same fix.
+3. `/clubs/:id/feed` (route name `club-feed`) is never linked from `ClubDetailView` — add a
+   "Club feed" link/tab there.
+4. `MeetDetailView`'s "Matches" tab is a stale Phase 4 placeholder
+   (`<LiEmptyState title="Matches open in Phase 4">`) that was never wired up, even though
+   `MatchSessionView` has existed and worked since Phase 4. Replace the placeholder with a
+   real link/button to the match-session route (`/meets/:meetId/match-session`) —
+   `MatchSessionView` already bootstraps a new session when no `sessionId` is given, so this
+   is template wiring, not new business logic.
+
+General correctness checklist applied to every nav surface (desktop pills, mobile tab bar,
+More sheet, in-page cross-links) while restyling:
+
+- Every route in `router/index.js` is reachable from at least one nav surface or a natural
+  in-app flow (no orphan routes beyond intentionally-implicit ones like `not-found`).
+- Active-state highlighting still works correctly for nested routes (e.g. `/clubs/:id`
+  correctly highlights the "Clubs" pill/tab) after the restyle.
+- Auth-gated nav items only render for signed-in users — the existing `v-if="user"` pattern
+  in `AppLayout` is preserved, not broken by the restyle.
+- If adding `/stats` and `/challenges` makes the desktop pill row too crowded (10 items + bell
+  + sign out), fold the least-frequent items into a small overflow "More" affordance rather
+  than letting the row silently overflow — same instinct as the mobile More sheet in §4,
+  applied to desktop.
+
+## 6. Hard Constraints
+
+1. **No business-logic changes, but navigation wiring fixes are in scope.** Composables,
+   Supabase calls, RPCs, computed values, and event handlers stay untouched. Adding missing
+   `router-link`/button elements and replacing the stale `MeetDetailView` Matches placeholder
+   (§5) counts as template/routing wiring, not business logic, and is in scope.
 2. **Preserve test selectors.** 18 `*.spec.js` files assert on `data-testid` attributes and/or
    rendered text (e.g. `AchievementsView.spec.js` expects `data-testid="achievement-card"`).
    Every existing `data-testid` must survive the restyle unchanged; new wrapper elements
@@ -130,7 +165,7 @@ desktop layout that just reflows. This applies across all views in §1, not as a
    an existing token/component, flag it during implementation rather than inventing a new one
    ad hoc.
 
-## 6. Execution Shape
+## 7. Execution Shape
 
 Each view file is independent (shared dependencies: `LiPageHeader` and the breakpoint
 convention/bottom-tab-bar must exist before per-view restyling leans on them). This suits
@@ -139,18 +174,23 @@ parallel, per-view execution:
 1. Build `LiPageHeader` and the `AppLayout` bottom tab bar + breakpoint convention first
    (blocks everything else).
 2. Restyle all remaining views in parallel/independent tasks, grouped by the categories in
-   §3, applying the §4 responsive/mobile-native requirements as part of the same pass (not a
-   separate follow-up), each verified against its own existing spec file.
+   §3, applying the §4 responsive/mobile-native requirements and the §5 navigation fixes as
+   part of the same pass (not a separate follow-up), each verified against its own existing
+   spec file.
 3. Final pass: manual visual check via dev server across one sample view per category
    (e.g. `ClubsView`, `MeetDetailView`, `LoginView`, `AchievementsView`, `LeaderboardView`)
-   at 375px / 768px / 1280px widths, plus a dark-mode toggle check.
+   at 375px / 768px / 1280px widths, a dark-mode toggle check, and a full click-through of
+   every nav surface (desktop pills, mobile tab bar, More sheet) confirming every route in
+   §5's checklist is reachable.
 
-## 7. Out of Scope
+## 8. Out of Scope
 
-- No changes to routing, auth flow, RLS policies, or Supabase schema.
+- No new route definitions, no auth-flow/RLS/Supabase-schema changes — §5's fixes only add
+  links/wiring to routes that already exist in `router/index.js`.
 - No new features (no new gamification mechanics, no new stats).
-- No redesign of `HomeView.vue`'s content or the desktop pill nav (already modernized) —
-  `AppLayout` changes are limited to adding the mobile bottom tab bar per §4.
+- No redesign of `HomeView.vue`'s content (already modernized). `AppLayout` changes are the
+  mobile bottom tab bar (§4) plus the missing-link fixes and possible desktop overflow "More"
+  affordance (§5) — not a full nav redesign.
 - No changes to the PNG export mechanism in `LeaderboardView`.
 - No native app wrapper (Capacitor/Cordova/etc.) — "mobile-native" here means the web app
   *feels* native in a mobile browser/PWA context, not a compiled native shell.
