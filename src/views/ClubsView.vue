@@ -1,23 +1,26 @@
 <template>
   <section class="clubs-view">
-    <div class="clubs-view__header">
-      <h1>Clubs</h1>
-      <LiButton @click="showCreateModal = true">Create club</LiButton>
-    </div>
+    <LiPageHeader title="Clubs" subtitle="Find or start a padel community near you.">
+      <template #actions>
+        <LiButton @click="showCreateModal = true">Create club</LiButton>
+      </template>
+    </LiPageHeader>
 
     <LiTextField v-model="query" placeholder="Search clubs..." @update:modelValue="handleSearch" />
 
     <LiEmptyState v-if="clubs.length === 0" title="No clubs found" icon="search" />
-    <div v-else class="clubs-view__list">
-      <LiCard v-for="club in clubs" :key="club.id" hover class="clubs-view__card">
-        <router-link :to="`/clubs/${club.id}`">
-          <h3>{{ club.name }}</h3>
-          <p>{{ club.description }}</p>
-        </router-link>
-      </LiCard>
-    </div>
+    <LiRevealOnScroll v-else variant="fade-up" stagger>
+      <div class="clubs-view__list">
+        <LiCard v-for="club in clubs" :key="club.id" hover class="clubs-view__card">
+          <router-link :to="`/clubs/${club.id}`">
+            <h3>{{ club.name }}</h3>
+            <p>{{ club.description }}</p>
+          </router-link>
+        </LiCard>
+      </div>
+    </LiRevealOnScroll>
 
-    <LiModal v-model="showCreateModal" title="Create a club">
+    <component :is="isMobile ? LiBottomSheet : LiModal" v-model="showCreateModal" title="Create a club">
       <form @submit.prevent="handleCreate">
         <LiTextField v-model="newClub.name" label="Name" />
         <LiTextField v-model="newClub.slug" label="URL slug" placeholder="padel-brow" />
@@ -29,19 +32,21 @@
         />
         <LiButton type="submit" :loading="creating">Create</LiButton>
       </form>
-    </LiModal>
+    </component>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { LiButton, LiTextField, LiCard, LiEmptyState, LiModal, LiSelect, useToast } from '../design-system/components/index.js'
+import { LiButton, LiTextField, LiCard, LiEmptyState, LiModal, LiBottomSheet, LiSelect, LiPageHeader, LiRevealOnScroll, useToast } from '../design-system/components/index.js'
 import { useAuth } from '../composables/useAuth.js'
 import { useClubs } from '../composables/useClubs.js'
+import { useViewport } from '../composables/useViewport.js'
 
 const { user } = useAuth()
 const { listClubs, searchClubs, createClub } = useClubs()
 const toast = useToast()
+const { isMobile } = useViewport()
 
 const clubs = ref([])
 const query = ref('')
@@ -77,12 +82,6 @@ async function handleCreate() {
   display: flex;
   flex-direction: column;
   gap: var(--space-l, 24px);
-}
-
-.clubs-view__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .clubs-view__list {

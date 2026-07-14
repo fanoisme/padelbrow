@@ -13,7 +13,12 @@ vi.mock('../composables/useClubs.js', () => ({
   useClubs: vi.fn(() => ({ listClubs, searchClubs: vi.fn(), createClub })),
 }))
 
+vi.mock('../composables/useViewport.js', () => ({
+  useViewport: vi.fn(() => ({ isMobile: ref(false) })),
+}))
+
 import ClubsView from './ClubsView.vue'
+import { useViewport } from '../composables/useViewport.js'
 
 // Renders slot content so club name/description are visible in wrapper.text()
 // — the default `RouterLink: true` stub does not render its default slot
@@ -26,5 +31,39 @@ describe('ClubsView', () => {
     await flushPromises()
     expect(listClubs).toHaveBeenCalled()
     expect(wrapper.text()).toContain('Padel Brow')
+  })
+
+  it('shows the create-club form in a centered LiModal on desktop', async () => {
+    useViewport.mockReturnValue({ isMobile: ref(false) })
+    const wrapper = mount(ClubsView, {
+      global: { stubs: { RouterLink: RouterLinkStub } },
+      attachTo: document.body,
+    })
+    await flushPromises()
+    const createBtn = wrapper.findAll('button').find((b) => b.text().match(/create club/i))
+    expect(createBtn).toBeTruthy()
+    await createBtn.trigger('click')
+    await flushPromises()
+    // LiModal/LiBottomSheet render via <Teleport to="body">, so assert
+    // against document.body, not wrapper.text()/wrapper.find().
+    expect(document.body.querySelector('.li-modal-overlay')).toBeTruthy()
+    expect(document.body.querySelector('.li-bottomsheet-overlay')).toBeFalsy()
+    wrapper.unmount()
+  })
+
+  it('shows the create-club form in a mobile LiBottomSheet when isMobile is true', async () => {
+    useViewport.mockReturnValue({ isMobile: ref(true) })
+    const wrapper = mount(ClubsView, {
+      global: { stubs: { RouterLink: RouterLinkStub } },
+      attachTo: document.body,
+    })
+    await flushPromises()
+    const createBtn = wrapper.findAll('button').find((b) => b.text().match(/create club/i))
+    expect(createBtn).toBeTruthy()
+    await createBtn.trigger('click')
+    await flushPromises()
+    expect(document.body.querySelector('.li-bottomsheet-overlay')).toBeTruthy()
+    expect(document.body.querySelector('.li-modal-overlay')).toBeFalsy()
+    wrapper.unmount()
   })
 })
