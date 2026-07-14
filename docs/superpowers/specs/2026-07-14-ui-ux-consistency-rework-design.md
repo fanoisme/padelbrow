@@ -24,8 +24,10 @@ visual bar as the landing page, using the design system that already exists.
 - Gamification: `AchievementsView`, `ChallengesView`, `LeaderboardView`, `PersonalStatsView`
 - Feed: `FeedView`
 - Competitions: `CompetitionsListView`, `CompetitionDetailView`, `CreateCompetitionView`
-- Shell: `AppLayout.vue` (nav already modernized in the last commit — only touch if a shared
-  page-header pattern needs shell-level support)
+- Shell: `AppLayout.vue` — nav content/links already modernized in the last commit, but it
+  needs a **mobile-native bottom tab bar** per §4 (this widens the "no change" note from the
+  original draft: the nav *destinations* stay the same, only how they're presented on small
+  screens changes).
 
 ## 2. Shared Foundation — one new component
 
@@ -74,7 +76,44 @@ Applied consistently across the view groups; each view keeps its existing script
   completely untouched — only the DOM being exported gets restyled, not the export mechanism.
 - **Profile** (`ProfileView`): same card/button/badge treatment as detail views.
 
-## 4. Hard Constraints
+## 4. Responsive & Mobile-Native Requirements
+
+Every restyled view must be genuinely responsive and feel like a native mobile app, not a
+desktop layout that just reflows. This applies across all views in §1, not as a separate pass.
+
+- **Standard breakpoints.** CSS custom properties can't be read inside `@media` conditions, so
+  breakpoints are a documented literal-value convention (added as a comment block at the top
+  of `tokens.css`, next to the existing token groups) used identically everywhere:
+  `480px` (phone), `768px` (tablet / nav collapse point), `1024px` (wide desktop content cap).
+  This replaces the current ad hoc, inconsistent `max-width: 720px` used in only `HomeView`
+  and `AppLayout`.
+- **Bottom tab bar on mobile.** Below the `768px` breakpoint, `AppLayout`'s nav switches from
+  the horizontal scrolling pill row to a fixed bottom tab bar (the standard native-app
+  pattern) for the primary destinations (Home/Feed, Meets, Clubs, Leaderboard, Profile — cap
+  at 5 icons, matching common mobile tab-bar limits). Secondary destinations (Network,
+  Achievements, Challenges, Competitions) move into a "More" entry that opens a `LiBottomSheet`
+  listing them. Above `768px`, the existing pill nav in the header is unchanged.
+- **Safe-area insets.** The sticky header and new bottom tab bar use
+  `env(safe-area-inset-top)` / `env(safe-area-inset-bottom)` padding so content isn't obscured
+  by notches/home-indicators on modern phones.
+- **Touch targets.** All interactive elements (buttons, nav items, form controls, tab bar
+  icons) are at least 44x44px on mobile widths, per standard mobile tap-target guidance.
+- **Bottom sheets over modals on touch.** Any view currently using (or gaining) a modal-style
+  interaction (filters, confirmations, secondary actions) uses `LiBottomSheet` at mobile
+  widths instead of a centered dialog — reads as native on touch devices. Desktop widths can
+  keep a centered modal if that's what the component already does.
+- **Single-column stacking.** Multi-column grids (feature/card grids, stat tiles, podium,
+  achievement grid) collapse to a single column below `768px`; side-by-side detail layouts
+  (e.g. `MeetDetailView`'s info + actions) stack vertically on mobile.
+- **Mobile-appropriate form inputs.** Inputs use correct `type`/`autocomplete` (e.g. `email`,
+  `tel`, `number`) so mobile keyboards match the expected input, and long forms
+  (`CreateMeetView`, `CreateCompetitionView`) keep the primary submit action reachable
+  (sticky bottom action bar) rather than requiring a scroll back up on small screens.
+- **Verification.** In addition to the spec-file check in §5 Hard Constraints, each restyled
+  view is checked at three widths — 375px (phone), 768px (tablet), 1280px (desktop) — using
+  the in-app browser preview, not just eyeballed at one size.
+
+## 5. Hard Constraints
 
 1. **No logic changes.** Composables, Supabase calls, RPCs, computed values, event handlers —
    untouched. This is a template/style-only pass.
@@ -91,21 +130,27 @@ Applied consistently across the view groups; each view keeps its existing script
    an existing token/component, flag it during implementation rather than inventing a new one
    ad hoc.
 
-## 5. Execution Shape
+## 6. Execution Shape
 
-Each view file is independent (only shared dependency: `LiPageHeader` must exist before any
-view can use it). This suits parallel, per-view execution:
+Each view file is independent (shared dependencies: `LiPageHeader` and the breakpoint
+convention/bottom-tab-bar must exist before per-view restyling leans on them). This suits
+parallel, per-view execution:
 
-1. Build `LiPageHeader` first (single task, blocks everything else).
+1. Build `LiPageHeader` and the `AppLayout` bottom tab bar + breakpoint convention first
+   (blocks everything else).
 2. Restyle all remaining views in parallel/independent tasks, grouped by the categories in
-   §3 for consistency of pattern, each verified against its own existing spec file.
+   §3, applying the §4 responsive/mobile-native requirements as part of the same pass (not a
+   separate follow-up), each verified against its own existing spec file.
 3. Final pass: manual visual check via dev server across one sample view per category
    (e.g. `ClubsView`, `MeetDetailView`, `LoginView`, `AchievementsView`, `LeaderboardView`)
-   plus a dark-mode toggle check.
+   at 375px / 768px / 1280px widths, plus a dark-mode toggle check.
 
-## 6. Out of Scope
+## 7. Out of Scope
 
 - No changes to routing, auth flow, RLS policies, or Supabase schema.
 - No new features (no new gamification mechanics, no new stats).
-- No redesign of `HomeView.vue` or `AppLayout.vue` nav (already modernized).
+- No redesign of `HomeView.vue`'s content or the desktop pill nav (already modernized) —
+  `AppLayout` changes are limited to adding the mobile bottom tab bar per §4.
 - No changes to the PNG export mechanism in `LeaderboardView`.
+- No native app wrapper (Capacitor/Cordova/etc.) — "mobile-native" here means the web app
+  *feels* native in a mobile browser/PWA context, not a compiled native shell.
