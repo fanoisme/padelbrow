@@ -13,7 +13,9 @@
         <router-link to="/clubs" class="nav-pill">Clubs</router-link>
         <router-link to="/network" class="nav-pill">Network</router-link>
         <router-link to="/leaderboard" class="nav-pill">Leaderboard</router-link>
+        <router-link to="/stats" class="nav-pill">Stats</router-link>
         <router-link to="/achievements" class="nav-pill">Achievements</router-link>
+        <router-link to="/challenges" class="nav-pill">Challenges</router-link>
         <router-link to="/profile" class="nav-pill">Profile</router-link>
         <NotificationsBell />
         <button class="nav-pill nav-pill--ghost" @click="handleSignOut">Sign out</button>
@@ -26,19 +28,65 @@
       </nav>
       <img class="app-header__allo" src="../assets/logo-allo.png" alt="Allo Bank" />
     </header>
+
     <main class="app-main">
       <slot />
     </main>
+
+    <nav v-if="user" class="bottom-tab-bar" aria-label="Primary">
+      <router-link to="/feed" class="bottom-tab-bar__item">
+        <span class="bottom-tab-bar__icon" aria-hidden="true">📰</span>
+        <span class="bottom-tab-bar__label">Feed</span>
+      </router-link>
+      <router-link to="/meets" class="bottom-tab-bar__item">
+        <span class="bottom-tab-bar__icon" aria-hidden="true">🎾</span>
+        <span class="bottom-tab-bar__label">Meets</span>
+      </router-link>
+      <router-link to="/clubs" class="bottom-tab-bar__item">
+        <span class="bottom-tab-bar__icon" aria-hidden="true">🏛️</span>
+        <span class="bottom-tab-bar__label">Clubs</span>
+      </router-link>
+      <router-link to="/leaderboard" class="bottom-tab-bar__item">
+        <span class="bottom-tab-bar__icon" aria-hidden="true">📊</span>
+        <span class="bottom-tab-bar__label">Leaderboard</span>
+      </router-link>
+      <button type="button" class="bottom-tab-bar__item" data-testid="bottom-nav-more" @click="showMore = true">
+        <span class="bottom-tab-bar__icon" aria-hidden="true">⋯</span>
+        <span class="bottom-tab-bar__label">More</span>
+      </button>
+    </nav>
+
+    <LiBottomSheet v-model="showMore" title="More">
+      <div class="more-sheet__list">
+        <router-link to="/competitions" class="more-sheet__item" @click="showMore = false">🏆 Competitions</router-link>
+        <router-link to="/network" class="more-sheet__item" @click="showMore = false">🧑‍🤝‍🧑 Network</router-link>
+        <router-link to="/achievements" class="more-sheet__item" @click="showMore = false">🏅 Achievements</router-link>
+        <router-link to="/challenges" class="more-sheet__item" @click="showMore = false">🎯 Challenges</router-link>
+        <router-link to="/stats" class="more-sheet__item" @click="showMore = false">📈 My stats</router-link>
+        <router-link to="/profile" class="more-sheet__item" @click="showMore = false">👤 Profile</router-link>
+      </div>
+      <template #footer>
+        <LiButton variant="secondary" @click="handleSignOutFromSheet">Sign out</LiButton>
+      </template>
+    </LiBottomSheet>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useAuth } from '../composables/useAuth.js'
 import NotificationsBell from '../components/notifications/NotificationsBell.vue'
+import { LiBottomSheet, LiButton } from '../design-system/components/index.js'
 
 const { user, signOut } = useAuth()
+const showMore = ref(false)
 
 async function handleSignOut() {
+  await signOut()
+}
+
+async function handleSignOutFromSheet() {
+  showMore.value = false
   await signOut()
 }
 </script>
@@ -57,7 +105,7 @@ async function handleSignOut() {
   display: flex;
   align-items: center;
   gap: var(--space-s, 12px);
-  padding: var(--space-m, 16px) var(--space-l, 24px);
+  padding: calc(var(--space-m, 16px) + env(safe-area-inset-top, 0px)) var(--space-l, 24px) var(--space-m, 16px);
   background: var(--glass-bg-light, rgba(255, 255, 255, 0.5));
   backdrop-filter: var(--glass-blur, blur(20px)) var(--glass-saturate, saturate(1.6));
   -webkit-backdrop-filter: var(--glass-blur, blur(20px)) var(--glass-saturate, saturate(1.6));
@@ -138,7 +186,7 @@ async function handleSignOut() {
 }
 
 .nav-pill--ghost {
-  color: var(--color-on-surface, #333333);
+  color: var(--color-gray-900, #333333);
 }
 
 .app-header__allo {
@@ -152,8 +200,88 @@ async function handleSignOut() {
   padding: var(--space-l, 24px);
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
   .app-header__title { display: none; }
   .app-main { padding: var(--space-m, 16px); }
+}
+
+/* ── Mobile bottom tab bar ── */
+@media (max-width: 768px) {
+  .app-header__nav--pills { display: none; }
+  .app-main { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+}
+
+.bottom-tab-bar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .bottom-tab-bar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-sticky, 30);
+    justify-content: space-around;
+    background: var(--glass-bg-light, rgba(255, 255, 255, 0.85));
+    backdrop-filter: var(--glass-blur, blur(20px)) var(--glass-saturate, saturate(1.6));
+    -webkit-backdrop-filter: var(--glass-blur, blur(20px)) var(--glass-saturate, saturate(1.6));
+    border-top: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+.bottom-tab-bar__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-on-surface-variant, #666666);
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-sm, 12px);
+}
+
+.bottom-tab-bar__item.router-link-active {
+  color: var(--color-gray-900, #333333);
+}
+
+.bottom-tab-bar__icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.bottom-tab-bar__label {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.more-sheet__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.more-sheet__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s, 8px);
+  min-height: 44px;
+  padding: var(--space-m, 12px) var(--space-s, 8px);
+  text-decoration: none;
+  color: var(--color-gray-900, #333333);
+  font-weight: 600;
+  border-radius: var(--radius-sm, 8px);
+}
+
+.more-sheet__item:hover {
+  background: var(--color-gray-100, #F2F2F2);
 }
 </style>

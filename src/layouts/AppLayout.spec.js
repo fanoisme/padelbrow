@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { ref } from 'vue'
 import AppLayout from './AppLayout.vue'
@@ -13,6 +13,7 @@ vi.mock('../composables/useAuth.js', () => ({
 }))
 
 import { useAuth } from '../composables/useAuth.js'
+import { vi } from 'vitest'
 
 describe('AppLayout', () => {
   it('renders the PADEL BROW mark, Allo Bank logo, title, and slot content', () => {
@@ -40,5 +41,29 @@ describe('AppLayout', () => {
     expect(wrapper.text()).toContain('Network')
     expect(wrapper.text()).toContain('Profile')
     expect(wrapper.text()).toContain('Sign out')
+  })
+
+  it('includes Stats and Challenges links when logged in (previously unreachable routes)', () => {
+    useAuth.mockReturnValue({ user: ref({ id: 'u1' }), signOut })
+    const wrapper = mount(AppLayout, { global: { stubs: { RouterLink: RouterLinkStub, NotificationsBell: true } } })
+    expect(wrapper.text()).toContain('Stats')
+    expect(wrapper.text()).toContain('Challenges')
+  })
+
+  it('opens the mobile More sheet and shows the secondary destinations', async () => {
+    useAuth.mockReturnValue({ user: ref({ id: 'u1' }), signOut })
+    const wrapper = mount(AppLayout, {
+      global: { stubs: { RouterLink: RouterLinkStub, NotificationsBell: true } },
+      attachTo: document.body,
+    })
+    const moreBtn = wrapper.find('[data-testid="bottom-nav-more"]')
+    expect(moreBtn.exists()).toBe(true)
+    await moreBtn.trigger('click')
+    // LiBottomSheet renders via <Teleport to="body">, so assert against the
+    // document body, not wrapper.text() — Vue Test Utils doesn't include
+    // teleported content in the component's own text()/html().
+    expect(document.body.textContent).toContain('Competitions')
+    expect(document.body.textContent).toContain('Network')
+    wrapper.unmount()
   })
 })
