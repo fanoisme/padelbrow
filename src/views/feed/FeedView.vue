@@ -1,23 +1,25 @@
 <template>
   <section class="feed-view">
-    <h1>{{ clubId ? 'Club feed' : 'Feed' }}</h1>
+    <LiPageHeader :title="clubId ? 'Club feed' : 'Feed'" />
 
-    <LiCard class="feed-view__composer">
-      <textarea v-model="caption" class="feed-view__caption" placeholder="Share something…"></textarea>
+    <LiGlassCard class="feed-view__composer">
+      <LiTextField v-model="caption" type="area" placeholder="Share something…" />
       <input type="file" multiple accept="image/*,video/*" class="feed-view__file" @change="onFiles" />
       <LiButton :loading="posting" @click="handlePost">Post</LiButton>
-    </LiCard>
+    </LiGlassCard>
 
     <LiEmptyState v-if="posts.length === 0" title="No posts yet" icon="feed" />
-    <div class="feed-view__list">
-      <PostCard v-for="p in posts" :key="p.id" :post="p" @deleted="onDeleted" />
-    </div>
+    <LiRevealOnScroll v-else variant="fade-up" stagger>
+      <div class="feed-view__list">
+        <PostCard v-for="p in posts" :key="p.id" :post="p" @deleted="onDeleted" />
+      </div>
+    </LiRevealOnScroll>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { LiCard, LiButton, LiEmptyState, useToast } from '../../design-system/components/index.js'
+import { LiGlassCard, LiButton, LiEmptyState, LiPageHeader, LiRevealOnScroll, LiTextField, useToast } from '../../design-system/components/index.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { useFeed } from '../../composables/useFeed.js'
 import { useStorage } from '../../composables/useStorage.js'
@@ -75,6 +77,6 @@ function onDeleted(postId) {
 <style scoped>
 .feed-view { display: flex; flex-direction: column; gap: var(--space-m, 16px); max-width: 640px; margin: 0 auto; }
 .feed-view__composer { display: flex; flex-direction: column; gap: var(--space-s, 8px); }
-.feed-view__caption { min-height: 72px; padding: var(--space-s, 8px); border: 1px solid var(--color-gray-300, #CCC); border-radius: var(--radius-m, 8px); font: inherit; resize: vertical; }
+.feed-view__file { font-size: var(--text-xs, 14px); }
 .feed-view__list { display: flex; flex-direction: column; gap: var(--space-m, 16px); }
 </style>
