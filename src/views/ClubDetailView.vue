@@ -1,19 +1,21 @@
 <template>
   <section v-if="club" class="club-detail-view">
-    <div class="club-detail-view__header">
-      <h1>{{ club.name }}</h1>
-      <LiButton v-if="!myMembership" @click="handleJoin">Join</LiButton>
-      <LiButton v-else variant="secondary" @click="handleLeave">Leave</LiButton>
-    </div>
-    <p>{{ club.description }}</p>
+    <LiPageHeader :title="club.name" :subtitle="club.description">
+      <template #actions>
+        <LiButton variant="secondary" @click="goToFeed">Club feed</LiButton>
+        <LiButton v-if="!myMembership" @click="handleJoin">Join</LiButton>
+        <LiButton v-else variant="secondary" @click="handleLeave">Leave</LiButton>
+      </template>
+    </LiPageHeader>
 
     <h2>Members</h2>
-    <ul class="club-detail-view__members">
-      <li v-for="member in members" :key="member.user_id">
-        <span>{{ member.profiles.full_name }}</span>
-        <LiBadge :label="member.role" variant="brand" />
-      </li>
-    </ul>
+    <LiCard flush>
+      <LiListTile v-for="member in members" :key="member.user_id" :title="member.profiles.full_name">
+        <template #trailing>
+          <LiBadge :label="member.role" variant="brand" />
+        </template>
+      </LiListTile>
+    </LiCard>
 
     <ClubMembershipsPanel
       :club-id="club.id"
@@ -24,13 +26,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { LiButton, LiBadge, useToast } from '../design-system/components/index.js'
+import { useRoute, useRouter } from 'vue-router'
+import { LiButton, LiBadge, LiCard, LiListTile, LiPageHeader, useToast } from '../design-system/components/index.js'
 import { useAuth } from '../composables/useAuth.js'
 import { useClubs } from '../composables/useClubs.js'
 import ClubMembershipsPanel from '../components/clubs/ClubMembershipsPanel.vue'
 
 const route = useRoute()
+const router = useRouter()
 const { user } = useAuth()
 const { getClub, listMembers, getMyMembership, joinClub, leaveClub } = useClubs()
 const toast = useToast()
@@ -68,6 +71,10 @@ async function handleLeave() {
     toast.error(err.message || 'Could not leave the club.')
   }
 }
+
+function goToFeed() {
+  router.push({ name: 'club-feed', params: { id: route.params.id } })
+}
 </script>
 
 <style scoped>
@@ -75,26 +82,5 @@ async function handleLeave() {
   display: flex;
   flex-direction: column;
   gap: var(--space-m, 16px);
-}
-
-.club-detail-view__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.club-detail-view__members {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s, 8px);
-}
-
-.club-detail-view__members li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-s, 8px) 0;
 }
 </style>

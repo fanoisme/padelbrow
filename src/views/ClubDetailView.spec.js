@@ -40,4 +40,24 @@ describe('ClubDetailView', () => {
     expect(wrapper.text()).toContain('Fano')
     expect(wrapper.text()).toContain('Join')
   })
+
+  it('navigates to the club feed when "Club feed" is clicked', async () => {
+    const router = createRouter({
+      history: createWebHashHistory(),
+      routes: [
+        { path: '/clubs/:id', name: 'club-detail', component: ClubDetailView },
+        { path: '/clubs/:id/feed', name: 'club-feed', component: { template: '<div>stub feed</div>' } },
+      ],
+    })
+    router.push('/clubs/c1')
+    await router.isReady()
+    const wrapper = mount(ClubDetailView, { global: { plugins: [router] } })
+    await flushPromises()
+
+    const feedBtn = wrapper.findAll('button').find((b) => b.text().match(/club feed/i))
+    expect(feedBtn).toBeTruthy()
+    await feedBtn.trigger('click')
+    await flushPromises()
+    expect(router.currentRoute.value.path).toBe('/clubs/c1/feed')
+  })
 })
