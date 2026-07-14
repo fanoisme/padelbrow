@@ -7,6 +7,23 @@
   ══════════════════════════════════════════════════════════════
 */
 
+/*
+  ══════════════════════════════════════════════════════════════
+  BREAKPOINT CONVENTION (documentation only — CSS custom properties
+  cannot be read inside @media conditions, so these are NOT tokens,
+  just the literal pixel values every @media rule in this app must
+  use consistently)
+
+    480px  — phone
+    768px  — tablet / nav collapse point (AppLayout switches from
+             the desktop pill nav to the mobile bottom tab bar here)
+    1024px — wide desktop content cap
+
+  Always write `@media (max-width: 480px)` / `768px` / `1024px`
+  literally — do not invent new breakpoint values.
+  ══════════════════════════════════════════════════════════════
+*/
+
 :root {
   /* ══════════════════════════════════════════════════════════════
      COLOR PRIMITIVES
