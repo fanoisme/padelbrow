@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { ref } from 'vue'
 import AppLayout from './AppLayout.vue'
@@ -13,7 +13,6 @@ vi.mock('../composables/useAuth.js', () => ({
 }))
 
 import { useAuth } from '../composables/useAuth.js'
-import { vi } from 'vitest'
 
 describe('AppLayout', () => {
   it('renders the PADEL BROW mark, Allo Bank logo, title, and slot content', () => {

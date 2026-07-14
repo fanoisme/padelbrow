@@ -17,7 +17,6 @@
         <router-link to="/achievements" class="nav-pill">Achievements</router-link>
         <router-link to="/challenges" class="nav-pill">Challenges</router-link>
         <router-link to="/profile" class="nav-pill">Profile</router-link>
-        <NotificationsBell />
         <button class="nav-pill nav-pill--ghost" @click="handleSignOut">Sign out</button>
       </nav>
       <nav v-else class="app-header__nav app-header__nav--pills">
@@ -26,6 +25,7 @@
         <router-link to="/login" class="nav-pill nav-pill--ghost">Sign in</router-link>
         <router-link to="/signup" class="nav-pill nav-pill--primary">Get started</router-link>
       </nav>
+      <NotificationsBell v-if="user" class="app-header__bell" />
       <img class="app-header__allo" src="../assets/logo-allo.png" alt="Allo Bank" />
     </header>
 
@@ -187,6 +187,10 @@ async function handleSignOutFromSheet() {
 
 .nav-pill--ghost {
   color: var(--color-gray-900, #333333);
+}
+
+.app-header__bell {
+  flex-shrink: 0;
 }
 
 .app-header__allo {
