@@ -1,32 +1,37 @@
 <template>
   <section class="stats-view">
-    <h1>My stats</h1>
+    <LiPageHeader title="My stats" subtitle="Your rating, reliability, and match history." />
 
-    <div class="stats-view__card" v-if="stats">
-      <div><span>Rating</span><strong>{{ Number(stats.rating).toFixed(1) }}</strong></div>
-      <div><span>Played</span><strong>{{ stats.matches_played }}</strong></div>
-      <div><span>Reliability</span><strong>{{ Math.round(stats.reliability_pct) }}%</strong></div>
-      <div><span>Wins</span><strong>{{ wins }}</strong></div>
-      <div><span>Losses</span><strong>{{ losses }}</strong></div>
-      <div><span>Win %</span><strong>{{ winPct }}%</strong></div>
+    <div v-if="stats" class="stats-view__card">
+      <LiCard class="stats-view__tile"><span>Rating</span><strong>{{ Number(stats.rating).toFixed(1) }}</strong></LiCard>
+      <LiCard class="stats-view__tile"><span>Played</span><strong>{{ stats.matches_played }}</strong></LiCard>
+      <LiCard class="stats-view__tile"><span>Reliability</span><strong>{{ Math.round(stats.reliability_pct) }}%</strong></LiCard>
+      <LiCard class="stats-view__tile"><span>Wins</span><strong>{{ wins }}</strong></LiCard>
+      <LiCard class="stats-view__tile"><span>Losses</span><strong>{{ losses }}</strong></LiCard>
+      <LiCard class="stats-view__tile"><span>Win %</span><strong>{{ winPct }}%</strong></LiCard>
     </div>
 
     <h2>Match history</h2>
-    <ul class="stats-view__history">
-      <li v-for="h in history" :key="h.match.id" class="stats-view__match">
-        <span class="stats-view__title">{{ h.match.meet?.title || 'Match' }}</span>
-        <span class="stats-view__score">{{ h.match.score_a }}-{{ h.match.score_b }}</span>
-        <LiBadge v-if="h.match.status === 'completed'" :label="resultOf(h) ? 'W' : 'L'" :variant="resultOf(h) ? 'success' : 'danger'" />
-        <LiBadge v-else label="pending" variant="neutral" />
-      </li>
-      <li v-if="!history.length" class="stats-view__empty">No matches yet.</li>
-    </ul>
+    <LiEmptyState v-if="!history.length" title="No matches yet." icon="history" />
+    <LiCard v-else flush>
+      <LiListTile
+        v-for="h in history"
+        :key="h.match.id"
+        :title="h.match.meet?.title || 'Match'"
+        :subtitle="`${h.match.score_a}-${h.match.score_b}`"
+      >
+        <template #trailing>
+          <LiBadge v-if="h.match.status === 'completed'" :label="resultOf(h) ? 'W' : 'L'" :variant="resultOf(h) ? 'success' : 'error'" />
+          <LiBadge v-else label="pending" variant="neutral" />
+        </template>
+      </LiListTile>
+    </LiCard>
   </section>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { LiBadge, useToast } from '../design-system/components/index.js'
+import { LiBadge, LiCard, LiEmptyState, LiListTile, LiPageHeader, useToast } from '../design-system/components/index.js'
 import { useAuth } from '../composables/useAuth.js'
 import { useStats } from '../composables/useStats.js'
 
@@ -60,12 +65,8 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.stats-view { display: flex; flex-direction: column; gap: var(--space-m, 16px); }
-.stats-view__card { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-s, 8px); }
-.stats-view__card > div { display: flex; flex-direction: column; gap: var(--space-xs, 4px); padding: var(--space-s, 8px); background: var(--color-surface, #fff); border-radius: var(--radius-s, 6px); }
-.stats-view__card span { font-size: 0.8rem; opacity: 0.6; }
-.stats-view__history { list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--space-s, 8px); }
-.stats-view__match { display: flex; align-items: center; gap: var(--space-s, 8px); }
-.stats-view__title { flex: 1; }
-.stats-view__score { font-variant-numeric: tabular-nums; }
+.stats-view { display: flex; flex-direction: column; gap: var(--space-l, 24px); }
+.stats-view__card { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--space-s, 8px); }
+.stats-view__tile { display: flex; flex-direction: column; gap: var(--space-xs, 4px); }
+.stats-view__tile span { font-size: 0.8rem; opacity: 0.6; }
 </style>
