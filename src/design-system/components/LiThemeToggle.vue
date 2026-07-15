@@ -52,5 +52,6 @@ const { isDark, toggle } = useTheme()
 @media (prefers-reduced-motion: reduce) {
   .li-theme-toggle,
   .li-theme-toggle :deep(.li-icon) { transition: none; transform: none; }
+  .li-theme-toggle:active { transform: none; }
 }
 </style>
