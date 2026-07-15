@@ -1,25 +1,28 @@
 <template>
   <section class="comps-list-view">
-    <div class="comps-list-view__header">
-      <h1>Competitions</h1>
-      <LiButton @click="$router.push('/competitions/new')">Create competition</LiButton>
-    </div>
+    <LiPageHeader title="Competitions" subtitle="Round-robin leagues and knockout brackets.">
+      <template #actions>
+        <LiButton @click="$router.push('/competitions/new')">Create competition</LiButton>
+      </template>
+    </LiPageHeader>
 
     <LiEmptyState v-if="competitions.length === 0" title="No competitions yet" icon="trophy" />
-    <div v-else class="comps-list-view__list">
-      <LiCard v-for="comp in competitions" :key="comp.id" hover>
-        <router-link :to="`/competitions/${comp.id}`">
-          <h3>{{ comp.name }}</h3>
-          <p>{{ comp.format }} · {{ comp.status }}</p>
-        </router-link>
-      </LiCard>
-    </div>
+    <LiRevealOnScroll v-else variant="fade-up" stagger>
+      <div class="comps-list-view__list">
+        <LiCard v-for="comp in competitions" :key="comp.id" hover>
+          <router-link :to="`/competitions/${comp.id}`">
+            <h3>{{ comp.name }}</h3>
+            <p>{{ comp.format }} · {{ comp.status }}</p>
+          </router-link>
+        </LiCard>
+      </div>
+    </LiRevealOnScroll>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { LiButton, LiCard, LiEmptyState, useToast } from '../../design-system/components/index.js'
+import { LiButton, LiCard, LiEmptyState, LiPageHeader, LiRevealOnScroll, useToast } from '../../design-system/components/index.js'
 import { useCompetitions } from '../../composables/useCompetitions.js'
 
 const { listCompetitions } = useCompetitions()
@@ -40,12 +43,6 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: var(--space-l, 24px);
-}
-
-.comps-list-view__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .comps-list-view__list {
