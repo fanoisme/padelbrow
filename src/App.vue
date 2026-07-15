@@ -1,6 +1,10 @@
 <template>
   <AppLayout>
-    <router-view />
+    <router-view v-slot="{ Component, route }">
+      <Transition :name="route.meta.transition || 'li-page'" mode="out-in">
+        <component :is="Component" :key="route.path" />
+      </Transition>
+    </router-view>
   </AppLayout>
   <LiToast />
 </template>
@@ -13,3 +17,19 @@ import { LiToast, useTheme } from './design-system/components/index.js'
 // prefers-color-scheme before the first authed view paints.
 useTheme()
 </script>
+
+<style>
+/* Page transition — slide + dim. Guide §1J. Reduced-motion collapses to a fade. */
+.li-page-enter-active,
+.li-page-leave-active {
+  transition: opacity var(--dur-medium, 300ms) var(--ease-smooth, cubic-bezier(0.16, 1, 0.3, 1)),
+              transform var(--dur-medium, 300ms) var(--ease-smooth, cubic-bezier(0.16, 1, 0.3, 1));
+}
+.li-page-enter-from { opacity: 0; transform: translateX(24px); }
+.li-page-leave-to   { opacity: 0; transform: translateX(-24px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .li-page-enter-from, .li-page-leave-to { transform: none; }
+  .li-page-enter-active, .li-page-leave-active { transition: opacity var(--dur-short, 200ms) ease; }
+}
+</style>
