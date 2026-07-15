@@ -1,38 +1,42 @@
 <template>
   <section class="achievements-view">
-    <div class="achievements-view__head" v-if="progress">
-      <h1>Level {{ progress.level.level }} — {{ progress.level.title }}</h1>
-      <p>{{ progress.totalXp }} XP</p>
-      <div class="achievements-view__bar">
-        <div class="achievements-view__bar-fill" :style="{ width: barPct + '%' }"></div>
-      </div>
+    <LiPageHeader v-if="progress" :title="`Level ${progress.level.level} — ${progress.level.title}`">
+      <template #actions>
+        <span class="achievements-view__xp"><LiCountUp :end-val="progress.totalXp" />&nbsp;XP</span>
+      </template>
+    </LiPageHeader>
+
+    <div v-if="progress" class="achievements-view__head">
+      <LiProgress :value="barPct" variant="brand" />
       <p v-if="progress.nextLevel" class="achievements-view__next">
         {{ progress.nextMinXp - progress.totalXp }} XP to {{ progress.nextLevel.title }}
       </p>
       <p v-else class="achievements-view__next">Max level reached</p>
     </div>
 
-    <div class="achievements-view__grid">
-      <div
-        v-for="a in achievements"
-        :key="a.id"
-        data-testid="achievement-card"
-        class="achievement-card"
-        :class="{ 'achievement-card--unlocked': unlocked.has(a.id) }"
-      >
-        <LiBadge :label="a.tier" :variant="tierVariant(a.tier)" />
-        <strong>{{ a.name }}</strong>
-        <p>{{ a.description }}</p>
-        <span v-if="unlocked.has(a.id)" class="achievement-card__state">Unlocked</span>
-        <span v-else class="achievement-card__state achievement-card__state--locked">Locked</span>
+    <LiRevealOnScroll variant="fade-up" stagger>
+      <div class="achievements-view__grid">
+        <LiCard
+          v-for="a in achievements"
+          :key="a.id"
+          data-testid="achievement-card"
+          class="achievement-card"
+          :class="{ 'achievement-card--unlocked': unlocked.has(a.id) }"
+        >
+          <LiBadge :label="a.tier" :variant="tierVariant(a.tier)" />
+          <strong>{{ a.name }}</strong>
+          <p>{{ a.description }}</p>
+          <span v-if="unlocked.has(a.id)" class="achievement-card__state">Unlocked</span>
+          <span v-else class="achievement-card__state achievement-card__state--locked">Locked</span>
+        </LiCard>
       </div>
-    </div>
+    </LiRevealOnScroll>
   </section>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { LiBadge, useToast } from '../design-system/components/index.js'
+import { LiBadge, LiCard, LiCountUp, LiPageHeader, LiProgress, LiRevealOnScroll, useToast } from '../design-system/components/index.js'
 import { useAuth } from '../composables/useAuth.js'
 import { useGamification } from '../composables/useGamification.js'
 
@@ -76,14 +80,13 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.achievements-view { display: flex; flex-direction: column; gap: var(--space-m, 16px); }
-.achievements-view__head { display: flex; flex-direction: column; gap: var(--space-xs, 4px); }
-.achievements-view__bar { height: 8px; background: var(--color-gray-200, #E6E6E6); border-radius: 999px; overflow: hidden; }
-.achievements-view__bar-fill { height: 100%; background: var(--color-brand, #4f46e5); transition: width 0.3s; }
+.achievements-view { display: flex; flex-direction: column; gap: var(--space-l, 24px); }
+.achievements-view__xp { font-weight: 700; font-size: 1.1rem; color: var(--color-on-surface, #333333); }
+.achievements-view__head { display: flex; flex-direction: column; gap: var(--space-s, 8px); }
 .achievements-view__next { font-size: 0.85rem; opacity: 0.7; }
 .achievements-view__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--space-s, 8px); }
-.achievement-card { display: flex; flex-direction: column; gap: var(--space-xs, 4px); padding: var(--space-m, 16px); background: var(--color-surface, #fff); border-radius: var(--radius-m, 12px); opacity: 0.5; border: 2px solid transparent; }
-.achievement-card--unlocked { opacity: 1; border-color: var(--color-brand, #4f46e5); }
+.achievement-card { display: flex; flex-direction: column; gap: var(--space-xs, 4px); opacity: 0.5; border: 2px solid transparent; }
+.achievement-card--unlocked { opacity: 1; border-color: var(--color-brand, #FFAF03); box-shadow: var(--shadow-glow, 0 0 24px rgba(255, 188, 37, 0.25)); }
 .achievement-card__state { font-size: 0.8rem; font-weight: 600; }
 .achievement-card__state--locked { opacity: 0.5; }
 </style>
