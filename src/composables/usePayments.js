@@ -22,7 +22,7 @@ export function usePayments() {
   async function listPaymentsForMeet(meetId) {
     const { data, error } = await supabase
       .from('payments')
-      .select('id, meet_id, competition_id, expense_share_id, user_id, amount, proof_url, status, confirmed_at, created_at, user:profiles(id, full_name, avatar_url), expense_share:meet_expense_shares(id, amount_owed, user:profiles(id, full_name))')
+      .select('id, meet_id, competition_id, expense_share_id, user_id, amount, proof_url, status, confirmed_at, created_at, user:profiles!payments_user_id_fkey(id, full_name, avatar_url), expense_share:meet_expense_shares(id, amount_owed, user:profiles(id, full_name))')
       .eq('meet_id', meetId)
       .order('created_at', { ascending: false })
     if (error) throw error

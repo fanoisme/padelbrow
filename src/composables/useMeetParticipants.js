@@ -4,7 +4,7 @@ export function useMeetParticipants() {
   async function listParticipants(meetId) {
     const { data, error } = await supabase
       .from('meet_participants')
-      .select('id, user_id, role, status, joined_at, payment_status, profiles(id, full_name, avatar_url)')
+      .select('id, user_id, role, status, joined_at, payment_status, profiles!meet_participants_user_id_fkey(id, full_name, avatar_url)')
       .eq('meet_id', meetId)
       .order('joined_at', { ascending: true })
     if (error) throw error
