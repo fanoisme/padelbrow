@@ -4,7 +4,7 @@ export function useFeed() {
   async function listFeed(clubId) {
     let q = supabase
       .from('feed_posts')
-      .select('*, author:profiles(id, full_name, avatar_url)')
+      .select('*, author:profiles!feed_posts_author_id_fkey(id, full_name, avatar_url)')
     if (clubId) q = q.eq('club_id', clubId)
     q = q.order('created_at', { ascending: false }).limit(50)
     const { data, error } = await q
@@ -24,7 +24,7 @@ export function useFeed() {
       })
       // Embed author so PostCard can render post.author.* on the just-created row
       // (bare .select() returns table columns only, no relation).
-      .select('*, author:profiles(id, full_name, avatar_url)')
+      .select('*, author:profiles!feed_posts_author_id_fkey(id, full_name, avatar_url)')
       .single()
     if (error) throw error
     return data

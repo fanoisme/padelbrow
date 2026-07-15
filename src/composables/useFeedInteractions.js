@@ -4,7 +4,7 @@ export function useFeedInteractions() {
   async function listComments(postId) {
     const { data, error } = await supabase
       .from('feed_comments')
-      .select('*, author:profiles(id, full_name, avatar_url)')
+      .select('*, author:profiles!feed_comments_author_id_fkey(id, full_name, avatar_url)')
       .eq('post_id', postId)
       .order('created_at', { ascending: true })
     if (error) throw error
@@ -16,7 +16,7 @@ export function useFeedInteractions() {
       .from('feed_comments')
       .insert({ post_id: postId, body, author_id: authorId })
       // Embed author so the just-added comment shows a name without a remount.
-      .select('*, author:profiles(id, full_name, avatar_url)')
+      .select('*, author:profiles!feed_comments_author_id_fkey(id, full_name, avatar_url)')
       .single()
     if (error) throw error
     return data
