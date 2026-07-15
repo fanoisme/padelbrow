@@ -5,7 +5,7 @@
       <li v-for="(s, i) in stepLabels" :key="s" :class="{ 'is-active': step === i, 'is-done': step > i }">{{ s }}</li>
     </ol>
 
-    <LiCard class="create-meet-view__card">
+    <LiGlassCard class="create-meet-view__card">
       <!-- Step 0: club + sport + format -->
       <div v-if="step === 0">
         <LiSelect
@@ -77,14 +77,14 @@
         <LiButton v-if="step < stepLabels.length - 1" @click="step++">Next</LiButton>
         <LiButton v-else :loading="submitting" @click="handleSubmit">Create meet</LiButton>
       </div>
-    </LiCard>
+    </LiGlassCard>
   </section>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { LiCard, LiButton, LiTextField, LiSelect, LiToggle, useToast } from '../../design-system/components/index.js'
+import { LiGlassCard, LiButton, LiTextField, LiSelect, LiToggle, useToast } from '../../design-system/components/index.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { useClubs } from '../../composables/useClubs.js'
 import { useMeets } from '../../composables/useMeets.js'
