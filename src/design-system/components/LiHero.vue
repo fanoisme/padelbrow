@@ -8,8 +8,8 @@
     <LiMeshBackground :variant="variant" :intensity="intensity" />
     <div class="li-hero__spotlight" aria-hidden="true" :style="spotlightStyle" />
     <div class="li-hero__inner">
-      <LiRevealOnScroll variant="fade-down" :duration="500">
-        <span v-if="eyebrow" class="li-hero__eyebrow">{{ eyebrow }}</span>
+      <LiRevealOnScroll v-if="eyebrow" variant="fade-down" :duration="500">
+        <span class="li-hero__eyebrow">{{ eyebrow }}</span>
       </LiRevealOnScroll>
       <LiRevealOnScroll variant="fade-up" :delay="80" :duration="700">
         <h1 class="li-hero__title"><LiGradientText>{{ title }}</LiGradientText></h1>
@@ -65,6 +65,9 @@ function onSpotlight(e) {
   isolation: isolate;
 }
 .li-hero__spotlight { position: absolute; inset: 0; z-index: 1; pointer-events: none; transition: opacity var(--dur-medium, 300ms) var(--ease-out, ease); }
+/* LiMeshBackground is position:fixed by default (full-bleed ambient). Inside the hero
+   card, re-contain it so overflow:hidden clips the orbs to the rounded box. */
+.li-hero :deep(.li-mesh) { position: absolute; inset: 0; }
 .li-hero__inner { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-l, 16px); margin: 0 auto; max-width: 820px; }
 .li-hero__eyebrow {
   display: inline-block; padding: 6px 14px; border-radius: var(--radius-pill, 999px);
