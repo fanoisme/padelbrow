@@ -73,12 +73,15 @@
 
     <LiBottomSheet v-model="showMore" title="More">
       <div class="more-sheet__list">
-        <router-link to="/competitions" class="more-sheet__item" @click="showMore = false">🏆 Competitions</router-link>
-        <router-link to="/network" class="more-sheet__item" @click="showMore = false">🧑‍🤝‍🧑 Network</router-link>
-        <router-link to="/achievements" class="more-sheet__item" @click="showMore = false">🏅 Achievements</router-link>
-        <router-link to="/challenges" class="more-sheet__item" @click="showMore = false">🎯 Challenges</router-link>
-        <router-link to="/stats" class="more-sheet__item" @click="showMore = false">📈 My stats</router-link>
-        <router-link to="/profile" class="more-sheet__item" @click="showMore = false">👤 Profile</router-link>
+        <router-link
+          v-for="item in sheetNav"
+          :key="item.to"
+          :to="item.to"
+          class="more-sheet__item"
+          @click="showMore = false"
+        >
+          <LiIcon :name="item.icon" size="sm" />{{ item.label }}
+        </router-link>
       </div>
       <template #footer>
         <LiButton variant="secondary" @click="handleSignOutFromSheet">Sign out</LiButton>
@@ -111,6 +114,11 @@ const moreNav = [
   { to: '/achievements', label: 'Achievements', icon: 'military_tech' },
   { to: '/challenges', label: 'Challenges', icon: 'flag' },
   { to: '/stats', label: 'Stats', icon: 'insights' },
+]
+
+const sheetNav = [
+  ...moreNav,
+  { to: '/profile', label: 'Profile', icon: 'person' },
 ]
 
 const moreDropdown = ref(null)
@@ -386,8 +394,4 @@ async function handleSignOutFromSheet() {
 }
 @media (max-width: 768px) { .nav-pill__label { display: none; } .nav-pill { padding: 10px; } }
 
-.sr-only {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
-}
 </style>

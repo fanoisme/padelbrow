@@ -350,6 +350,7 @@
   --glass-bg-dark-soft:  rgba(33, 35, 36, 0.4);
   --glass-border:        rgba(255, 255, 255, 0.12);
   --glass-border-hover:  rgba(255, 255, 255, 0.2);
+  --glass-border-strong: rgba(255, 188, 37, 0.18);
   --glass-highlight:     rgba(255, 255, 255, 0.1);
   --glass-edge-glow:     rgba(255, 255, 255, 0.2);
   --glass-noise-opacity: 0.03;
@@ -565,6 +566,7 @@
   --glass-bg-light:      rgba(30, 30, 30, 0.7);
   --glass-bg-light-soft: rgba(30, 30, 30, 0.5);
   --glass-border:        rgba(255, 255, 255, 0.06);
+  --glass-border-strong: rgba(255, 188, 37, 0.22);
 
   /* Borders */
   --border-subtle: 1px solid rgba(255, 255, 255, 0.06);
