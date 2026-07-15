@@ -85,7 +85,8 @@ onMounted(async () => {
 .achievements-view__head { display: flex; flex-direction: column; gap: var(--space-s, 8px); }
 .achievements-view__next { font-size: 0.85rem; opacity: 0.7; }
 .achievements-view__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--space-s, 8px); }
-.achievement-card { display: flex; flex-direction: column; gap: var(--space-xs, 4px); opacity: 0.5; border: 2px solid transparent; }
+.achievement-card { opacity: 0.5; border: 2px solid transparent; }
+.achievement-card :deep(.li-card__body) { display: flex; flex-direction: column; gap: var(--space-xs, 4px); }
 .achievement-card--unlocked { opacity: 1; border-color: var(--color-brand, #FFAF03); box-shadow: var(--shadow-glow, 0 0 24px rgba(255, 188, 37, 0.25)); }
 .achievement-card__state { font-size: 0.8rem; font-weight: 600; }
 .achievement-card__state--locked { opacity: 0.5; }

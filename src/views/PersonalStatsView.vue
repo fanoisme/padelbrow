@@ -67,6 +67,6 @@ onMounted(async () => {
 <style scoped>
 .stats-view { display: flex; flex-direction: column; gap: var(--space-l, 24px); }
 .stats-view__card { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--space-s, 8px); }
-.stats-view__tile { display: flex; flex-direction: column; gap: var(--space-xs, 4px); }
+.stats-view__tile :deep(.li-card__body) { display: flex; flex-direction: column; gap: var(--space-xs, 4px); }
 .stats-view__tile span { font-size: 0.8rem; opacity: 0.6; }
 </style>

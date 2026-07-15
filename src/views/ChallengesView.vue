@@ -75,7 +75,7 @@ onMounted(async () => {
 <style scoped>
 .challenges-view { display: flex; flex-direction: column; gap: var(--space-l, 24px); }
 .challenges-view__list { display: flex; flex-direction: column; gap: var(--space-s, 8px); }
-.challenge-card { display: flex; flex-direction: column; gap: var(--space-xs, 4px); }
+.challenge-card :deep(.li-card__body) { display: flex; flex-direction: column; gap: var(--space-xs, 4px); }
 .challenge-card__head { display: flex; align-items: center; gap: var(--space-s, 8px); }
 .challenge-card__reward { margin-left: auto; font-weight: 600; }
 .challenge-card__progress { font-size: 0.85rem; opacity: 0.7; }

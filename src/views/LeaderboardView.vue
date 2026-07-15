@@ -74,7 +74,7 @@ async function handleExport() {
 <style scoped>
 .leaderboard-view { display: flex; flex-direction: column; gap: var(--space-l, 24px); }
 .leaderboard-view__standings { display: flex; flex-direction: column; gap: var(--space-m, 16px); background: var(--color-surface, #fff); padding: var(--space-m, 16px); border-radius: var(--radius-lg, 24px); }
-.leaderboard-view__row--me { background: var(--color-warning-container, #FFF3D6); font-weight: 600; }
+.leaderboard-view__standings .leaderboard-view__row--me { background: var(--color-warning-container, #FFF3D6); font-weight: 600; }
 .leaderboard-view__rank { opacity: 0.6; font-weight: 700; min-width: 24px; text-align: center; }
 .leaderboard-view__rating { font-weight: 600; font-variant-numeric: tabular-nums; }
 </style>
