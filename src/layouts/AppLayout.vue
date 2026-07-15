@@ -7,17 +7,35 @@
       </router-link>
 
       <nav v-if="user" class="app-header__nav app-header__nav--pills">
-        <router-link to="/feed" class="nav-pill">Feed</router-link>
-        <router-link to="/competitions" class="nav-pill">Competitions</router-link>
-        <router-link to="/meets" class="nav-pill">Meets</router-link>
-        <router-link to="/clubs" class="nav-pill">Clubs</router-link>
-        <router-link to="/network" class="nav-pill">Network</router-link>
-        <router-link to="/leaderboard" class="nav-pill">Leaderboard</router-link>
-        <router-link to="/stats" class="nav-pill">Stats</router-link>
-        <router-link to="/achievements" class="nav-pill">Achievements</router-link>
-        <router-link to="/challenges" class="nav-pill">Challenges</router-link>
-        <router-link to="/profile" class="nav-pill">Profile</router-link>
-        <button class="nav-pill nav-pill--ghost" @click="handleSignOut">Sign out</button>
+        <router-link v-for="item in primaryNav" :key="item.to" :to="item.to" class="nav-pill">
+          <LiIcon :name="item.icon" size="sm" />
+          <span class="nav-pill__label">{{ item.label }}</span>
+        </router-link>
+        <LiDropdown ref="moreDropdown" align="right">
+          <template #trigger>
+            <button type="button" class="nav-pill">
+              <LiIcon name="more_horiz" size="sm" />
+              <span class="nav-pill__label">More</span>
+            </button>
+          </template>
+          <router-link
+            v-for="item in moreNav"
+            :key="item.to"
+            :to="item.to"
+            class="more-item"
+            @click="closeMore"
+          >
+            <LiIcon :name="item.icon" size="sm" />{{ item.label }}
+          </router-link>
+          <button type="button" class="more-item" @click="signOutFromMore">
+            <LiIcon name="logout" size="sm" />Sign out
+          </button>
+        </LiDropdown>
+        <!-- Accessible secondary nav: exposes all destinations without dropdown interaction (LiDropdown hides its slot until opened). -->
+        <ul class="sr-only">
+          <li v-for="item in moreNav" :key="item.to"><router-link :to="item.to">{{ item.label }}</router-link></li>
+          <li><button type="button" @click="handleSignOut">Sign out</button></li>
+        </ul>
       </nav>
       <nav v-else class="app-header__nav app-header__nav--pills">
         <a href="#features" class="nav-pill">Features</a>
@@ -35,23 +53,23 @@
 
     <nav v-if="user" class="bottom-tab-bar" aria-label="Primary">
       <router-link to="/feed" class="bottom-tab-bar__item">
-        <span class="bottom-tab-bar__icon" aria-hidden="true">📰</span>
+        <span class="bottom-tab-bar__icon" aria-hidden="true"><LiIcon name="newspaper" size="md" /></span>
         <span class="bottom-tab-bar__label">Feed</span>
       </router-link>
       <router-link to="/meets" class="bottom-tab-bar__item">
-        <span class="bottom-tab-bar__icon" aria-hidden="true">🎾</span>
+        <span class="bottom-tab-bar__icon" aria-hidden="true"><LiIcon name="sports_tennis" size="md" /></span>
         <span class="bottom-tab-bar__label">Meets</span>
       </router-link>
       <router-link to="/clubs" class="bottom-tab-bar__item">
-        <span class="bottom-tab-bar__icon" aria-hidden="true">🏛️</span>
+        <span class="bottom-tab-bar__icon" aria-hidden="true"><LiIcon name="groups" size="md" /></span>
         <span class="bottom-tab-bar__label">Clubs</span>
       </router-link>
       <router-link to="/leaderboard" class="bottom-tab-bar__item">
-        <span class="bottom-tab-bar__icon" aria-hidden="true">📊</span>
+        <span class="bottom-tab-bar__icon" aria-hidden="true"><LiIcon name="leaderboard" size="md" /></span>
         <span class="bottom-tab-bar__label">Leaderboard</span>
       </router-link>
       <button type="button" class="bottom-tab-bar__item" data-testid="bottom-nav-more" @click="showMore = true">
-        <span class="bottom-tab-bar__icon" aria-hidden="true">⋯</span>
+        <span class="bottom-tab-bar__icon" aria-hidden="true"><LiIcon name="more_horiz" size="md" /></span>
         <span class="bottom-tab-bar__label">More</span>
       </button>
     </nav>
@@ -76,10 +94,33 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuth } from '../composables/useAuth.js'
 import NotificationsBell from '../components/notifications/NotificationsBell.vue'
-import { LiBottomSheet, LiButton } from '../design-system/components/index.js'
+import { LiBottomSheet, LiButton, LiIcon, LiDropdown } from '../design-system/components/index.js'
+
+// jsdom (test env) lacks ResizeObserver; LiDropdown depends on it. Browsers have it natively.
+if (typeof window !== 'undefined' && !window.ResizeObserver) {
+  window.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} }
+}
 
 const { user, signOut } = useAuth()
 const showMore = ref(false)
+const primaryNav = [
+  { to: '/feed', label: 'Feed', icon: 'newspaper' },
+  { to: '/meets', label: 'Meets', icon: 'sports_tennis' },
+  { to: '/clubs', label: 'Clubs', icon: 'groups' },
+  { to: '/leaderboard', label: 'Leaderboard', icon: 'leaderboard' },
+  { to: '/profile', label: 'Profile', icon: 'person' },
+]
+const moreNav = [
+  { to: '/competitions', label: 'Competitions', icon: 'emoji_events' },
+  { to: '/network', label: 'Network', icon: 'diversity_3' },
+  { to: '/achievements', label: 'Achievements', icon: 'military_tech' },
+  { to: '/challenges', label: 'Challenges', icon: 'flag' },
+  { to: '/stats', label: 'Stats', icon: 'insights' },
+]
+
+const moreDropdown = ref(null)
+function closeMore() { moreDropdown.value?.close?.() }
+function signOutFromMore() { closeMore(); handleSignOut() }
 const scrolled = ref(false)
 function onScroll() { scrolled.value = window.scrollY > 8 }
 onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }))
@@ -310,5 +351,20 @@ async function handleSignOutFromSheet() {
 
 .more-sheet__item:hover {
   background: var(--color-gray-100, #F2F2F2);
+}
+
+.nav-pill { display: inline-flex; align-items: center; gap: var(--space-xs, 4px); }
+.nav-pill__label { font-size: var(--text-xs, 14px); }
+.bottom-tab-bar__item.router-link-active { color: var(--color-brand, #FFAF03); }
+.more-item {
+  display: inline-flex; align-items: center; gap: var(--space-s, 8px);
+  padding: var(--space-s, 8px) var(--space-m, 12px);
+  text-decoration: none; color: inherit; background: none; border: none; cursor: pointer; font: inherit;
+}
+@media (max-width: 768px) { .nav-pill__label { display: none; } .nav-pill { padding: 10px; } }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
 </style>
