@@ -11,8 +11,8 @@
       <LiButton data-testid="generate-round-btn" @click="handleGenerateRound">Generate next round</LiButton>
     </div>
 
-    <LiCard v-for="round in rounds" :key="round.id" class="match-session-view__round">
-      <h3>Round {{ round.round_number + 1 }}</h3>
+    <LiCard v-for="round in rounds" :key="round.id" flush class="match-session-view__round">
+      <h3 class="match-session-view__round-title">Round {{ round.round_number + 1 }}</h3>
       <LiListTile
         v-for="m in round.matches"
         :key="m.id"
@@ -186,6 +186,14 @@ function statusVariant(status) {
 .match-session-view { display: flex; flex-direction: column; gap: var(--space-m, 16px); }
 .match-session-view__actions { display: flex; }
 .match-session-view__round { display: flex; flex-direction: column; gap: var(--space-s, 8px); }
+.match-session-view__round-title {
+  padding: var(--space-m, 16px) var(--space-m, 16px) 0;
+}
+.match-session-view__round :deep(.li-list-tile-subtitle) {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  white-space: normal;
+}
 .match-session-view__score-entry { display: flex; align-items: center; gap: var(--space-xs, 4px); }
 .match-session-view__score-input { width: 56px; padding: var(--space-xs, 4px); border: 1px solid var(--color-gray-300, #CCC); border-radius: var(--radius-s, 6px); }
 .match-session-view__standings-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
