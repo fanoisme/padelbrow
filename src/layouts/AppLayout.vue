@@ -1,6 +1,6 @@
 <template>
   <div class="app-shell">
-    <header class="app-header">
+    <header class="app-header" :class="{ 'app-header--scrolled': scrolled }">
       <router-link to="/" class="app-header__brand">
         <img class="app-header__mark" src="../assets/padel-brow-mark.svg" alt="PADEL BROW" />
         <span class="app-header__title">PADEL BROW</span>
@@ -73,13 +73,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuth } from '../composables/useAuth.js'
 import NotificationsBell from '../components/notifications/NotificationsBell.vue'
 import { LiBottomSheet, LiButton } from '../design-system/components/index.js'
 
 const { user, signOut } = useAuth()
 const showMore = ref(false)
+const scrolled = ref(false)
+function onScroll() { scrolled.value = window.scrollY > 8 }
+onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }))
+onUnmounted(() => window.removeEventListener('scroll', onScroll))
 
 async function handleSignOut() {
   await signOut()
@@ -110,6 +114,25 @@ async function handleSignOutFromSheet() {
   backdrop-filter: var(--glass-blur, blur(20px)) var(--glass-saturate, saturate(1.6));
   -webkit-backdrop-filter: var(--glass-blur, blur(20px)) var(--glass-saturate, saturate(1.6));
   border-bottom: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
+  isolation: isolate;
+}
+.app-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(120% 100% at 20% 0%, var(--gradient-brand-subtle, rgba(255,213,79,0.25)), transparent 60%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+.app-header--scrolled {
+  background: var(--glass-bg-light, rgba(255, 255, 255, 0.85));
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(0,0,0,0.04));
+  border-bottom-color: var(--glass-border-strong, rgba(255,188,37,0.18));
+}
+.app-header__mark { animation: lith-float 8s var(--ease-in-out-sine, ease-in-out) infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .app-header__mark { animation: none; }
 }
 
 .app-header__brand {
