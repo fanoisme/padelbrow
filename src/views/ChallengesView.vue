@@ -1,27 +1,28 @@
 <template>
   <section class="challenges-view">
-    <h1>Challenges</h1>
-    <ul class="challenges-view__list">
-      <li v-for="c in challenges" :key="c.id" class="challenge-card">
-        <div class="challenge-card__head">
-          <strong>{{ c.title }}</strong>
-          <LiBadge :label="c.period" variant="info" />
-          <span class="challenge-card__reward">+{{ c.xp_reward }} XP</span>
-        </div>
-        <p>{{ c.description }}</p>
-        <div class="challenge-card__bar">
-          <div class="challenge-card__bar-fill" :style="{ width: pctOf(c) + '%' }"></div>
-        </div>
-        <span class="challenge-card__progress">{{ progressOf(c) }} / {{ targetOf(c) }}</span>
-      </li>
-      <li v-if="!challenges.length" class="challenges-view__empty">No active challenges.</li>
-    </ul>
+    <LiPageHeader title="Challenges" subtitle="Complete active challenges to earn bonus XP." />
+
+    <LiEmptyState v-if="!challenges.length" title="No active challenges." icon="target" />
+    <LiRevealOnScroll v-else variant="fade-up" stagger>
+      <div class="challenges-view__list">
+        <LiCard v-for="c in challenges" :key="c.id" class="challenge-card">
+          <div class="challenge-card__head">
+            <strong>{{ c.title }}</strong>
+            <LiBadge :label="c.period" variant="info" />
+            <span class="challenge-card__reward">+{{ c.xp_reward }} XP</span>
+          </div>
+          <p>{{ c.description }}</p>
+          <LiProgress :value="pctOf(c)" variant="brand" />
+          <span class="challenge-card__progress">{{ progressOf(c) }} / {{ targetOf(c) }}</span>
+        </LiCard>
+      </div>
+    </LiRevealOnScroll>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { LiBadge, useToast } from '../design-system/components/index.js'
+import { LiBadge, LiCard, LiEmptyState, LiPageHeader, LiProgress, LiRevealOnScroll, useToast } from '../design-system/components/index.js'
 import { useAuth } from '../composables/useAuth.js'
 import { useGamification } from '../composables/useGamification.js'
 import { useStats } from '../composables/useStats.js'
@@ -72,13 +73,10 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.challenges-view { display: flex; flex-direction: column; gap: var(--space-m, 16px); }
-.challenges-view__list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--space-s, 8px); }
-.challenge-card { display: flex; flex-direction: column; gap: var(--space-xs, 4px); padding: var(--space-m, 16px); background: var(--color-surface, #fff); border-radius: var(--radius-m, 12px); }
+.challenges-view { display: flex; flex-direction: column; gap: var(--space-l, 24px); }
+.challenges-view__list { display: flex; flex-direction: column; gap: var(--space-s, 8px); }
+.challenge-card { display: flex; flex-direction: column; gap: var(--space-xs, 4px); }
 .challenge-card__head { display: flex; align-items: center; gap: var(--space-s, 8px); }
 .challenge-card__reward { margin-left: auto; font-weight: 600; }
-.challenge-card__bar { height: 8px; background: var(--color-gray-200, #E6E6E6); border-radius: 999px; overflow: hidden; }
-.challenge-card__bar-fill { height: 100%; background: var(--color-brand, #4f46e5); transition: width 0.3s; }
 .challenge-card__progress { font-size: 0.85rem; opacity: 0.7; }
-.challenges-view__empty { opacity: 0.6; }
 </style>
