@@ -1,25 +1,28 @@
 <template>
   <section class="meets-list-view">
-    <div class="meets-list-view__header">
-      <h1>Meets</h1>
-      <LiButton @click="$router.push('/meets/new')">Create meet</LiButton>
-    </div>
+    <LiPageHeader title="Meets" subtitle="Book a social match or join one nearby.">
+      <template #actions>
+        <LiButton @click="$router.push('/meets/new')">Create meet</LiButton>
+      </template>
+    </LiPageHeader>
 
     <LiEmptyState v-if="meets.length === 0" title="No upcoming meets" icon="event" />
-    <div v-else class="meets-list-view__list">
-      <LiCard v-for="meet in meets" :key="meet.id" hover>
-        <router-link :to="`/meets/${meet.id}`">
-          <h3>{{ meet.title }}</h3>
-          <p>{{ formatWhen(meet.starts_at) }} · {{ meet.venue_name || 'Venue TBD' }}</p>
-        </router-link>
-      </LiCard>
-    </div>
+    <LiRevealOnScroll v-else variant="fade-up" stagger>
+      <div class="meets-list-view__list">
+        <LiCard v-for="meet in meets" :key="meet.id" hover>
+          <router-link :to="`/meets/${meet.id}`">
+            <h3>{{ meet.title }}</h3>
+            <p>{{ formatWhen(meet.starts_at) }} · {{ meet.venue_name || 'Venue TBD' }}</p>
+          </router-link>
+        </LiCard>
+      </div>
+    </LiRevealOnScroll>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { LiButton, LiCard, LiEmptyState, useToast } from '../../design-system/components/index.js'
+import { LiButton, LiCard, LiEmptyState, LiPageHeader, LiRevealOnScroll, useToast } from '../../design-system/components/index.js'
 import { useMeets } from '../../composables/useMeets.js'
 
 const { listMeets } = useMeets()
@@ -45,12 +48,6 @@ function formatWhen(iso) {
   display: flex;
   flex-direction: column;
   gap: var(--space-l, 24px);
-}
-
-.meets-list-view__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .meets-list-view__list {
