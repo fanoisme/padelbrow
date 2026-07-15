@@ -1,5 +1,6 @@
 <template>
   <div class="app-shell">
+    <LiScrollProgress />
     <header class="app-header" :class="{ 'app-header--scrolled': scrolled }">
       <router-link to="/" class="app-header__brand">
         <img class="app-header__mark" src="../assets/padel-brow-mark.svg" alt="PADEL BROW" />
@@ -39,6 +40,7 @@
         <router-link to="/signup" class="nav-pill nav-pill--primary">Get started</router-link>
       </nav>
       <NotificationsBell v-if="user" class="app-header__bell" />
+      <LiThemeToggle class="app-header__theme" />
       <img class="app-header__allo" src="../assets/logo-allo.png" alt="Allo Bank" />
     </header>
 
@@ -82,6 +84,8 @@
         <LiButton variant="secondary" @click="handleSignOutFromSheet">Sign out</LiButton>
       </template>
     </LiBottomSheet>
+
+    <LiCommandPalette v-model="paletteOpen" :commands="commands" @execute="onCommand" />
   </div>
 </template>
 
@@ -89,7 +93,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuth } from '../composables/useAuth.js'
 import NotificationsBell from '../components/notifications/NotificationsBell.vue'
-import { LiBottomSheet, LiButton, LiIcon, LiDropdown } from '../design-system/components/index.js'
+import { LiBottomSheet, LiButton, LiIcon, LiDropdown, LiThemeToggle, LiScrollProgress, LiCommandPalette, useTheme } from '../design-system/components/index.js'
+import { useRouter } from 'vue-router'
 
 const { user, signOut } = useAuth()
 const showMore = ref(false)
@@ -115,6 +120,30 @@ const scrolled = ref(false)
 function onScroll() { scrolled.value = window.scrollY > 8 }
 onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }))
 onUnmounted(() => window.removeEventListener('scroll', onScroll))
+
+const router = useRouter()
+const paletteOpen = ref(false)
+const commands = [
+  {
+    label: 'Navigate',
+    items: [
+      ...primaryNav.map(n => ({ id: `go:${n.to}`, label: n.label })),
+      ...moreNav.map(n => ({ id: `go:${n.to}`, label: n.label })),
+    ],
+  },
+  {
+    label: 'Actions',
+    items: [
+      { id: 'theme:toggle', label: 'Toggle theme', shortcut: ['Ctrl', 'K'] },
+      { id: 'signout', label: 'Sign out' },
+    ],
+  },
+]
+function onCommand(cmd) {
+  if (cmd.id.startsWith('go:')) router.push(cmd.id.slice(3))
+  else if (cmd.id === 'theme:toggle') useTheme().toggle()
+  else if (cmd.id === 'signout') handleSignOut()
+}
 
 async function handleSignOut() {
   await signOut()
@@ -244,6 +273,10 @@ async function handleSignOutFromSheet() {
 }
 
 .app-header__bell {
+  flex-shrink: 0;
+}
+
+.app-header__theme {
   flex-shrink: 0;
 }
 
