@@ -1,5 +1,5 @@
 <template>
-  <div class="li-glass-panel" :class="{ 'li-glass-panel--accent': accent }">
+  <div class="li-glass-panel" :class="{ 'li-glass-panel--accent': accent, 'li-textured': textured }">
     <div v-if="accent" class="li-glass-panel__gradient" />
     <div class="li-glass-panel__content">
       <slot />
@@ -10,6 +10,7 @@
 <script setup>
 defineProps({
   accent: { type: Boolean, default: false },
+  textured: { type: Boolean, default: true },
 })
 </script>
 

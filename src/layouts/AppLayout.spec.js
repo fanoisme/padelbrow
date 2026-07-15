@@ -33,20 +33,27 @@ describe('AppLayout', () => {
     expect(wrapper.text()).toContain('Sign in')
   })
 
-  it('shows nav links and a sign-out button when logged in', () => {
+  it('shows primary nav links when logged in', () => {
     useAuth.mockReturnValue({ user: ref({ id: 'u1' }), signOut })
     const wrapper = mount(AppLayout, { global: { stubs: { RouterLink: RouterLinkStub, NotificationsBell: true } } })
     expect(wrapper.text()).toContain('Clubs')
-    expect(wrapper.text()).toContain('Network')
     expect(wrapper.text()).toContain('Profile')
-    expect(wrapper.text()).toContain('Sign out')
+    expect(wrapper.text()).toContain('More')
   })
 
-  it('includes Stats and Challenges links when logged in (previously unreachable routes)', () => {
+  it('reveals secondary destinations and sign-out from the desktop More dropdown', async () => {
     useAuth.mockReturnValue({ user: ref({ id: 'u1' }), signOut })
-    const wrapper = mount(AppLayout, { global: { stubs: { RouterLink: RouterLinkStub, NotificationsBell: true } } })
-    expect(wrapper.text()).toContain('Stats')
-    expect(wrapper.text()).toContain('Challenges')
+    const wrapper = mount(AppLayout, {
+      global: { stubs: { RouterLink: RouterLinkStub, NotificationsBell: true } },
+      attachTo: document.body,
+    })
+    await wrapper.find('.li-dropdown__trigger').trigger('click')
+    // LiDropdown renders its menu via <Teleport to="body">, so assert against body.
+    expect(document.body.textContent).toContain('Network')
+    expect(document.body.textContent).toContain('Stats')
+    expect(document.body.textContent).toContain('Challenges')
+    expect(document.body.textContent).toContain('Sign out')
+    wrapper.unmount()
   })
 
   it('opens the mobile More sheet and shows the secondary destinations', async () => {

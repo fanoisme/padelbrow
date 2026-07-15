@@ -23,7 +23,7 @@ defineProps({
 
 <style scoped>
 .li-icon {
-  font-family: 'Material Symbols Outlined Variable';
+  font-family: 'Material Symbols Outlined';
   font-weight: normal;
   font-style: normal;
   display: inline-flex;

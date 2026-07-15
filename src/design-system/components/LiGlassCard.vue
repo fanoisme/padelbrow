@@ -13,7 +13,7 @@
     ]"
     :style="cardStyle"
   >
-    <div class="li-glass-card__surface">
+    <div class="li-glass-card__surface" :class="{ 'li-textured': textured }">
       <slot />
     </div>
   </div>
@@ -31,6 +31,8 @@ const props = defineProps({
   hoverable: { type: Boolean, default: true },
   /** Custom border radius */
   radius: { type: String, default: null },
+  /** Overlay a subtle noise texture (Design Guide §1C). Set false for compact/dense uses. */
+  textured: { type: Boolean, default: true },
 })
 
 const cardStyle = computed(() => ({

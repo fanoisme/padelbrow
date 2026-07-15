@@ -350,6 +350,7 @@
   --glass-bg-dark-soft:  rgba(33, 35, 36, 0.4);
   --glass-border:        rgba(255, 255, 255, 0.12);
   --glass-border-hover:  rgba(255, 255, 255, 0.2);
+  --glass-border-strong: rgba(255, 188, 37, 0.18);
   --glass-highlight:     rgba(255, 255, 255, 0.1);
   --glass-edge-glow:     rgba(255, 255, 255, 0.2);
   --glass-noise-opacity: 0.03;
@@ -565,6 +566,7 @@
   --glass-bg-light:      rgba(30, 30, 30, 0.7);
   --glass-bg-light-soft: rgba(30, 30, 30, 0.5);
   --glass-border:        rgba(255, 255, 255, 0.06);
+  --glass-border-strong: rgba(255, 188, 37, 0.22);
 
   /* Borders */
   --border-subtle: 1px solid rgba(255, 255, 255, 0.06);
@@ -749,3 +751,22 @@
   0%   { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   NOISE TEXTURE UTILITY (Design Guide §1C)
+   Layer a 2px SVG noise tile at low opacity over large surfaces to
+   break the flat "digital plastic" sheen. Use on glass cards/panels/
+   modal backdrops — NOT on small elements (buttons, inputs, badges),
+   where noise reads dirty.
+   ══════════════════════════════════════════════════════════════ */
+.li-textured::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: var(--glass-noise-opacity, 0.03);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+[data-theme="dark"] .li-textured::after { opacity: 0.06; }

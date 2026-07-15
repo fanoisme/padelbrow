@@ -1,23 +1,37 @@
 <template>
   <div class="app-shell">
-    <header class="app-header">
+    <LiScrollProgress />
+    <header class="app-header" :class="{ 'app-header--scrolled': scrolled }">
       <router-link to="/" class="app-header__brand">
         <img class="app-header__mark" src="../assets/padel-brow-mark.svg" alt="PADEL BROW" />
         <span class="app-header__title">PADEL BROW</span>
       </router-link>
 
       <nav v-if="user" class="app-header__nav app-header__nav--pills">
-        <router-link to="/feed" class="nav-pill">Feed</router-link>
-        <router-link to="/competitions" class="nav-pill">Competitions</router-link>
-        <router-link to="/meets" class="nav-pill">Meets</router-link>
-        <router-link to="/clubs" class="nav-pill">Clubs</router-link>
-        <router-link to="/network" class="nav-pill">Network</router-link>
-        <router-link to="/leaderboard" class="nav-pill">Leaderboard</router-link>
-        <router-link to="/stats" class="nav-pill">Stats</router-link>
-        <router-link to="/achievements" class="nav-pill">Achievements</router-link>
-        <router-link to="/challenges" class="nav-pill">Challenges</router-link>
-        <router-link to="/profile" class="nav-pill">Profile</router-link>
-        <button class="nav-pill nav-pill--ghost" @click="handleSignOut">Sign out</button>
+        <router-link v-for="item in primaryNav" :key="item.to" :to="item.to" class="nav-pill">
+          <LiIcon :name="item.icon" size="sm" />
+          <span class="nav-pill__label">{{ item.label }}</span>
+        </router-link>
+        <LiDropdown ref="moreDropdown" align="right">
+          <template #trigger>
+            <button type="button" class="nav-pill">
+              <LiIcon name="more_horiz" size="sm" />
+              <span class="nav-pill__label">More</span>
+            </button>
+          </template>
+          <router-link
+            v-for="item in moreNav"
+            :key="item.to"
+            :to="item.to"
+            class="more-item"
+            @click="closeMore"
+          >
+            <LiIcon :name="item.icon" size="sm" />{{ item.label }}
+          </router-link>
+          <button type="button" class="more-item" @click="signOutFromMore">
+            <LiIcon name="logout" size="sm" />Sign out
+          </button>
+        </LiDropdown>
       </nav>
       <nav v-else class="app-header__nav app-header__nav--pills">
         <a href="#features" class="nav-pill">Features</a>
@@ -26,6 +40,7 @@
         <router-link to="/signup" class="nav-pill nav-pill--primary">Get started</router-link>
       </nav>
       <NotificationsBell v-if="user" class="app-header__bell" />
+      <LiThemeToggle class="app-header__theme" />
       <img class="app-header__allo" src="../assets/logo-allo.png" alt="Allo Bank" />
     </header>
 
@@ -35,51 +50,108 @@
 
     <nav v-if="user" class="bottom-tab-bar" aria-label="Primary">
       <router-link to="/feed" class="bottom-tab-bar__item">
-        <span class="bottom-tab-bar__icon" aria-hidden="true">📰</span>
+        <span class="bottom-tab-bar__icon" aria-hidden="true"><LiIcon name="newspaper" size="md" /></span>
         <span class="bottom-tab-bar__label">Feed</span>
       </router-link>
       <router-link to="/meets" class="bottom-tab-bar__item">
-        <span class="bottom-tab-bar__icon" aria-hidden="true">🎾</span>
+        <span class="bottom-tab-bar__icon" aria-hidden="true"><LiIcon name="sports_tennis" size="md" /></span>
         <span class="bottom-tab-bar__label">Meets</span>
       </router-link>
       <router-link to="/clubs" class="bottom-tab-bar__item">
-        <span class="bottom-tab-bar__icon" aria-hidden="true">🏛️</span>
+        <span class="bottom-tab-bar__icon" aria-hidden="true"><LiIcon name="groups" size="md" /></span>
         <span class="bottom-tab-bar__label">Clubs</span>
       </router-link>
       <router-link to="/leaderboard" class="bottom-tab-bar__item">
-        <span class="bottom-tab-bar__icon" aria-hidden="true">📊</span>
+        <span class="bottom-tab-bar__icon" aria-hidden="true"><LiIcon name="leaderboard" size="md" /></span>
         <span class="bottom-tab-bar__label">Leaderboard</span>
       </router-link>
       <button type="button" class="bottom-tab-bar__item" data-testid="bottom-nav-more" @click="showMore = true">
-        <span class="bottom-tab-bar__icon" aria-hidden="true">⋯</span>
+        <span class="bottom-tab-bar__icon" aria-hidden="true"><LiIcon name="more_horiz" size="md" /></span>
         <span class="bottom-tab-bar__label">More</span>
       </button>
     </nav>
 
     <LiBottomSheet v-model="showMore" title="More">
       <div class="more-sheet__list">
-        <router-link to="/competitions" class="more-sheet__item" @click="showMore = false">🏆 Competitions</router-link>
-        <router-link to="/network" class="more-sheet__item" @click="showMore = false">🧑‍🤝‍🧑 Network</router-link>
-        <router-link to="/achievements" class="more-sheet__item" @click="showMore = false">🏅 Achievements</router-link>
-        <router-link to="/challenges" class="more-sheet__item" @click="showMore = false">🎯 Challenges</router-link>
-        <router-link to="/stats" class="more-sheet__item" @click="showMore = false">📈 My stats</router-link>
-        <router-link to="/profile" class="more-sheet__item" @click="showMore = false">👤 Profile</router-link>
+        <router-link
+          v-for="item in sheetNav"
+          :key="item.to"
+          :to="item.to"
+          class="more-sheet__item"
+          @click="showMore = false"
+        >
+          <LiIcon :name="item.icon" size="sm" />{{ item.label }}
+        </router-link>
       </div>
       <template #footer>
         <LiButton variant="secondary" @click="handleSignOutFromSheet">Sign out</LiButton>
       </template>
     </LiBottomSheet>
+
+    <LiCommandPalette v-model="paletteOpen" :commands="commands" @execute="onCommand" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuth } from '../composables/useAuth.js'
 import NotificationsBell from '../components/notifications/NotificationsBell.vue'
-import { LiBottomSheet, LiButton } from '../design-system/components/index.js'
+import { LiBottomSheet, LiButton, LiIcon, LiDropdown, LiThemeToggle, LiScrollProgress, LiCommandPalette, useTheme } from '../design-system/components/index.js'
+import { useRouter } from 'vue-router'
 
 const { user, signOut } = useAuth()
 const showMore = ref(false)
+const primaryNav = [
+  { to: '/feed', label: 'Feed', icon: 'newspaper' },
+  { to: '/meets', label: 'Meets', icon: 'sports_tennis' },
+  { to: '/clubs', label: 'Clubs', icon: 'groups' },
+  { to: '/leaderboard', label: 'Leaderboard', icon: 'leaderboard' },
+  { to: '/profile', label: 'Profile', icon: 'person' },
+]
+const moreNav = [
+  { to: '/competitions', label: 'Competitions', icon: 'emoji_events' },
+  { to: '/network', label: 'Network', icon: 'diversity_3' },
+  { to: '/achievements', label: 'Achievements', icon: 'military_tech' },
+  { to: '/challenges', label: 'Challenges', icon: 'flag' },
+  { to: '/stats', label: 'Stats', icon: 'insights' },
+]
+
+const sheetNav = [
+  ...moreNav,
+  { to: '/profile', label: 'Profile', icon: 'person' },
+]
+
+const moreDropdown = ref(null)
+function closeMore() { moreDropdown.value?.close?.() }
+function signOutFromMore() { closeMore(); handleSignOut() }
+const scrolled = ref(false)
+function onScroll() { scrolled.value = window.scrollY > 8 }
+onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }))
+onUnmounted(() => window.removeEventListener('scroll', onScroll))
+
+const router = useRouter()
+const paletteOpen = ref(false)
+const commands = [
+  {
+    label: 'Navigate',
+    items: [
+      ...primaryNav.map(n => ({ id: `go:${n.to}`, label: n.label })),
+      ...moreNav.map(n => ({ id: `go:${n.to}`, label: n.label })),
+    ],
+  },
+  {
+    label: 'Actions',
+    items: [
+      { id: 'theme:toggle', label: 'Toggle theme' },
+      { id: 'signout', label: 'Sign out' },
+    ],
+  },
+]
+function onCommand(cmd) {
+  if (cmd.id.startsWith('go:')) router.push(cmd.id.slice(3))
+  else if (cmd.id === 'theme:toggle') useTheme().toggle()
+  else if (cmd.id === 'signout') handleSignOut()
+}
 
 async function handleSignOut() {
   await signOut()
@@ -110,6 +182,25 @@ async function handleSignOutFromSheet() {
   backdrop-filter: var(--glass-blur, blur(20px)) var(--glass-saturate, saturate(1.6));
   -webkit-backdrop-filter: var(--glass-blur, blur(20px)) var(--glass-saturate, saturate(1.6));
   border-bottom: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
+  isolation: isolate;
+}
+.app-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(120% 100% at 20% 0%, rgba(255, 213, 79, 0.25), transparent 60%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+.app-header--scrolled {
+  background: var(--glass-bg-light, rgba(255, 255, 255, 0.85));
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(0,0,0,0.04));
+  border-bottom-color: var(--glass-border-strong, rgba(255,188,37,0.18));
+}
+.app-header__mark { animation: lith-float 8s var(--ease-in-out-sine, ease-in-out) infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .app-header__mark { animation: none; }
 }
 
 .app-header__brand {
@@ -190,6 +281,10 @@ async function handleSignOutFromSheet() {
 }
 
 .app-header__bell {
+  flex-shrink: 0;
+}
+
+.app-header__theme {
   flex-shrink: 0;
 }
 
@@ -288,4 +383,15 @@ async function handleSignOutFromSheet() {
 .more-sheet__item:hover {
   background: var(--color-gray-100, #F2F2F2);
 }
+
+.nav-pill { display: inline-flex; align-items: center; gap: var(--space-xs, 4px); }
+.nav-pill__label { font-size: var(--text-xs, 14px); }
+.bottom-tab-bar__item.router-link-active { color: var(--color-brand, #FFAF03); }
+.more-item {
+  display: inline-flex; align-items: center; gap: var(--space-s, 8px);
+  padding: var(--space-s, 8px) var(--space-m, 12px);
+  text-decoration: none; color: inherit; background: none; border: none; cursor: pointer; font: inherit;
+}
+@media (max-width: 768px) { .nav-pill__label { display: none; } .nav-pill { padding: 10px; } }
+
 </style>
