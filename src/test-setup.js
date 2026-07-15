@@ -28,3 +28,13 @@ if (typeof window !== 'undefined' && !window.IntersectionObserver) {
     takeRecords() { return [] }
   }
 }
+
+// jsdom lacks ResizeObserver, which LiDropdown uses to reposition its menu on
+// viewport resize. Polyfill: no-op (position is recomputed on each open).
+if (typeof window !== 'undefined' && !window.ResizeObserver) {
+  window.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+}

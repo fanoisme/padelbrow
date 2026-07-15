@@ -31,11 +31,6 @@
             <LiIcon name="logout" size="sm" />Sign out
           </button>
         </LiDropdown>
-        <!-- Accessible secondary nav: exposes all destinations without dropdown interaction (LiDropdown hides its slot until opened). -->
-        <ul class="sr-only">
-          <li v-for="item in moreNav" :key="item.to"><router-link :to="item.to">{{ item.label }}</router-link></li>
-          <li><button type="button" @click="handleSignOut">Sign out</button></li>
-        </ul>
       </nav>
       <nav v-else class="app-header__nav app-header__nav--pills">
         <a href="#features" class="nav-pill">Features</a>
@@ -95,11 +90,6 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuth } from '../composables/useAuth.js'
 import NotificationsBell from '../components/notifications/NotificationsBell.vue'
 import { LiBottomSheet, LiButton, LiIcon, LiDropdown } from '../design-system/components/index.js'
-
-// jsdom (test env) lacks ResizeObserver; LiDropdown depends on it. Browsers have it natively.
-if (typeof window !== 'undefined' && !window.ResizeObserver) {
-  window.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} }
-}
 
 const { user, signOut } = useAuth()
 const showMore = ref(false)
