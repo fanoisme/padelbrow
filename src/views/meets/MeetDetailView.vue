@@ -1,30 +1,34 @@
 <template>
   <section v-if="meet" class="meet-detail-view">
-    <div class="meet-detail-view__header">
-      <h1>{{ meet.title }}</h1>
-      <LiButton v-if="myParticipation === 'none'" @click="handleJoin">Join</LiButton>
-      <LiButton v-else-if="myParticipation === 'confirmed'" variant="secondary" @click="handleLeave">Leave</LiButton>
-      <LiBadge v-else-if="myParticipation === 'waitlisted'" label="Waitlisted" variant="warning" />
-    </div>
+    <LiPageHeader :title="meet.title">
+      <template #actions>
+        <LiButton v-if="myParticipation === 'none'" @click="handleJoin">Join</LiButton>
+        <LiButton v-else-if="myParticipation === 'confirmed'" variant="secondary" @click="handleLeave">Leave</LiButton>
+        <LiBadge v-else-if="myParticipation === 'waitlisted'" label="Waitlisted" variant="warning" />
+      </template>
+    </LiPageHeader>
 
     <LiTabs v-model="activeTab" :tabs="tabs" />
     <div class="meet-detail-view__panel">
       <!-- Details -->
       <div v-show="activeTab === 0">
-        <p>{{ formatWhen(meet.starts_at) }} · {{ meet.venue_name || 'Venue TBD' }}</p>
-        <p v-if="meet.venue_address">{{ meet.venue_address }}</p>
-        <p>Format: {{ meet.format }} · Max {{ meet.max_players }} players</p>
-        <p v-if="meet.fee_amount > 0">Fee: Rp{{ meet.fee_amount.toLocaleString('id-ID') }}</p>
+        <LiCard>
+          <p>{{ formatWhen(meet.starts_at) }} · {{ meet.venue_name || 'Venue TBD' }}</p>
+          <p v-if="meet.venue_address">{{ meet.venue_address }}</p>
+          <p>Format: {{ meet.format }} · Max {{ meet.max_players }} players</p>
+          <p v-if="meet.fee_amount > 0">Fee: Rp{{ meet.fee_amount.toLocaleString('id-ID') }}</p>
+        </LiCard>
       </div>
 
       <!-- Participants -->
       <div v-show="activeTab === 1">
-        <ul class="meet-detail-view__participants">
-          <li v-for="p in participants" :key="p.id">
-            <span>{{ p.profiles.full_name }}</span>
-            <LiBadge :label="p.status" :variant="statusVariant(p.status)" />
-          </li>
-        </ul>
+        <LiCard flush>
+          <LiListTile v-for="p in participants" :key="p.id" :title="p.profiles.full_name">
+            <template #trailing>
+              <LiBadge :label="p.status" :variant="statusVariant(p.status)" />
+            </template>
+          </LiListTile>
+        </LiCard>
       </div>
 
       <!-- Payments -->
@@ -33,9 +37,13 @@
         <PaymentsPanel :meet-id="meet.id" :is-organizer="isOrganizer" :fee-amount="meet.fee_amount" />
       </div>
 
-      <!-- Matches (Phase 4 placeholder) -->
+      <!-- Matches -->
       <div v-show="activeTab === 3">
-        <LiEmptyState title="Matches open in Phase 4" icon="trophy" />
+        <LiEmptyState title="Ready to play?" description="Start a live match session to generate rounds and track scores." icon="trophy">
+          <template #action>
+            <LiButton @click="goToMatches">Open match session</LiButton>
+          </template>
+        </LiEmptyState>
       </div>
 
       <!-- Chat -->
@@ -48,8 +56,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { LiButton, LiBadge, LiTabs, LiEmptyState, useToast } from '../../design-system/components/index.js'
+import { useRoute, useRouter } from 'vue-router'
+import { LiButton, LiBadge, LiTabs, LiEmptyState, LiCard, LiListTile, LiPageHeader, useToast } from '../../design-system/components/index.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { useMeets } from '../../composables/useMeets.js'
 import { useMeetParticipants } from '../../composables/useMeetParticipants.js'
@@ -58,6 +66,7 @@ import ExpensesPanel from '../../components/payments/ExpensesPanel.vue'
 import PaymentsPanel from '../../components/payments/PaymentsPanel.vue'
 
 const route = useRoute()
+const router = useRouter()
 const { user } = useAuth()
 const { getMeet } = useMeets()
 const { listParticipants, joinMeet, leaveMeet } = useMeetParticipants()
@@ -124,6 +133,10 @@ function formatWhen(iso) {
   if (!iso) return ''
   return new Date(iso).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })
 }
+
+function goToMatches() {
+  router.push({ name: 'match-session', params: { meetId: route.params.id } })
+}
 </script>
 
 <style scoped>
@@ -131,25 +144,5 @@ function formatWhen(iso) {
   display: flex;
   flex-direction: column;
   gap: var(--space-m, 16px);
-}
-
-.meet-detail-view__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.meet-detail-view__participants {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s, 8px);
-}
-
-.meet-detail-view__participants li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 </style>

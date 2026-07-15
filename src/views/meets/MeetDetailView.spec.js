@@ -65,4 +65,26 @@ describe('MeetDetailView', () => {
     expect(wrapper.text()).toContain('Fano')
     expect(wrapper.text()).toContain('Join')
   })
+
+  it('navigates to the match session when "Open match session" is clicked', async () => {
+    const router = createRouter({
+      history: createWebHashHistory(),
+      routes: [
+        { path: '/meets/:id', name: 'meet-detail', component: MeetDetailView },
+        { path: '/meets/:meetId/match-session/:sessionId?', name: 'match-session', component: { template: '<div>stub match session</div>' } },
+      ],
+    })
+    router.push('/meets/m1')
+    await router.isReady()
+    const wrapper = mount(MeetDetailView, { global: { plugins: [router] } })
+    await flushPromises()
+
+    // The Matches tab panel is v-show (not the active tab by default), so its
+    // button is already in the DOM without needing to switch tabs first.
+    const matchBtn = wrapper.findAll('button').find((b) => b.text().match(/open match session/i))
+    expect(matchBtn).toBeTruthy()
+    await matchBtn.trigger('click')
+    await flushPromises()
+    expect(router.currentRoute.value.path).toBe('/meets/m1/match-session')
+  })
 })
