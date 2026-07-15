@@ -1463,7 +1463,7 @@ const commands = [
   {
     label: 'Actions',
     items: [
-      { id: 'theme:toggle', label: 'Toggle theme', shortcut: ['Ctrl', 'K'] },
+      { id: 'theme:toggle', label: 'Toggle theme' },
       { id: 'signout', label: 'Sign out' },
     ],
   },
