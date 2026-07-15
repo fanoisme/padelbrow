@@ -1285,7 +1285,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(120% 100% at 20% 0%, var(--gradient-brand-subtle, rgba(255,213,79,0.25)), transparent 60%);
+  background: radial-gradient(120% 100% at 20% 0%, rgba(255, 213, 79, 0.25), transparent 60%);
   opacity: 0.7;
   pointer-events: none;
 }
