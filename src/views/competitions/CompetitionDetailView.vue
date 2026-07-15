@@ -1,93 +1,105 @@
 <template>
   <section v-if="comp" class="comp-detail-view">
-    <div class="comp-detail-view__header">
-      <h1>{{ comp.name }}</h1>
-      <LiBadge :label="comp.status" :variant="statusVariant(comp.status)" />
-    </div>
+    <LiPageHeader :title="comp.name">
+      <template #actions>
+        <LiBadge :label="comp.status" :variant="statusVariant(comp.status)" />
+        <LiButton v-if="isOrganizer && comp.status === 'draft'" @click="handleOpenRegistration">Open registration</LiButton>
+        <LiButton
+          v-if="isOrganizer && comp.status === 'registration_open'"
+          :disabled="confirmedTeams.length < 2"
+          @click="handleGenerate"
+        >
+          Generate matches
+        </LiButton>
+      </template>
+    </LiPageHeader>
 
     <LiTabs v-model="activeTab" :tabs="tabs" />
     <div class="comp-detail-view__panel">
       <!-- Details -->
       <div v-show="activeTab === 0">
-        <p>Format: {{ comp.format }}</p>
-        <p v-if="comp.registration_opens_at">Registration opens: {{ formatWhen(comp.registration_opens_at) }}</p>
-        <p v-if="comp.registration_closes_at">Registration closes: {{ formatWhen(comp.registration_closes_at) }}</p>
-        <div v-if="isOrganizer" class="comp-detail-view__actions">
-          <LiButton v-if="comp.status === 'draft'" @click="handleOpenRegistration">Open registration</LiButton>
-          <LiButton
-            v-if="comp.status === 'registration_open'"
-            :disabled="confirmedTeams.length < 2"
-            @click="handleGenerate"
-          >
-            Generate matches
-          </LiButton>
-        </div>
+        <LiCard>
+          <p>Format: {{ comp.format }}</p>
+          <p v-if="comp.registration_opens_at">Registration opens: {{ formatWhen(comp.registration_opens_at) }}</p>
+          <p v-if="comp.registration_closes_at">Registration closes: {{ formatWhen(comp.registration_closes_at) }}</p>
+        </LiCard>
       </div>
 
       <!-- Teams -->
       <div v-show="activeTab === 1">
-        <form class="comp-detail-view__register" @submit.prevent="handleRegister">
-          <LiTextField v-model="newTeam.name" placeholder="Team name" />
-          <LiTextField v-model="newTeam.players" placeholder="Player IDs, comma-separated" />
-          <LiButton type="submit" :loading="registering">Register team</LiButton>
-        </form>
-        <ul class="comp-detail-view__teams">
-          <li v-for="reg in registrations" :key="reg.team_id">
-            <span>{{ reg.competition_teams.name }}</span>
-            <LiBadge v-if="reg.status === 'confirmed'" :label="`Seed ${reg.seed}`" variant="success" />
-            <LiBadge v-else label="Pending" variant="warning" />
-            <LiButton v-if="reg.status === 'pending' && isOrganizer" size="sm" @click="handleConfirm(reg)">Confirm + seed</LiButton>
-          </li>
-        </ul>
+        <LiGlassCard class="comp-detail-view__register">
+          <form @submit.prevent="handleRegister">
+            <LiTextField v-model="newTeam.name" placeholder="Team name" />
+            <LiTextField v-model="newTeam.players" placeholder="Player IDs, comma-separated" />
+            <LiButton type="submit" :loading="registering">Register team</LiButton>
+          </form>
+        </LiGlassCard>
+        <LiCard flush>
+          <LiListTile v-for="reg in registrations" :key="reg.team_id" :title="reg.competition_teams.name">
+            <template #trailing>
+              <LiBadge v-if="reg.status === 'confirmed'" :label="`Seed ${reg.seed}`" variant="success" />
+              <LiBadge v-else label="Pending" variant="warning" />
+              <LiButton v-if="reg.status === 'pending' && isOrganizer" size="sm" @click="handleConfirm(reg)">Confirm + seed</LiButton>
+            </template>
+          </LiListTile>
+        </LiCard>
       </div>
 
       <!-- Standings (round_robin): matches with score entry + standings table -->
       <div v-show="activeTab === 2 && comp.format === 'round_robin'">
         <div v-if="matches.length" class="comp-detail-view__rounds">
-          <div v-for="round in matchesByRound" :key="round.name" class="comp-detail-view__round">
-            <h3>{{ round.name }}</h3>
-            <ul>
-              <li v-for="m in round.matches" :key="m.id" class="comp-detail-view__match">
-                <span>{{ teamName(m.team_a_id) }} vs {{ teamName(m.team_b_id) }}</span>
+          <LiCard v-for="round in matchesByRound" :key="round.name" flush class="comp-detail-view__round">
+            <h3 class="comp-detail-view__round-title">{{ round.name }}</h3>
+            <LiListTile
+              v-for="m in round.matches"
+              :key="m.id"
+              :title="`${teamName(m.team_a_id)} vs ${teamName(m.team_b_id)}`"
+            >
+              <template #trailing>
                 <span v-if="m.status === 'completed'" class="comp-detail-view__match-score">{{ m.score_a }}-{{ m.score_b }}</span>
                 <div v-else-if="isOrganizer && m.team_a_id && m.team_b_id" class="comp-detail-view__score">
                   <input type="number" class="comp-detail-view__score-input" v-model.number="scoreOf(m).a" placeholder="0" />
                   <input type="number" class="comp-detail-view__score-input" v-model.number="scoreOf(m).b" placeholder="0" />
                   <LiButton size="sm" @click="handleScore(m)">Save</LiButton>
                 </div>
-              </li>
-            </ul>
-          </div>
+              </template>
+            </LiListTile>
+          </LiCard>
         </div>
-        <table class="comp-detail-view__standings">
-          <thead><tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>L</th><th>PF</th><th>PA</th></tr></thead>
-          <tbody>
-            <tr v-for="(s, i) in standings" :key="s.team_id">
-              <td>{{ i + 1 }}</td>
-              <td>{{ teamName(s.team_id) }}</td>
-              <td>{{ s.played }}</td><td>{{ s.won }}</td><td>{{ s.lost }}</td>
-              <td>{{ s.points_for }}</td><td>{{ s.points_against }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="comp-detail-view__standings-scroll">
+          <table class="comp-detail-view__standings-table">
+            <thead><tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>L</th><th>PF</th><th>PA</th></tr></thead>
+            <tbody>
+              <tr v-for="(s, i) in standings" :key="s.team_id">
+                <td>{{ i + 1 }}</td>
+                <td>{{ teamName(s.team_id) }}</td>
+                <td>{{ s.played }}</td><td>{{ s.won }}</td><td>{{ s.lost }}</td>
+                <td>{{ s.points_for }}</td><td>{{ s.points_against }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Bracket (single_elim) -->
       <div v-show="activeTab === 2 && comp.format === 'single_elim'">
-        <div v-for="round in matchesByRound" :key="round.name" class="comp-detail-view__round">
-          <h3>{{ round.name }}</h3>
-          <ul>
-            <li v-for="m in round.matches" :key="m.id" class="comp-detail-view__match">
-              <span>{{ teamName(m.team_a_id) }} vs {{ teamName(m.team_b_id) }}</span>
+        <LiCard v-for="round in matchesByRound" :key="round.name" flush class="comp-detail-view__round">
+          <h3 class="comp-detail-view__round-title">{{ round.name }}</h3>
+          <LiListTile
+            v-for="m in round.matches"
+            :key="m.id"
+            :title="`${teamName(m.team_a_id)} vs ${teamName(m.team_b_id)}`"
+          >
+            <template #trailing>
               <span v-if="m.status === 'completed'" class="comp-detail-view__match-score">{{ m.score_a }}-{{ m.score_b }}</span>
               <div v-else-if="isOrganizer && m.team_a_id && m.team_b_id" class="comp-detail-view__score">
                 <input type="number" class="comp-detail-view__score-input" v-model.number="scoreOf(m).a" placeholder="0" />
                 <input type="number" class="comp-detail-view__score-input" v-model.number="scoreOf(m).b" placeholder="0" />
                 <LiButton size="sm" @click="handleScore(m)">Save</LiButton>
               </div>
-            </li>
-          </ul>
-        </div>
+            </template>
+          </LiListTile>
+        </LiCard>
       </div>
     </div>
   </section>
@@ -96,7 +108,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { LiTabs, LiButton, LiBadge, LiTextField, useToast } from '../../design-system/components/index.js'
+import { LiTabs, LiButton, LiBadge, LiTextField, LiCard, LiGlassCard, LiListTile, LiPageHeader, useToast } from '../../design-system/components/index.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { useClubs } from '../../composables/useClubs.js'
 import { useCompetitions } from '../../composables/useCompetitions.js'
@@ -275,44 +287,31 @@ function formatWhen(iso) {
   gap: var(--space-m, 16px);
 }
 
-.comp-detail-view__header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-m, 16px);
-}
-
-.comp-detail-view__actions {
-  display: flex;
-  gap: var(--space-s, 8px);
-  margin-top: var(--space-m, 16px);
-}
-
 .comp-detail-view__register {
-  display: flex;
-  gap: var(--space-s, 8px);
   margin-bottom: var(--space-m, 16px);
 }
 
-.comp-detail-view__teams,
-.comp-detail-view__round ul {
-  list-style: none;
-  padding: 0;
+.comp-detail-view__register form {
   display: flex;
-  flex-direction: column;
   gap: var(--space-s, 8px);
 }
 
-.comp-detail-view__teams li {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s, 8px);
+.comp-detail-view__round {
+  margin-bottom: var(--space-s, 8px);
 }
 
-.comp-detail-view__match {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s, 8px);
-  flex-wrap: wrap;
+.comp-detail-view__round-title {
+  padding: var(--space-m, 16px) var(--space-m, 16px) 0;
+  margin: 0 0 var(--space-s, 8px);
+}
+
+/* Team names can be longer than LiListTile's default single-line
+   ellipsis assumes (built for dense contact-style lists) — always show
+   the full matchup in this competitions-round context. */
+.comp-detail-view__round :deep(.li-list-tile-title) {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .comp-detail-view__match-score {
@@ -333,15 +332,20 @@ function formatWhen(iso) {
   font-size: var(--text-sm, 14px);
 }
 
-.comp-detail-view__standings {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--text-xs, 14px);
+.comp-detail-view__standings-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   margin-top: var(--space-m, 16px);
 }
 
-.comp-detail-view__standings th,
-.comp-detail-view__standings td {
+.comp-detail-view__standings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-xs, 14px);
+}
+
+.comp-detail-view__standings-table th,
+.comp-detail-view__standings-table td {
   padding: var(--space-s, 8px);
   text-align: left;
   border-bottom: 1px solid var(--color-gray-200, #E6E6E6);
