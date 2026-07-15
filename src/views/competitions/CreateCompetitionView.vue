@@ -1,7 +1,7 @@
 <template>
   <section class="create-comp-view">
     <h1>Create competition</h1>
-    <LiCard class="create-comp-view__card">
+    <LiGlassCard class="create-comp-view__card">
       <div class="create-comp-view__form">
         <LiSelect v-model="form.club_id" label="Club" :options="clubOptions" placeholder="Select a club" />
         <LiTextField v-model="form.name" label="Name" placeholder="Sunday Cup" />
@@ -21,14 +21,14 @@
         <p v-if="errorMessage" class="create-comp-view__error">{{ errorMessage }}</p>
         <LiButton :loading="submitting" @click="handleSubmit">Create competition</LiButton>
       </div>
-    </LiCard>
+    </LiGlassCard>
   </section>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { LiCard, LiButton, LiTextField, LiSelect, useToast } from '../../design-system/components/index.js'
+import { LiGlassCard, LiButton, LiTextField, LiSelect, useToast } from '../../design-system/components/index.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { useClubs } from '../../composables/useClubs.js'
 import { useCompetitions } from '../../composables/useCompetitions.js'
