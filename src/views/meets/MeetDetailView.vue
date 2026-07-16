@@ -22,10 +22,12 @@
 
       <!-- Participants -->
       <div v-show="activeTab === 1">
+        <LiButton v-if="isOrganizer" variant="secondary" size="sm" @click="openAddPlayer">+ Add player</LiButton>
         <LiCard flush>
-          <LiListTile v-for="p in participants" :key="p.id" :title="p.profiles.full_name">
+          <LiListTile v-for="p in participants" :key="p.id" :title="p.profiles?.full_name || p.guest_name">
             <template #trailing>
-              <LiBadge :label="p.status" :variant="statusVariant(p.status)" />
+              <LiBadge v-if="!p.user_id" label="Guest" variant="neutral" />
+              <LiBadge v-else :label="p.status" :variant="statusVariant(p.status)" />
             </template>
           </LiListTile>
         </LiCard>
@@ -39,7 +41,10 @@
 
       <!-- Matches -->
       <div v-show="activeTab === 3" class="meet-detail-view__matches">
-        <LiButton variant="secondary" @click="goToMatches">+ New match session</LiButton>
+        <div class="meet-detail-view__matches-actions">
+          <LiButton variant="secondary" @click="goToMatches">{{ sessions.length ? 'Open match session' : '+ New match session' }}</LiButton>
+          <LiButton v-if="sessions.length" variant="ghost" size="sm" @click="startNewSession">+ Start another session</LiButton>
+        </div>
         <LiCard v-if="sessions.length" flush>
           <LiListTile
             v-for="s in sessions"
@@ -66,13 +71,38 @@
         <MeetChat :meet-id="meet.id" />
       </div>
     </div>
+
+    <LiBottomSheet v-model="showAddPlayer" title="Add player">
+      <div class="add-player-sheet">
+        <section v-if="meet.club_id">
+          <h4 class="add-player-sheet__label">Club members</h4>
+          <LiListTile
+            v-for="m in clubMembersToAdd"
+            :key="m.id"
+            :title="m.full_name"
+            data-testid="add-player-member"
+            interactive
+            @click="handleAddExistingMember(m.id)"
+          >
+            <template #trailing><LiIcon name="add" size="sm" /></template>
+          </LiListTile>
+          <p v-if="!clubMembersToAdd.length" class="add-player-sheet__empty">No club members left to add.</p>
+        </section>
+
+        <section class="add-player-sheet__guest">
+          <h4 class="add-player-sheet__label">Add a guest</h4>
+          <LiTextField v-model="guestName" placeholder="Guest name" data-testid="guest-name-input" />
+          <LiButton :disabled="!guestName.trim()" data-testid="add-guest-btn" @click="handleAddGuest">Add guest</LiButton>
+        </section>
+      </div>
+    </LiBottomSheet>
   </section>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { LiButton, LiBadge, LiTabs, LiEmptyState, LiCard, LiListTile, LiPageHeader, useToast } from '../../design-system/components/index.js'
+import { LiButton, LiBadge, LiTabs, LiEmptyState, LiCard, LiListTile, LiPageHeader, LiBottomSheet, LiTextField, LiIcon, useToast } from '../../design-system/components/index.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { useMeets } from '../../composables/useMeets.js'
 import { useMeetParticipants } from '../../composables/useMeetParticipants.js'
@@ -85,9 +115,13 @@ const route = useRoute()
 const router = useRouter()
 const { user } = useAuth()
 const { getMeet } = useMeets()
-const { listParticipants, joinMeet, leaveMeet } = useMeetParticipants()
+const { listParticipants, joinMeet, leaveMeet, addExistingMember, addGuest, listClubMembersNotInMeet } = useMeetParticipants()
 const { listSessionsByMeet } = useMatchSessions()
 const toast = useToast()
+
+const showAddPlayer = ref(false)
+const clubMembersToAdd = ref([])
+const guestName = ref('')
 
 const meet = ref(null)
 const participants = ref([])
@@ -162,11 +196,55 @@ function formatWhen(iso) {
 }
 
 function goToMatches() {
+  if (sessions.value.length) {
+    openSession(sessions.value[0].id)
+  } else {
+    startNewSession()
+  }
+}
+
+function startNewSession() {
   router.push({ name: 'match-session', params: { meetId: route.params.id } })
 }
 
 function openSession(sessionId) {
   router.push({ name: 'match-session', params: { meetId: route.params.id, sessionId } })
+}
+
+async function openAddPlayer() {
+  guestName.value = ''
+  showAddPlayer.value = true
+  try {
+    clubMembersToAdd.value = meet.value?.club_id
+      ? await listClubMembersNotInMeet(meet.value.id, meet.value.club_id)
+      : []
+  } catch (err) {
+    toast.error(err.message || 'Could not load club members.')
+  }
+}
+
+async function handleAddExistingMember(userId) {
+  try {
+    await addExistingMember(meet.value, userId, user.value.id)
+    await reloadParticipants()
+    clubMembersToAdd.value = clubMembersToAdd.value.filter((m) => m.id !== userId)
+    toast.success('Player added.')
+  } catch (err) {
+    toast.error(err.message || 'Could not add that player.')
+  }
+}
+
+async function handleAddGuest() {
+  const trimmed = guestName.value.trim()
+  if (!trimmed) return
+  try {
+    await addGuest(meet.value, trimmed, user.value.id)
+    guestName.value = ''
+    await reloadParticipants()
+    toast.success('Guest added.')
+  } catch (err) {
+    toast.error(err.message || 'Could not add that guest.')
+  }
 }
 
 const FORMAT_LABELS = {
@@ -204,5 +282,37 @@ function formatDate(iso) {
   display: flex;
   flex-direction: column;
   gap: var(--space-m, 16px);
+}
+
+.meet-detail-view__matches-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s, 8px);
+}
+
+.add-player-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m, 16px);
+}
+
+.add-player-sheet__label {
+  margin: 0 0 var(--space-xs, 8px);
+  font-size: var(--text-xs, 13px);
+  font-weight: 700;
+  color: var(--color-on-surface-variant, #A3A3A3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.add-player-sheet__empty {
+  color: var(--color-on-surface-variant, #A3A3A3);
+  font-size: var(--text-sm, 14px);
+}
+
+.add-player-sheet__guest {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s, 8px);
 }
 </style>
