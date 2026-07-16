@@ -105,6 +105,28 @@ export function useMeetParticipants() {
     }
   }
 
+  async function removeParticipant(participantId) {
+    // Keyed by the row's own id (not meet_id + user_id) so this works for
+    // guests too, who have no user_id to match on.
+    const { data: existing, error: findErr } = await supabase
+      .from('meet_participants')
+      .select('meet_id, status')
+      .eq('id', participantId)
+      .maybeSingle()
+    if (findErr) throw findErr
+    if (!existing) return
+
+    const { error: delErr } = await supabase
+      .from('meet_participants')
+      .delete()
+      .eq('id', participantId)
+    if (delErr) throw delErr
+
+    if (existing.status === 'confirmed') {
+      await promoteNext(existing.meet_id)
+    }
+  }
+
   async function promoteNext(meetId) {
     // Server-side atomic promotion via SECURITY DEFINER RPC: only promotes if
     // confirmed < max_players, and runs as the table owner so a non-creator
@@ -126,6 +148,7 @@ export function useMeetParticipants() {
     listParticipants,
     joinMeet,
     leaveMeet,
+    removeParticipant,
     promoteNext,
     inviteUser,
     addExistingMember,

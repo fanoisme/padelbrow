@@ -187,6 +187,55 @@ describe('useMeetParticipants', () => {
     expect(supabase.from).not.toHaveBeenCalled()
   })
 
+  it('removeParticipant deletes the row by id and promotes the next waitlisted participant if it was confirmed', async () => {
+    const findSingle = vi.fn().mockResolvedValue({ data: { meet_id: 'm1', status: 'confirmed' }, error: null })
+    const findEq = vi.fn(() => ({ maybeSingle: findSingle }))
+    const findSelect = vi.fn(() => ({ eq: findEq }))
+
+    const delEq = vi.fn().mockResolvedValue({ error: null })
+    const del = vi.fn(() => ({ eq: delEq }))
+
+    supabase.from.mockReturnValue({ select: findSelect, delete: del })
+    supabase.rpc.mockResolvedValue({ data: { id: 'p3', status: 'confirmed' }, error: null })
+
+    const { removeParticipant } = useMeetParticipants()
+    await removeParticipant('p9')
+
+    expect(findEq).toHaveBeenCalledWith('id', 'p9')
+    expect(delEq).toHaveBeenCalledWith('id', 'p9')
+    expect(supabase.rpc).toHaveBeenCalledWith('promote_next_meet_participant', { p_meet_id: 'm1' })
+  })
+
+  it('removeParticipant does not promote when the removed row was not confirmed (e.g. a waitlisted guest)', async () => {
+    const findSingle = vi.fn().mockResolvedValue({ data: { meet_id: 'm1', status: 'waitlisted' }, error: null })
+    const findEq = vi.fn(() => ({ maybeSingle: findSingle }))
+    const findSelect = vi.fn(() => ({ eq: findEq }))
+
+    const delEq = vi.fn().mockResolvedValue({ error: null })
+    const del = vi.fn(() => ({ eq: delEq }))
+
+    supabase.from.mockReturnValue({ select: findSelect, delete: del })
+
+    const { removeParticipant } = useMeetParticipants()
+    await removeParticipant('p9')
+
+    expect(supabase.rpc).not.toHaveBeenCalled()
+  })
+
+  it('removeParticipant is a no-op when the row no longer exists', async () => {
+    const findSingle = vi.fn().mockResolvedValue({ data: null, error: null })
+    const findEq = vi.fn(() => ({ maybeSingle: findSingle }))
+    const findSelect = vi.fn(() => ({ eq: findEq }))
+    const del = vi.fn()
+
+    supabase.from.mockReturnValue({ select: findSelect, delete: del })
+
+    const { removeParticipant } = useMeetParticipants()
+    await removeParticipant('p9')
+
+    expect(del).not.toHaveBeenCalled()
+  })
+
   it('addExistingMember does not retry as waitlisted on a non-capacity error (e.g. duplicate member)', async () => {
     // count looks like there's room, but the insert fails with a real unique
     // violation (23505) — the member is already in the meet. This must

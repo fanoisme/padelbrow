@@ -28,6 +28,16 @@
             <template #trailing>
               <LiBadge v-if="!p.user_id" label="Guest" variant="neutral" />
               <LiBadge v-else :label="p.status" :variant="statusVariant(p.status)" />
+              <button
+                v-if="isOrganizer"
+                type="button"
+                class="participant-remove"
+                aria-label="Remove participant"
+                data-testid="remove-participant-btn"
+                @click="handleRemoveParticipant(p.id)"
+              >
+                <LiIcon name="close" size="sm" />
+              </button>
             </template>
           </LiListTile>
         </LiCard>
@@ -118,7 +128,7 @@ const route = useRoute()
 const router = useRouter()
 const { user } = useAuth()
 const { getMeet } = useMeets()
-const { listParticipants, joinMeet, leaveMeet, addExistingMember, addGuest, listClubMembersNotInMeet } = useMeetParticipants()
+const { listParticipants, joinMeet, leaveMeet, addExistingMember, addGuest, listClubMembersNotInMeet, removeParticipant } = useMeetParticipants()
 const { listSessionsByMeet } = useMatchSessions()
 const toast = useToast()
 
@@ -243,6 +253,16 @@ async function handleAddExistingMember(userId) {
   }
 }
 
+async function handleRemoveParticipant(participantId) {
+  try {
+    await removeParticipant(participantId)
+    await reloadParticipants()
+    toast.success('Player removed.')
+  } catch (err) {
+    toast.error(err.message || 'Could not remove that player.')
+  }
+}
+
 async function handleAddGuest() {
   const trimmed = guestName.value.trim()
   if (!trimmed) return
@@ -291,6 +311,25 @@ function formatDate(iso) {
   display: flex;
   flex-direction: column;
   gap: var(--space-m, 16px);
+}
+
+.participant-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--color-on-surface-variant, #A3A3A3);
+  cursor: pointer;
+  border-radius: var(--radius-sm, 8px);
+  margin-left: var(--space-xs, 4px);
+}
+
+.participant-remove:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-error, #C83E3B);
 }
 
 .meet-detail-view__matches-actions {

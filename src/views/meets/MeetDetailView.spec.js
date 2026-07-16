@@ -20,8 +20,9 @@ const leaveMeet = vi.fn().mockResolvedValue()
 const addExistingMember = vi.fn().mockResolvedValue({ id: 'p9', status: 'confirmed' })
 const addGuest = vi.fn().mockResolvedValue({ id: 'p10', status: 'confirmed' })
 const listClubMembersNotInMeet = vi.fn().mockResolvedValue([{ id: 'u5', full_name: 'Rani' }])
+const removeParticipant = vi.fn().mockResolvedValue(undefined)
 vi.mock('../../composables/useMeetParticipants.js', () => ({
-  useMeetParticipants: vi.fn(() => ({ listParticipants, joinMeet, leaveMeet, addExistingMember, addGuest, listClubMembersNotInMeet })),
+  useMeetParticipants: vi.fn(() => ({ listParticipants, joinMeet, leaveMeet, addExistingMember, addGuest, listClubMembersNotInMeet, removeParticipant })),
 }))
 
 const listSessionsByMeet = vi.fn().mockResolvedValue([])
@@ -195,5 +196,29 @@ describe('MeetDetailView', () => {
 
     const addBtn = wrapper.findAll('button').find((b) => b.text().match(/\+ add player/i))
     expect(addBtn).toBeUndefined()
+  })
+
+  it('organizer can remove a participant from the Participants tab', async () => {
+    getMeet.mockResolvedValueOnce({ id: 'm1', title: 'Tue Night', creator_id: 'u2', club_id: null, max_players: 4, auto_approve: true, venue_name: 'Court 1', starts_at: '2026-07-14T13:00:00Z' })
+    const router = mountWithRouter()
+    await router.isReady()
+    const wrapper = mount(MeetDetailView, mountOpts(router))
+    await flushPromises()
+
+    const removeBtn = wrapper.find('[data-testid="remove-participant-btn"]')
+    expect(removeBtn.exists()).toBe(true)
+    await removeBtn.trigger('click')
+    await flushPromises()
+
+    expect(removeParticipant).toHaveBeenCalledWith('p1')
+  })
+
+  it('non-organizer does not see a remove button on participants', async () => {
+    const router = mountWithRouter()
+    await router.isReady()
+    const wrapper = mount(MeetDetailView, mountOpts(router))
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="remove-participant-btn"]').exists()).toBe(false)
   })
 })
