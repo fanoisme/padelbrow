@@ -19,7 +19,14 @@ import { useMatchRounds } from './useMatchRounds.js'
 describe('useMatchRounds', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('generateRound persists a round + matches + players for americano', async () => {
+  const participants = [
+    { id: 'p1', user_id: 'u1' },
+    { id: 'p2', user_id: 'u2' },
+    { id: 'p3', guest_name: 'Bambang' }, // guest — no user_id
+    { id: 'p4', user_id: 'u4' },
+  ]
+
+  function mockPersistence() {
     const roundSingle = vi.fn().mockResolvedValue({ data: { id: 'r1' }, error: null })
     const roundSelect = vi.fn(() => ({ single: roundSingle }))
     const roundInsert = vi.fn(() => ({ select: roundSelect }))
@@ -36,27 +43,74 @@ describe('useMatchRounds', () => {
       return {}
     })
 
+    return { roundInsert, matchesInsert, playersInsert }
+  }
+
+  it('generateRound persists a round + matches + players for americano, mapping guests to guest_participant_id', async () => {
+    const { roundInsert, matchesInsert, playersInsert } = mockPersistence()
+
     const { generateRound } = useMatchRounds()
     const result = await generateRound(
       { id: 'ms1', format: 'americano' },
       { playerIds: ['p1', 'p2', 'p3', 'p4'] },
-      0
+      0,
+      participants
     )
 
     expect(generateAmericanoRound).toHaveBeenCalledWith(['p1', 'p2', 'p3', 'p4'], 0, [])
     expect(roundInsert).toHaveBeenCalledWith({ match_session_id: 'ms1', round_number: 0, status: 'pending' })
     expect(matchesInsert).toHaveBeenCalledWith([{ match_round_id: 'r1', court_number: 1, status: 'pending' }])
     expect(playersInsert).toHaveBeenCalledWith([
-      { match_id: 'm1', user_id: 'p1', team: 'a' },
-      { match_id: 'm1', user_id: 'p2', team: 'a' },
-      { match_id: 'm1', user_id: 'p3', team: 'b' },
-      { match_id: 'm1', user_id: 'p4', team: 'b' },
+      { match_id: 'm1', team: 'a', user_id: 'u1' },
+      { match_id: 'm1', team: 'a', user_id: 'u2' },
+      { match_id: 'm1', team: 'b', guest_participant_id: 'p3' },
+      { match_id: 'm1', team: 'b', user_id: 'u4' },
     ])
     expect(result).toHaveLength(1)
   })
 
   it('generateRound throws for an unsupported format', async () => {
     const { generateRound } = useMatchRounds()
-    await expect(generateRound({ id: 'ms1', format: 'doubles' }, { playerIds: ['p1'] }, 0)).rejects.toThrow(/unsupported format/)
+    await expect(generateRound({ id: 'ms1', format: 'doubles' }, { playerIds: ['p1'] }, 0, [])).rejects.toThrow(/unsupported format/)
+  })
+
+  it('generateRound throws if a generated player id has no matching participant', async () => {
+    mockPersistence()
+    const { generateRound } = useMatchRounds()
+    await expect(
+      generateRound({ id: 'ms1', format: 'americano' }, { playerIds: ['p1', 'p2', 'p3', 'p4'] }, 0, [])
+    ).rejects.toThrow(/unknown participant/i)
+  })
+
+  it('listRoundsWithMatches resolves guest players by guest_participant_id', async () => {
+    const roundsOrder = vi.fn().mockResolvedValue({ data: [{ id: 'r1', round_number: 0, status: 'pending' }], error: null })
+    const roundsEq = vi.fn(() => ({ order: roundsOrder }))
+    const roundsSelect = vi.fn(() => ({ eq: roundsEq }))
+
+    const matchesOrder = vi.fn().mockResolvedValue({
+      data: [{
+        id: 'm1',
+        court_number: 1,
+        match_players: [
+          { match_id: 'm1', user_id: 'u1', guest_participant_id: null, team: 'a' },
+          { match_id: 'm1', user_id: null, guest_participant_id: 'p3', team: 'b' },
+        ],
+      }],
+      error: null,
+    })
+    const matchesEq = vi.fn(() => ({ order: matchesOrder }))
+    const matchesSelect = vi.fn(() => ({ eq: matchesEq }))
+
+    supabase.from.mockImplementation((table) => {
+      if (table === 'match_rounds') return { select: roundsSelect }
+      if (table === 'matches') return { select: matchesSelect }
+      return {}
+    })
+
+    const { listRoundsWithMatches } = useMatchRounds()
+    const result = await listRoundsWithMatches('ms1')
+
+    expect(result[0].matches[0].team_a).toEqual(['u1'])
+    expect(result[0].matches[0].team_b).toEqual(['p3'])
   })
 })
