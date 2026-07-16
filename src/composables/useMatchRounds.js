@@ -76,7 +76,9 @@ export function useMatchRounds() {
     return insertedMatches
   }
 
-  async function listRoundsWithMatches(sessionId) {
+  async function listRoundsWithMatches(sessionId, participants) {
+    const byUserId = new Map(participants.filter((p) => p.user_id).map((p) => [p.user_id, p.id]))
+
     const { data: rounds, error: roundError } = await supabase
       .from('match_rounds')
       .select('*')
@@ -96,8 +98,8 @@ export function useMatchRounds() {
         ...round,
         matches: (matches || []).map((m) => ({
           ...m,
-          team_a: (m.match_players || []).filter((p) => p.team === 'a').map((p) => p.user_id || p.guest_participant_id),
-          team_b: (m.match_players || []).filter((p) => p.team === 'b').map((p) => p.user_id || p.guest_participant_id),
+          team_a: (m.match_players || []).filter((p) => p.team === 'a').map((p) => p.guest_participant_id || byUserId.get(p.user_id) || p.user_id),
+          team_b: (m.match_players || []).filter((p) => p.team === 'b').map((p) => p.guest_participant_id || byUserId.get(p.user_id) || p.user_id),
         })),
       })
     }

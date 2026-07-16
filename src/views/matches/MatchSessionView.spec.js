@@ -62,7 +62,7 @@ describe('MatchSessionView', () => {
     await flushPromises()
 
     expect(getSession).toHaveBeenCalledWith('ms1')
-    expect(listRoundsWithMatches).toHaveBeenCalledWith('ms1')
+    expect(listRoundsWithMatches).toHaveBeenCalledWith('ms1', expect.any(Array))
     expect(wrapper.text()).toContain('Standings')
     expect(computeStandingsFor).toHaveBeenCalled()
   })

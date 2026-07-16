@@ -241,7 +241,7 @@ function buildRoundInput(format, ids) {
 }
 
 async function reload() {
-  rounds.value = await listRoundsWithMatches(session.value.id)
+  rounds.value = await listRoundsWithMatches(session.value.id, participants.value)
 }
 
 onMounted(async () => {

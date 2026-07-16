@@ -82,7 +82,7 @@ describe('useMatchRounds', () => {
     ).rejects.toThrow(/unknown participant/i)
   })
 
-  it('listRoundsWithMatches resolves guest players by guest_participant_id', async () => {
+  it('listRoundsWithMatches resolves both real and guest players to their participant id', async () => {
     const roundsOrder = vi.fn().mockResolvedValue({ data: [{ id: 'r1', round_number: 0, status: 'pending' }], error: null })
     const roundsEq = vi.fn(() => ({ order: roundsOrder }))
     const roundsSelect = vi.fn(() => ({ eq: roundsEq }))
@@ -107,10 +107,16 @@ describe('useMatchRounds', () => {
       return {}
     })
 
+    // Note: this participant's `id` ('p1') deliberately differs from their
+    // `user_id` ('u1') — matching production, where meet_participants.id is
+    // its own independent uuid, never equal to profiles.id.
     const { listRoundsWithMatches } = useMatchRounds()
-    const result = await listRoundsWithMatches('ms1')
+    const result = await listRoundsWithMatches('ms1', [
+      { id: 'p1', user_id: 'u1' },
+      { id: 'p3', guest_name: 'Bambang' },
+    ])
 
-    expect(result[0].matches[0].team_a).toEqual(['u1'])
+    expect(result[0].matches[0].team_a).toEqual(['p1'])
     expect(result[0].matches[0].team_b).toEqual(['p3'])
   })
 })
