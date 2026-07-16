@@ -58,7 +58,9 @@ Hash-mode (`#/path`) — 20 routes. Key path patterns:
 
 ### Database
 
-Supabase Postgres with 21 migrations in `supabase/migrations/`. RLS enabled on all tables. Core tables: `profiles`, `clubs`, `club_members`, `meets`, `match_sessions`, `match_rounds`, competitions, payments, feed, notifications, chat, gamification.
+Supabase Postgres with 22 migrations in `supabase/migrations/`. RLS enabled on all tables (the real access-control boundary, since the anon key ships inside the static frontend build). Core tables: `profiles`, `clubs`, `club_members`, `meets`, `match_sessions`, `match_rounds`, competitions, payments, feed, notifications, chat, gamification.
+
+Apply migrations to the linked Supabase project via the CLI: `npx supabase db push` (after `npx supabase login` + `npx supabase link --project-ref <ref>`).
 
 ### Layout
 
@@ -80,3 +82,9 @@ GitHub Actions on push to `main`: install → test → build → deploy to Pages
 - Supabase client: `src/lib/supabase.js`
 - Design tokens: `src/design-system/tokens.css`
 - Match/tournament logic: `src/lib/matchFormatGenerators.js`, `src/lib/tournamentGenerators.js`
+
+## Project Docs
+
+The app was built in phases from a design spec, with a plan doc per phase — check these before making architectural changes:
+- `docs/superpowers/specs/2026-07-11-padel-brow-design.md` — full architecture, data model, and feature scope across all 9 planned phases
+- `docs/superpowers/plans/*.md` — one plan per build phase (foundation, identity/clubs, meets, match engine, payments, competitions, feed, stats/leaderboard) plus later UI/UX rework and immersive-redesign phases
