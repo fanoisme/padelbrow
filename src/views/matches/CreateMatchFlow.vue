@@ -401,7 +401,6 @@ async function doJoin() {
   width: 100%;
   max-width: 640px;
   margin: 0 auto;
-  min-height: calc(100dvh - var(--space-2xl, 32px));
   background: #121212;
   color: #FFFFFF;
   border-radius: var(--radius-lg, 24px);
@@ -438,7 +437,7 @@ async function doJoin() {
 }
 
 /* hero */
-.cmf__hero { display: flex; flex-direction: column; gap: var(--space-xl, 24px); min-height: 100%; }
+.cmf__hero { display: flex; flex-direction: column; gap: var(--space-xl, 24px); min-height: calc(100dvh - 2 * var(--space-xl, 24px)); }
 .cmf__hero-art { display: flex; justify-content: center; padding: var(--space-xl, 24px) 0; }
 .cmf__court {
   --c: 220px;

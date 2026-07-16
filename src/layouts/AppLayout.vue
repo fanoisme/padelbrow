@@ -16,10 +16,18 @@
           v-for="item in primaryNav"
           :key="item.to"
           :to="item.to"
-          class="sidebar-item"
+          custom
+          v-slot="{ href, navigate, isActive, isExactActive }"
         >
-          <LiIcon :name="item.icon" size="sm" />
-          <span class="sidebar-item__label">{{ item.label }}</span>
+          <a
+            :href="href"
+            class="sidebar-item"
+            :class="{ 'router-link-active': item.to === '/' ? isExactActive : isActive }"
+            @click="navigate"
+          >
+            <LiIcon :name="item.icon" size="sm" />
+            <span class="sidebar-item__label">{{ item.label }}</span>
+          </a>
         </router-link>
       </nav>
 
@@ -78,9 +86,11 @@
 
     <!-- Mobile bottom tab bar -->
     <nav v-if="user" class="bottom-tab-bar" aria-label="Primary">
-      <router-link to="/feed" class="bottom-tab-bar__item">
-        <span class="bottom-tab-bar__icon" aria-hidden="true"><LiIcon name="newspaper" size="md" /></span>
-        <span class="bottom-tab-bar__label">Feed</span>
+      <router-link to="/" custom v-slot="{ href, navigate, isExactActive }">
+        <a :href="href" class="bottom-tab-bar__item" :class="{ 'router-link-active': isExactActive }" @click="navigate">
+          <span class="bottom-tab-bar__icon" aria-hidden="true"><LiIcon name="home" size="md" /></span>
+          <span class="bottom-tab-bar__label">Home</span>
+        </a>
       </router-link>
       <router-link to="/meets" class="bottom-tab-bar__item">
         <span class="bottom-tab-bar__icon" aria-hidden="true"><LiIcon name="sports_tennis" size="md" /></span>
@@ -132,13 +142,14 @@ const { user, signOut } = useAuth()
 const showMore = ref(false)
 
 const primaryNav = [
-  { to: '/feed', label: 'Feed', icon: 'newspaper' },
+  { to: '/', label: 'Home', icon: 'home' },
   { to: '/meets', label: 'Meets', icon: 'sports_tennis' },
   { to: '/clubs', label: 'Clubs', icon: 'groups' },
   { to: '/leaderboard', label: 'Leaderboard', icon: 'leaderboard' },
 ]
 
 const secondaryNav = [
+  { to: '/feed', label: 'Feed', icon: 'newspaper' },
   { to: '/competitions', label: 'Competitions', icon: 'emoji_events' },
   { to: '/network', label: 'Network', icon: 'diversity_3' },
   { to: '/achievements', label: 'Achievements', icon: 'military_tech' },
