@@ -163,6 +163,30 @@ describe('MeetDetailView', () => {
     expect(addGuest).toHaveBeenCalledWith(expect.objectContaining({ id: 'm1' }), 'Bambang', 'u2')
   })
 
+  it('shows a loading indicator while club members are being fetched, then the list', async () => {
+    getMeet.mockResolvedValueOnce({ id: 'm1', title: 'Tue Night', creator_id: 'u2', club_id: 'c1', max_players: 4, auto_approve: true, venue_name: 'Court 1', starts_at: '2026-07-14T13:00:00Z' })
+    let resolveMembers
+    listClubMembersNotInMeet.mockReturnValueOnce(new Promise((resolve) => { resolveMembers = resolve }))
+
+    const router = mountWithRouter()
+    await router.isReady()
+    const wrapper = mount(MeetDetailView, mountOpts(router))
+    await flushPromises()
+
+    const addBtn = wrapper.findAll('button').find((b) => b.text().match(/\+ add player/i))
+    await addBtn.trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="add-player-loading"]').exists()).toBe(true)
+    expect(wrapper.text()).not.toContain('No club members left to add.')
+
+    resolveMembers([{ id: 'u5', full_name: 'Rani' }])
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="add-player-loading"]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Rani')
+  })
+
   it('non-organizer does not see the Add player button', async () => {
     const router = mountWithRouter()
     await router.isReady()

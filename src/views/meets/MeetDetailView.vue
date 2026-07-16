@@ -76,17 +76,20 @@
       <div class="add-player-sheet">
         <section v-if="meet.club_id">
           <h4 class="add-player-sheet__label">Club members</h4>
-          <LiListTile
-            v-for="m in clubMembersToAdd"
-            :key="m.id"
-            :title="m.full_name"
-            data-testid="add-player-member"
-            interactive
-            @click="handleAddExistingMember(m.id)"
-          >
-            <template #trailing><LiIcon name="add" size="sm" /></template>
-          </LiListTile>
-          <p v-if="!clubMembersToAdd.length" class="add-player-sheet__empty">No club members left to add.</p>
+          <LiSpinner v-if="loadingClubMembers" data-testid="add-player-loading" size="sm" inline label="Loading club members…" />
+          <template v-else>
+            <LiListTile
+              v-for="m in clubMembersToAdd"
+              :key="m.id"
+              :title="m.full_name"
+              data-testid="add-player-member"
+              interactive
+              @click="handleAddExistingMember(m.id)"
+            >
+              <template #trailing><LiIcon name="add" size="sm" /></template>
+            </LiListTile>
+            <p v-if="!clubMembersToAdd.length" class="add-player-sheet__empty">No club members left to add.</p>
+          </template>
         </section>
 
         <section class="add-player-sheet__guest">
@@ -102,7 +105,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { LiButton, LiBadge, LiTabs, LiEmptyState, LiCard, LiListTile, LiPageHeader, LiBottomSheet, LiTextField, LiIcon, useToast } from '../../design-system/components/index.js'
+import { LiButton, LiBadge, LiTabs, LiEmptyState, LiCard, LiListTile, LiPageHeader, LiBottomSheet, LiTextField, LiIcon, LiSpinner, useToast } from '../../design-system/components/index.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { useMeets } from '../../composables/useMeets.js'
 import { useMeetParticipants } from '../../composables/useMeetParticipants.js'
@@ -121,6 +124,7 @@ const toast = useToast()
 
 const showAddPlayer = ref(false)
 const clubMembersToAdd = ref([])
+const loadingClubMembers = ref(false)
 const guestName = ref('')
 
 const meet = ref(null)
@@ -214,12 +218,17 @@ function openSession(sessionId) {
 async function openAddPlayer() {
   guestName.value = ''
   showAddPlayer.value = true
+  if (!meet.value?.club_id) {
+    clubMembersToAdd.value = []
+    return
+  }
+  loadingClubMembers.value = true
   try {
-    clubMembersToAdd.value = meet.value?.club_id
-      ? await listClubMembersNotInMeet(meet.value.id, meet.value.club_id)
-      : []
+    clubMembersToAdd.value = await listClubMembersNotInMeet(meet.value.id, meet.value.club_id)
   } catch (err) {
     toast.error(err.message || 'Could not load club members.')
+  } finally {
+    loadingClubMembers.value = false
   }
 }
 
