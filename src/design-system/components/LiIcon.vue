@@ -13,7 +13,7 @@
 <script setup>
 defineProps({
   name: { type: String, required: true },
-  size: { type: String, default: 'md', validator: v => ['sm', 'md', 'lg', 'xl'].includes(v) },
+  size: { type: String, default: 'md', validator: v => ['xs', 'sm', 'md', 'lg', 'xl'].includes(v) },
   filled: { type: Boolean, default: false },
   color: { type: String, default: 'inherit' },
   decorative: { type: Boolean, default: true },
@@ -41,6 +41,7 @@ defineProps({
   flex-shrink: 0;
 }
 
+.li-icon--xs  { font-size: 12px; width: 12px; height: 12px; }
 .li-icon--sm  { font-size: 16px; width: 16px; height: 16px; }
 .li-icon--md  { font-size: 20px; width: 20px; height: 20px; }
 .li-icon--lg  { font-size: 24px; width: 24px; height: 24px; }

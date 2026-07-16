@@ -1,7 +1,7 @@
 <template>
   <AppLayout>
     <router-view v-slot="{ Component, route }">
-      <Transition :name="route.meta.transition || 'li-page'" mode="out-in">
+      <Transition :name="route.meta.transition || 'li-page'">
         <component :is="Component" :key="route.path" />
       </Transition>
     </router-view>
@@ -19,9 +19,17 @@ useTheme()
 </script>
 
 <style>
-/* Page transition — slide + dim. Guide §1J. Reduced-motion collapses to a fade. */
-.li-page-enter-active,
+/* Page transition — crossfade + slide.
+   Leaving component is absolutely positioned so it doesn't block layout,
+   and z-indexed above the entering component so it fades out on top. */
 .li-page-leave-active {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transition: opacity var(--dur-medium, 300ms) var(--ease-smooth, cubic-bezier(0.16, 1, 0.3, 1)),
+              transform var(--dur-medium, 300ms) var(--ease-smooth, cubic-bezier(0.16, 1, 0.3, 1));
+}
+.li-page-enter-active {
   transition: opacity var(--dur-medium, 300ms) var(--ease-smooth, cubic-bezier(0.16, 1, 0.3, 1)),
               transform var(--dur-medium, 300ms) var(--ease-smooth, cubic-bezier(0.16, 1, 0.3, 1));
 }

@@ -38,8 +38,23 @@
       </div>
 
       <!-- Matches -->
-      <div v-show="activeTab === 3">
-        <LiEmptyState title="Ready to play?" description="Start a live match session to generate rounds and track scores." icon="trophy">
+      <div v-show="activeTab === 3" class="meet-detail-view__matches">
+        <LiButton variant="secondary" @click="goToMatches">+ New match session</LiButton>
+        <LiCard v-if="sessions.length" flush>
+          <LiListTile
+            v-for="s in sessions"
+            :key="s.id"
+            :title="formatLabel(s.format)"
+            :subtitle="`${s.num_courts} court${s.num_courts === 1 ? '' : 's'} · ${formatDate(s.created_at)}`"
+            interactive
+            @click="openSession(s.id)"
+          >
+            <template #trailing>
+              <LiBadge :label="sessionStatusLabel(s.status)" :variant="sessionStatusVariant(s.status)" />
+            </template>
+          </LiListTile>
+        </LiCard>
+        <LiEmptyState v-else title="Ready to play?" description="Start a live match session to generate rounds and track scores." icon="trophy">
           <template #action>
             <LiButton @click="goToMatches">Open match session</LiButton>
           </template>
@@ -61,6 +76,7 @@ import { LiButton, LiBadge, LiTabs, LiEmptyState, LiCard, LiListTile, LiPageHead
 import { useAuth } from '../../composables/useAuth.js'
 import { useMeets } from '../../composables/useMeets.js'
 import { useMeetParticipants } from '../../composables/useMeetParticipants.js'
+import { useMatchSessions } from '../../composables/useMatchSessions.js'
 import MeetChat from '../../components/meets/MeetChat.vue'
 import ExpensesPanel from '../../components/payments/ExpensesPanel.vue'
 import PaymentsPanel from '../../components/payments/PaymentsPanel.vue'
@@ -70,10 +86,12 @@ const router = useRouter()
 const { user } = useAuth()
 const { getMeet } = useMeets()
 const { listParticipants, joinMeet, leaveMeet } = useMeetParticipants()
+const { listSessionsByMeet } = useMatchSessions()
 const toast = useToast()
 
 const meet = ref(null)
 const participants = ref([])
+const sessions = ref([])
 const activeTab = ref(0)
 const tabs = [
   { label: 'Details' },
@@ -95,10 +113,19 @@ async function reloadParticipants() {
   participants.value = await listParticipants(route.params.id)
 }
 
+async function reloadSessions() {
+  try {
+    sessions.value = await listSessionsByMeet(route.params.id)
+  } catch {
+    sessions.value = []
+  }
+}
+
 onMounted(async () => {
   try {
     meet.value = await getMeet(route.params.id)
     await reloadParticipants()
+    await reloadSessions()
   } catch (err) {
     toast.error(err.message || 'Could not load this meet.')
   }
@@ -137,10 +164,43 @@ function formatWhen(iso) {
 function goToMatches() {
   router.push({ name: 'match-session', params: { meetId: route.params.id } })
 }
+
+function openSession(sessionId) {
+  router.push({ name: 'match-session', params: { meetId: route.params.id, sessionId } })
+}
+
+const FORMAT_LABELS = {
+  americano: 'Americano',
+  mexicano: 'Mexicano',
+  team_americano: 'Team Americano',
+  team_mexicano: 'Team Mexicano',
+  singles: 'Singles',
+}
+function formatLabel(format) { return FORMAT_LABELS[format] || format }
+function sessionStatusLabel(status) {
+  if (status === 'in_progress') return 'Live'
+  if (status === 'completed') return 'Done'
+  return 'Setup'
+}
+function sessionStatusVariant(status) {
+  if (status === 'in_progress') return 'info'
+  if (status === 'completed') return 'success'
+  return 'neutral'
+}
+function formatDate(iso) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })
+}
 </script>
 
 <style scoped>
 .meet-detail-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m, 16px);
+}
+
+.meet-detail-view__matches {
   display: flex;
   flex-direction: column;
   gap: var(--space-m, 16px);

@@ -45,6 +45,7 @@ const props = defineProps({
 const elRef = ref(null)
 const visible = ref(false)
 let observer = null
+let fallbackTimer = null
 
 const revealStyle = computed(() => ({
   '--li-reveal-delay': `${props.delay}ms`,
@@ -52,21 +53,29 @@ const revealStyle = computed(() => ({
   '--li-reveal-stagger-delay': `${props.staggerDelay}ms`,
 }))
 
+function reveal() {
+  if (visible.value) return
+  visible.value = true
+  if (observer) { observer.disconnect(); observer = null }
+  if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null }
+}
+
 onMounted(() => {
   if (!elRef.value) return
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    visible.value = true
+    reveal()
     return
   }
+
+  // Fallback: IntersectionObserver can miss elements during out-in page
+  // transitions. Reveal unconditionally after a short delay as safety net.
+  fallbackTimer = setTimeout(reveal, 500)
 
   observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          visible.value = true
-          observer.unobserve(entry.target)
-        }
+        if (entry.isIntersecting) reveal()
       })
     },
     { threshold: props.threshold, rootMargin: props.rootMargin }
@@ -76,6 +85,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (observer) observer.disconnect()
+  if (fallbackTimer) clearTimeout(fallbackTimer)
 })
 </script>
 

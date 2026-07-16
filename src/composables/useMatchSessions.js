@@ -16,6 +16,8 @@ export function useMatchSessions() {
       .select()
       .single()
     if (error) throw error
+    // RLS blocks non-organizers silently → data null, no error. Surface it.
+    if (!data) throw new Error('Could not create the match — only the meet organizer can start a session.')
     return data
   }
 

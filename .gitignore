@@ -3,3 +3,4 @@ dist/
 .env
 dist-ssr/
 *.local
+.playwright-mcp/
