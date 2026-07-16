@@ -31,7 +31,12 @@ vi.mock('../../composables/useMatchScoring.js', () => ({
 
 vi.mock('../../composables/useMeetParticipants.js', () => ({
   useMeetParticipants: vi.fn(() => ({
-    listParticipants: vi.fn().mockResolvedValue([{ user_id: 'p1' }, { user_id: 'p2' }, { user_id: 'p3' }, { user_id: 'p4' }]),
+    listParticipants: vi.fn().mockResolvedValue([
+      { id: 'p1', user_id: 'p1', profiles: { full_name: 'Alpha' } },
+      { id: 'p2', user_id: 'p2', profiles: { full_name: 'Bravo' } },
+      { id: 'p3', user_id: 'p3', profiles: { full_name: 'Charlie' } },
+      { id: 'p4', user_id: null, guest_name: 'Delta (guest)' },
+    ]),
     joinMeet: vi.fn().mockResolvedValue(undefined),
   })),
 }))
@@ -114,5 +119,25 @@ describe('MatchSessionView', () => {
     const payload = createSession.mock.calls[0][0]
     expect(payload.format).toBe('americano')
     expect(createSession.mock.calls[0][1]).toBe('meet1')
+  })
+
+  it('renders a guest participant using guest_name and passes participants into generateRound', async () => {
+    const router = createRouter({
+      history: createWebHashHistory(),
+      routes: [{ path: '/meets/:meetId/match-session/:sessionId', name: 'match-session', component: MatchSessionView }],
+    })
+    router.push('/meets/meet1/match-session/ms1')
+    await router.isReady()
+    const wrapper = mount(MatchSessionView, { global: { plugins: [router] } })
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Delta (guest)')
+
+    const btn = wrapper.find('[data-testid="generate-round-btn"]')
+    await btn.trigger('click')
+    await flushPromises()
+
+    const participantsArg = generateRound.mock.calls[0][3]
+    expect(participantsArg.map((p) => p.id)).toEqual(['p1', 'p2', 'p3', 'p4'])
   })
 })

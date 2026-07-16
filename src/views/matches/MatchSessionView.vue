@@ -179,10 +179,12 @@ const statusLabel = computed(() => {
 
 const playerById = computed(() => {
   const m = new Map()
-  for (const p of participants.value) m.set(p.user_id, p.profiles || {})
+  for (const p of participants.value) {
+    m.set(p.id, { full_name: p.profiles?.full_name || p.guest_name, avatar_url: p.profiles?.avatar_url || '' })
+  }
   return m
 })
-const playerIds = computed(() => participants.value.map((p) => p.user_id))
+const playerIds = computed(() => participants.value.map((p) => p.id))
 const standings = computed(() =>
   session.value ? computeStandingsFor(rounds.value, playerIds.value, session.value.ranking_criteria) : []
 )
@@ -268,7 +270,7 @@ function backToMeet() {
 async function handleGenerateRound() {
   try {
     const nextRound = rounds.value.length
-    await generateRound(session.value, buildRoundInput(session.value.format, playerIds.value), nextRound)
+    await generateRound(session.value, buildRoundInput(session.value.format, playerIds.value), nextRound, participants.value)
     await reload()
     toast.success('Round generated.')
   } catch (err) {
