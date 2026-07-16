@@ -16,11 +16,11 @@ export function initAuth() {
   return initPromise
 }
 
-async function signUpWithPassword(email, password, fullName) {
+async function signUpWithPassword(email, password, fullName, phone) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName } },
+    options: { data: { full_name: fullName, ...(phone ? { phone } : {}) } },
   })
   if (error) throw error
   return data

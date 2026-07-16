@@ -1,5 +1,76 @@
 <template>
-  <div class="landing">
+  <div v-if="user" class="dash">
+    <section class="dash__profile">
+      <div class="dash__who">
+        <h2 class="dash__name">{{ displayName }}</h2>
+        <p class="dash__contact"><LiIcon name="call" size="sm" /> {{ displayContact }}</p>
+      </div>
+      <div class="dash__split">
+        <div class="dash__stat">
+          <div class="dash__stat-top">
+            <span class="dash__stat-label">Ranking</span>
+            <div class="dash__stat-actions">
+              <button type="button" class="dash__icon-btn" :aria-label="showRank ? 'Hide ranking' : 'Show ranking'" @click="showRank = !showRank">
+                <LiIcon :name="showRank ? 'visibility' : 'visibility_off'" size="sm" />
+              </button>
+              <button type="button" class="dash__icon-btn" aria-label="Open leaderboard" @click="go('/leaderboard')">
+                <LiIcon name="chevron_right" size="sm" />
+              </button>
+            </div>
+          </div>
+          <span class="dash__stat-value">Elo {{ showRank ? elo : '••••' }}</span>
+        </div>
+        <span class="dash__divider" aria-hidden="true"></span>
+        <div class="dash__stat">
+          <div class="dash__stat-top">
+            <span class="dash__stat-label">Points</span>
+            <button type="button" class="dash__icon-btn" aria-label="Open stats" @click="go('/stats')">
+              <LiIcon name="chevron_right" size="sm" />
+            </button>
+          </div>
+          <span class="dash__stat-value">{{ xp }} XP</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="dash__promo">
+      <div class="dash__promo-glow" aria-hidden="true"></div>
+      <span class="dash__promo-icon"><LiIcon name="emoji_events" size="lg" color="#1A1A1A" /></span>
+      <div class="dash__promo-body">
+        <p class="dash__promo-eyebrow">Sunday Open</p>
+        <h3 class="dash__promo-title">Americano · 16 slots</h3>
+        <p class="dash__promo-sub">Prize pool <strong>Rp1.000.000</strong></p>
+      </div>
+      <button type="button" class="dash__promo-cta" @click="go('/competitions')">Register</button>
+    </section>
+
+    <section class="dash__actions" aria-label="Quick actions">
+      <button v-for="a in actions" :key="a.to" type="button" class="dash__action" @click="go(a.to)">
+        <span class="dash__action-icon"><LiIcon :name="a.icon" /></span>
+        <span class="dash__action-label">{{ a.label }}</span>
+        <span v-if="a.tag" class="dash__action-tag">{{ a.tag }}</span>
+      </button>
+    </section>
+
+    <section class="dash__hl">
+      <div class="dash__hl-head">
+        <h3>Recent activity</h3>
+        <router-link to="/feed" class="dash__hl-more">See all</router-link>
+      </div>
+      <ul class="dash__hl-list">
+        <li v-for="r in recent" :key="r.id">
+          <span class="dash__hl-icon"><LiIcon :name="r.icon" size="sm" /></span>
+          <span class="dash__hl-text">
+            <span class="dash__hl-title">{{ r.title }}</span>
+            <span class="dash__hl-sub">{{ r.sub }}</span>
+          </span>
+          <span class="dash__hl-amount" :class="r.tone">{{ r.amount }}</span>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <div v-else class="landing">
     <!-- HERO -->
     <section class="hero">
       <div class="landing__inner hero__inner">
@@ -105,13 +176,46 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { LiButton, LiGradientText, LiRevealOnScroll } from '../design-system/components/index.js'
+import { LiButton, LiIcon, LiGradientText, LiRevealOnScroll } from '../design-system/components/index.js'
+import { useAuth } from '../composables/useAuth.js'
 
 const router = useRouter()
+const { user } = useAuth()
 function go(path) {
   router.push(path)
 }
+
+// ponytail: profile/rank placeholders — wire to a profile + stats table later.
+const showRank = ref(true)
+const elo = ref('1.240')
+const xp = ref('1.950')
+const displayName = computed(
+  () => user.value?.user_metadata?.full_name || (user.value?.email ? user.value.email.split('@')[0] : 'Player')
+)
+const displayContact = computed(() => {
+  const phone = user.value?.user_metadata?.phone
+  if (phone) return `+62 ${phone}`
+  return user.value?.email || '—'
+})
+
+const actions = [
+  { to: '/meets', label: 'Meets', icon: 'sports_tennis', tag: 'LIVE' },
+  { to: '/competitions', label: 'Compete', icon: 'emoji_events', tag: 'NEW' },
+  { to: '/leaderboard', label: 'Ranking', icon: 'leaderboard', tag: 'ELO' },
+  { to: '/feed', label: 'Feed', icon: 'newspaper' },
+  { to: '/clubs', label: 'Clubs', icon: 'groups' },
+  { to: '/stats', label: 'Stats', icon: 'insights' },
+  { to: '/achievements', label: 'Awards', icon: 'military_tech' },
+  { to: '/network', label: 'Network', icon: 'diversity_3' },
+]
+
+const recent = [
+  { id: 1, icon: 'sports_tennis', title: 'Match win · Americano', sub: 'with Andi, Rere, Joko', amount: '+18 Elo', tone: 'pos' },
+  { id: 2, icon: 'payments', title: 'Meet entry paid', sub: 'Court 3 · Saturday', amount: 'Rp40.000', tone: 'neg' },
+  { id: 3, icon: 'military_tech', title: 'Achievement unlocked', sub: 'Five-match streak', amount: '+50 XP', tone: 'pos' },
+]
 
 const features = [
   { icon: '🎾', title: 'Meets', body: 'Book social matches — Americano, Mexicano, teams or singles. Auto pairings handle the rest.' },
@@ -374,5 +478,273 @@ const features = [
 
 @media (prefers-reduced-motion: reduce) {
   .hero__orb { animation: none; }
+}
+
+/* ── DASHBOARD (logged-in) ── */
+.dash {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l, 16px);
+  max-width: 640px;
+  margin: 0 auto;
+  padding-bottom: var(--space-2xl, 32px);
+}
+
+.dash__profile {
+  background: var(--color-bg-dark, #212324);
+  color: #FFFFFF;
+  border-radius: var(--radius-xl, 20px);
+  padding: var(--space-l, 20px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l, 18px);
+  box-shadow: var(--shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.12));
+}
+.dash__name {
+  margin: 0;
+  font-size: var(--text-lg, 18px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.dash__contact {
+  margin: 4px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs, 14px);
+  color: rgba(255, 255, 255, 0.7);
+}
+.dash__split {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-m, 16px);
+}
+.dash__stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dash__stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dash__stat-label {
+  font-size: var(--text-xs, 14px);
+  color: rgba(255, 255, 255, 0.7);
+}
+.dash__stat-actions {
+  display: inline-flex;
+  gap: 2px;
+}
+.dash__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background var(--dur-short, 200ms) var(--ease-out, ease), color var(--dur-short, 200ms) var(--ease-out, ease);
+}
+.dash__icon-btn:hover { background: rgba(255, 255, 255, 0.1); color: #FFFFFF; }
+.dash__stat-value {
+  font-size: var(--text-lg, 20px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.dash__divider {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.dash__promo {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: var(--space-m, 14px);
+  padding: var(--space-l, 18px);
+  border-radius: var(--radius-xl, 20px);
+  background: linear-gradient(135deg, var(--color-yellow-300, #FDDD00) 0%, var(--color-brand, #FFAF03) 60%, var(--color-orange-400, #FF6B00) 100%);
+  color: var(--color-gray-900, #1A1A1A);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(255, 107, 0, 0.18));
+}
+.dash__promo-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 120% at 90% 10%, rgba(255, 255, 255, 0.5), transparent 55%);
+  pointer-events: none;
+}
+.dash__promo-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  flex-shrink: 0;
+}
+.dash__promo-body { position: relative; flex: 1; min-width: 0; }
+.dash__promo-eyebrow {
+  margin: 0;
+  font-size: var(--text-xxs, 12px);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+.dash__promo-title {
+  margin: 2px 0;
+  font-size: var(--text-md, 16px);
+  font-weight: 800;
+}
+.dash__promo-sub {
+  margin: 0;
+  font-size: var(--text-xs, 13px);
+  opacity: 0.85;
+}
+.dash__promo-cta {
+  position: relative;
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill, 999px);
+  border: 1.5px solid var(--color-gray-900, #1A1A1A);
+  background: #FFFFFF;
+  color: var(--color-gray-900, #1A1A1A);
+  font-weight: 700;
+  font-size: var(--text-xs, 14px);
+  cursor: pointer;
+  transition: transform var(--dur-short, 200ms) var(--ease-smooth, cubic-bezier(0.16, 1, 0.3, 1));
+}
+.dash__promo-cta:active { transform: scale(0.97); }
+
+.dash__actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-m, 16px) var(--space-s, 8px);
+}
+.dash__action {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: var(--space-s, 8px) 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-gray-900, #333);
+  transition: transform var(--dur-short, 200ms) var(--ease-smooth, cubic-bezier(0.16, 1, 0.3, 1));
+}
+.dash__action:active { transform: scale(0.95); }
+.dash__action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md, 16px);
+  background: var(--color-gray-100, #F2F2F2);
+  color: var(--color-brand, #FFAF03);
+}
+.dash__action-label {
+  font-size: var(--text-xs, 13px);
+  font-weight: 600;
+  text-align: center;
+}
+.dash__action-tag {
+  position: absolute;
+  top: -2px;
+  right: 6px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--color-red-400, #C83E3B);
+}
+@media (max-width: 360px) {
+  .dash__action-icon { width: 48px; height: 48px; }
+}
+
+.dash__hl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s, 12px);
+}
+.dash__hl-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dash__hl-head h3 {
+  margin: 0;
+  font-size: var(--text-md, 16px);
+  font-weight: 800;
+}
+.dash__hl-more {
+  font-size: var(--text-xs, 14px);
+  font-weight: 600;
+  color: var(--color-brand, #FFAF03);
+  text-decoration: none;
+}
+.dash__hl-more:hover { text-decoration: underline; }
+.dash__hl-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-gray-100, #F2F2F2);
+  border-radius: var(--radius-lg, 16px);
+}
+.dash__hl-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m, 12px);
+  padding: var(--space-m, 14px) var(--space-l, 16px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.dash__hl-list li:last-child { border-bottom: none; }
+.dash__hl-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-gray-0, #FFFFFF);
+  color: var(--color-brand, #FFAF03);
+  flex-shrink: 0;
+}
+.dash__hl-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.dash__hl-title {
+  font-size: var(--text-xs, 14px);
+  font-weight: 600;
+}
+.dash__hl-sub {
+  font-size: var(--text-xxs, 12px);
+  color: var(--color-on-surface-variant, #666);
+}
+.dash__hl-amount {
+  font-size: var(--text-xs, 14px);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.dash__hl-amount.pos { color: var(--color-green-500, #4CAF50); }
+.dash__hl-amount.neg { color: var(--color-gray-900, #333); }
+
+@media (prefers-reduced-motion: reduce) {
+  .dash__action:active, .dash__promo-cta:active { transform: none; }
 }
 </style>
