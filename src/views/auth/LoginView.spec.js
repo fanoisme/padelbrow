@@ -20,7 +20,7 @@ describe('LoginView', () => {
     router.push('/')
     await router.isReady()
     const wrapper = mount(LoginView, { global: { plugins: [router] } })
-    expect(wrapper.text()).toContain('Sign in to PADEL BROW')
+    expect(wrapper.text()).toContain('Continue to login')
     expect(wrapper.findAll('input').length).toBeGreaterThanOrEqual(2)
   })
 })

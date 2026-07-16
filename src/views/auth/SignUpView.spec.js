@@ -19,7 +19,7 @@ describe('SignUpView', () => {
     router.push('/')
     await router.isReady()
     const wrapper = mount(SignUpView, { global: { plugins: [router] } })
-    expect(wrapper.text()).toContain('Create your account')
+    expect(wrapper.text()).toContain('Welcome to PADEL BROW')
     expect(wrapper.findAll('input').length).toBeGreaterThanOrEqual(3)
   })
 })
