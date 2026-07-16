@@ -98,4 +98,92 @@ describe('useMeetParticipants', () => {
 
     expect(result).toBeNull()
   })
+
+  it('addExistingMember inserts the given user as confirmed and records who added them', async () => {
+    const countEq2 = vi.fn().mockResolvedValue({ count: 2, error: null })
+    const countEq = vi.fn(() => ({ eq: countEq2 }))
+    const countSelect = vi.fn(() => ({ eq: countEq }))
+
+    const pSingle = vi.fn().mockResolvedValue({ data: { id: 'p9', status: 'confirmed' }, error: null })
+    const pSelect = vi.fn(() => ({ single: pSingle }))
+    const pInsert = vi.fn(() => ({ select: pSelect }))
+
+    supabase.from.mockReturnValue({ select: countSelect, insert: pInsert })
+
+    const { addExistingMember } = useMeetParticipants()
+    const result = await addExistingMember({ id: 'm1', max_players: 4 }, 'u5', 'u1')
+
+    expect(pInsert).toHaveBeenCalledWith({ meet_id: 'm1', role: 'player', user_id: 'u5', invited_by: 'u1', status: 'confirmed' })
+    expect(result).toEqual({ id: 'p9', status: 'confirmed' })
+  })
+
+  it('addExistingMember waitlists when the meet is at capacity', async () => {
+    const countEq2 = vi.fn().mockResolvedValue({ count: 4, error: null })
+    const countEq = vi.fn(() => ({ eq: countEq2 }))
+    const countSelect = vi.fn(() => ({ eq: countEq }))
+
+    const pSingle = vi.fn().mockResolvedValue({ data: { id: 'p9', status: 'waitlisted' }, error: null })
+    const pSelect = vi.fn(() => ({ single: pSingle }))
+    const pInsert = vi.fn(() => ({ select: pSelect }))
+
+    supabase.from.mockReturnValue({ select: countSelect, insert: pInsert })
+
+    const { addExistingMember } = useMeetParticipants()
+    const result = await addExistingMember({ id: 'm1', max_players: 4 }, 'u5', 'u1')
+
+    expect(pInsert).toHaveBeenCalledWith({ meet_id: 'm1', role: 'player', user_id: 'u5', invited_by: 'u1', status: 'waitlisted' })
+    expect(result).toEqual({ id: 'p9', status: 'waitlisted' })
+  })
+
+  it('addGuest inserts a guest_name row (no user_id) as confirmed', async () => {
+    const countEq2 = vi.fn().mockResolvedValue({ count: 1, error: null })
+    const countEq = vi.fn(() => ({ eq: countEq2 }))
+    const countSelect = vi.fn(() => ({ eq: countEq }))
+
+    const pSingle = vi.fn().mockResolvedValue({ data: { id: 'p10', status: 'confirmed', guest_name: 'Bambang' }, error: null })
+    const pSelect = vi.fn(() => ({ single: pSingle }))
+    const pInsert = vi.fn(() => ({ select: pSelect }))
+
+    supabase.from.mockReturnValue({ select: countSelect, insert: pInsert })
+
+    const { addGuest } = useMeetParticipants()
+    const result = await addGuest({ id: 'm1', max_players: 4 }, 'Bambang', 'u1')
+
+    expect(pInsert).toHaveBeenCalledWith({ meet_id: 'm1', role: 'player', guest_name: 'Bambang', invited_by: 'u1', status: 'confirmed' })
+    expect(result).toEqual({ id: 'p10', status: 'confirmed', guest_name: 'Bambang' })
+  })
+
+  it('listClubMembersNotInMeet returns club members minus existing participants', async () => {
+    const membersEq = vi.fn().mockResolvedValue({
+      data: [
+        { user_id: 'u1', profiles: { id: 'u1', full_name: 'Fano', avatar_url: null } },
+        { user_id: 'u5', profiles: { id: 'u5', full_name: 'Rani', avatar_url: null } },
+      ],
+      error: null,
+    })
+    const membersSelect = vi.fn(() => ({ eq: membersEq }))
+
+    const existingEq = vi.fn().mockResolvedValue({ data: [{ user_id: 'u1' }], error: null })
+    const existingSelect = vi.fn(() => ({ eq: existingEq }))
+
+    supabase.from.mockImplementation((table) => {
+      if (table === 'club_members') return { select: membersSelect }
+      if (table === 'meet_participants') return { select: existingSelect }
+      throw new Error(`unexpected table ${table}`)
+    })
+
+    const { listClubMembersNotInMeet } = useMeetParticipants()
+    const result = await listClubMembersNotInMeet('m1', 'c1')
+
+    expect(membersEq).toHaveBeenCalledWith('club_id', 'c1')
+    expect(existingEq).toHaveBeenCalledWith('meet_id', 'm1')
+    expect(result).toEqual([{ id: 'u5', full_name: 'Rani', avatar_url: null }])
+  })
+
+  it('listClubMembersNotInMeet returns an empty list when the meet has no club', async () => {
+    const { listClubMembersNotInMeet } = useMeetParticipants()
+    const result = await listClubMembersNotInMeet('m1', null)
+    expect(result).toEqual([])
+    expect(supabase.from).not.toHaveBeenCalled()
+  })
 })
