@@ -35,7 +35,7 @@ const clampedValue = computed(() => Math.max(0, Math.min(100, props.value)))
 .li-progress__track {
   flex: 1;
   height: 6px;
-  background: var(--color-gray-200, #E6E6E6);
+  background: var(--color-gray-200, #1A1A1A);
   border-radius: 999px;
   overflow: hidden;
 }

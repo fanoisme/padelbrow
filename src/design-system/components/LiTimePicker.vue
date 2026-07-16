@@ -216,11 +216,11 @@ onUnmounted(() => {
   height: 40px;
   padding: 0 var(--space-m, 12px) 0 40px;
   background-color: var(--color-gray-0, #FFFFFF);
-  border: 1px solid var(--color-gray-300, #CCCCCC);
+  border: 1px solid var(--color-gray-300, #2A2A2A);
   border-radius: var(--radius-md, 8px);
   font-family: inherit;
   font-size: var(--text-sm, 16px);
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   transition: all var(--dur-short, 200ms) var(--ease-out);
   cursor: pointer;
 }
@@ -238,7 +238,7 @@ onUnmounted(() => {
 }
 
 .li-timepicker.is-disabled .li-timepicker-input {
-  background-color: var(--color-gray-100, #F2F2F2);
+  background-color: var(--color-gray-100, #121212);
   color: var(--color-gray-500, #999999);
   cursor: not-allowed;
 }
@@ -265,7 +265,7 @@ onUnmounted(() => {
   background-color: var(--color-gray-0, #FFFFFF);
   border-radius: var(--radius-md, 8px);
   box-shadow: var(--shadow-dropdown, 0 8px 24px rgba(0, 0, 0, 0.1));
-  border: 1px solid var(--color-gray-200, #E6E6E6);
+  border: 1px solid var(--color-gray-200, #1A1A1A);
   z-index: 1000;
   overflow: hidden;
   display: flex;
@@ -275,14 +275,14 @@ onUnmounted(() => {
 .li-time-columns {
   display: flex;
   height: 200px;
-  border-bottom: 1px solid var(--color-gray-200, #E6E6E6);
+  border-bottom: 1px solid var(--color-gray-200, #1A1A1A);
 }
 
 .li-time-column {
   flex: 1;
   overflow-y: auto;
   scroll-behavior: smooth;
-  border-right: 1px solid var(--color-gray-100, #F2F2F2);
+  border-right: 1px solid var(--color-gray-100, #121212);
 }
 
 .li-time-column:last-child {
@@ -298,13 +298,13 @@ onUnmounted(() => {
   padding: var(--space-s, 8px) 0;
   text-align: center;
   font-size: var(--text-sm, 14px);
-  color: var(--color-gray-700, #666666);
+  color: var(--color-gray-700, #B3B3B3);
   cursor: pointer;
   transition: all var(--dur-micro, 120ms);
 }
 
 .li-time-item:hover {
-  background-color: var(--color-gray-100, #F2F2F2);
+  background-color: var(--color-gray-100, #121212);
 }
 
 .li-time-item.is-selected {
@@ -336,7 +336,7 @@ onUnmounted(() => {
 }
 
 .li-time-btn-clear:hover {
-  background-color: var(--color-gray-100, #F2F2F2);
+  background-color: var(--color-gray-100, #121212);
 }
 
 .li-time-btn-ok {

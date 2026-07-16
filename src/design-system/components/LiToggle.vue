@@ -63,7 +63,7 @@ const isFocused = ref(false);
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--color-gray-300, #CCCCCC);
+  background-color: var(--color-gray-300, #2A2A2A);
   border-radius: var(--radius-pill, 999px);
   transition: background-color var(--dur-short, 200ms) var(--ease-out);
 }
@@ -94,7 +94,7 @@ const isFocused = ref(false);
 
 .li-toggle-label {
   font-size: var(--text-sm, 16px);
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .sr-only {

@@ -6,6 +6,7 @@ vi.mock('../lib/matchFormatGenerators.js', () => ({
   ]),
   generateMexicanoRound: vi.fn(),
   generateTeamAmericanoRound: vi.fn(),
+  generateTeamMexicanoRound: vi.fn(),
   generateSinglesRound: vi.fn(),
 }))
 

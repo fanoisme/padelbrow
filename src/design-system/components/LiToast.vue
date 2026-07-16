@@ -67,7 +67,7 @@ const { toasts, removeToast } = useToast();
   display: flex;
   align-items: flex-start;
   padding: var(--space-m, 12px) var(--space-l, 16px);
-  background-color: var(--color-gray-900, #333333);
+  background-color: var(--color-gray-900, #FFFFFF);
   color: var(--color-gray-0, #FFFFFF);
   border-radius: var(--radius-md, 8px);
   box-shadow: var(--shadow-dropdown, 0 8px 24px rgba(0,0,0,0.1));

@@ -58,8 +58,8 @@ defineEmits(['click', 'remove'])
 }
 
 /* Variants */
-.li-chip--neutral { background: var(--color-gray-100, #F2F2F2); color: var(--color-gray-700, #666666); }
-.li-chip--neutral.li-chip--clickable:hover { background: var(--color-gray-200, #E6E6E6); }
+.li-chip--neutral { background: var(--color-gray-100, #121212); color: var(--color-gray-700, #B3B3B3); }
+.li-chip--neutral.li-chip--clickable:hover { background: var(--color-gray-200, #1A1A1A); }
 
 .li-chip--brand { background: var(--color-yellow-100, #FFF3D6); color: #8B5E00; }
 .li-chip--brand.li-chip--clickable:hover { background: var(--color-yellow-200, #FFEB3B); }

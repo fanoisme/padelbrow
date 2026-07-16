@@ -56,14 +56,14 @@ function handleClick() {
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   cursor: pointer;
   text-align: left;
   transition: background 0.15s ease;
 }
 
 .li-dropdown-item:hover:not(.li-dropdown-item--divider):not(.li-dropdown-item--header) {
-  background: var(--color-gray-100, #F2F2F2);
+  background: var(--color-gray-100, #121212);
 }
 
 .li-dropdown-item:focus-visible {
@@ -82,7 +82,7 @@ function handleClick() {
 .li-dropdown-item__divider {
   width: 100%;
   height: 1px;
-  background: var(--color-gray-200, #E6E6E6);
+  background: var(--color-gray-200, #1A1A1A);
 }
 
 .li-dropdown-item--header {

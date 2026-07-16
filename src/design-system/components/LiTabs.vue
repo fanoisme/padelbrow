@@ -89,7 +89,7 @@ const selectTab = (index, event) => {
 .li-tabs-list {
   display: flex;
   position: relative;
-  border-bottom: 1px solid var(--color-gray-200, #E6E6E6);
+  border-bottom: 1px solid var(--color-gray-200, #1A1A1A);
   background: var(--color-gray-0, #FFFFFF);
   overflow-x: auto;
   scrollbar-width: none; /* Firefox */
@@ -121,7 +121,7 @@ const selectTab = (index, event) => {
 }
 
 .li-tab-button:focus-visible {
-  background-color: var(--color-gray-100, #F2F2F2);
+  background-color: var(--color-gray-100, #121212);
   border-radius: var(--radius-sm, 4px) var(--radius-sm, 4px) 0 0;
 }
 

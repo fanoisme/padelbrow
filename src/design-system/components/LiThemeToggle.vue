@@ -33,7 +33,7 @@ const { isDark, toggle } = useTheme()
   border: none;
   border-radius: var(--radius-pill, 999px);
   background: var(--glass-bg-light-soft, rgba(255, 255, 255, 0.35));
-  color: var(--color-on-surface, #333333);
+  color: var(--color-on-surface, #FFFFFF);
   cursor: pointer;
   transition: transform var(--dur-short, 200ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)),
               background var(--dur-short, 200ms) var(--ease-out, cubic-bezier(0.4, 0, 0.2, 1));

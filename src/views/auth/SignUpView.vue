@@ -143,12 +143,12 @@ async function handleSubmit() {
   margin-bottom: var(--space-m, 16px);
   border: none;
   background: transparent;
-  color: var(--color-gray-900, #333);
+  color: var(--color-gray-900, #FFFFFF);
   border-radius: var(--radius-pill, 999px);
   cursor: pointer;
   transition: background var(--dur-short, 200ms) var(--ease-out, ease);
 }
-.signup__back:hover { background: var(--color-gray-100, #F2F2F2); }
+.signup__back:hover { background: var(--color-gray-100, #121212); }
 
 .signup__head h1 {
   font-size: var(--text-xl, 24px);
@@ -158,7 +158,7 @@ async function handleSubmit() {
   margin: 0 0 var(--space-xs, 4px);
 }
 .signup__head p {
-  color: var(--color-on-surface-variant, #666);
+  color: var(--color-on-surface-variant, #A3A3A3);
   font-size: var(--text-sm, 15px);
   margin: 0 0 var(--space-xl, 24px);
 }
@@ -180,7 +180,7 @@ async function handleSubmit() {
   display: flex;
   justify-content: space-between;
   font-size: var(--text-xs, 14px);
-  color: var(--color-on-surface-variant, #666);
+  color: var(--color-on-surface-variant, #A3A3A3);
 }
 .signup__strength-tier { font-weight: 600; }
 .signup__strength-tier.low { color: var(--color-red-400, #C83E3B); }
@@ -189,7 +189,7 @@ async function handleSubmit() {
 .signup__strength-tier.strong { color: var(--color-green-500, #4CAF50); }
 .signup__strength-bar {
   height: 4px;
-  background: var(--color-gray-200, #E6E6E6);
+  background: var(--color-gray-200, #1A1A1A);
   border-radius: var(--radius-pill, 999px);
   overflow: hidden;
 }
@@ -217,7 +217,7 @@ async function handleSubmit() {
   align-items: center;
   gap: 8px;
   font-size: var(--text-xs, 14px);
-  color: var(--color-on-surface-variant, #666);
+  color: var(--color-on-surface-variant, #A3A3A3);
 }
 .signup__check-dot {
   display: inline-flex;
@@ -229,14 +229,14 @@ async function handleSubmit() {
   background: var(--color-gray-300, #CCC);
   color: #fff;
 }
-.signup__checks li.is-ok { color: var(--color-gray-900, #333); }
+.signup__checks li.is-ok { color: var(--color-gray-900, #FFFFFF); }
 .signup__checks li.is-ok .signup__check-dot { background: var(--color-green-500, #4CAF50); }
 
 .signup__secure {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-on-surface-variant, #666);
+  color: var(--color-on-surface-variant, #A3A3A3);
   font-size: var(--text-xs, 14px);
   margin: 2px 0;
 }

@@ -198,7 +198,7 @@ const executeSelected = (command) => {
   display: flex;
   align-items: center;
   padding: 0 var(--space-l, 16px);
-  border-bottom: 1px solid var(--color-gray-200, #E6E6E6);
+  border-bottom: 1px solid var(--color-gray-200, #1A1A1A);
 }
 
 .li-search-icon {
@@ -212,7 +212,7 @@ const executeSelected = (command) => {
   background: transparent;
   padding: var(--space-l, 16px);
   font-size: var(--text-md, 20px);
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   outline: none;
 }
 
@@ -224,8 +224,8 @@ const executeSelected = (command) => {
   font-size: var(--text-tiny, 10px);
   font-weight: 700;
   color: var(--color-gray-500, #999999);
-  background: var(--color-gray-100, #F2F2F2);
-  border: 1px solid var(--color-gray-200, #E6E6E6);
+  background: var(--color-gray-100, #121212);
+  border: 1px solid var(--color-gray-200, #1A1A1A);
   padding: 4px 6px;
   border-radius: var(--radius-sm, 4px);
   cursor: pointer;
@@ -257,7 +257,7 @@ const executeSelected = (command) => {
 }
 
 .li-command-item.is-selected {
-  background-color: var(--color-gray-100, #F2F2F2);
+  background-color: var(--color-gray-100, #121212);
 }
 
 .li-command-item-icon {
@@ -273,7 +273,7 @@ const executeSelected = (command) => {
 .li-command-item-label {
   flex: 1;
   font-size: var(--text-sm, 16px);
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .li-command-item.is-selected .li-command-item-label {
@@ -290,7 +290,7 @@ const executeSelected = (command) => {
   font-size: var(--text-xs, 14px);
   color: var(--color-gray-500, #999999);
   background: var(--color-gray-0, #FFFFFF);
-  border: 1px solid var(--color-gray-200, #E6E6E6);
+  border: 1px solid var(--color-gray-200, #1A1A1A);
   padding: 2px 6px;
   border-radius: var(--radius-sm, 4px);
   box-shadow: 0 1px 1px rgba(0,0,0,0.05);

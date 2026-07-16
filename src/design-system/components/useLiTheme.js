@@ -5,41 +5,41 @@
 import { computed } from 'vue'
 
 const TOKENS = {
-  // Gray
-  gray900: '#333333',
-  gray800: '#4D4D4D',
-  gray700: '#666666',
-  gray600: '#808080',
-  gray500: '#999999',
-  gray400: '#B3B3B3',
-  gray300: '#CCCCCC',
-  gray200: '#E6E6E6',
-  gray100: '#F2F2F2',
-  gray0: '#FFFFFF',
+  // Gray (dark-first: gray900 = lightest, gray0 = darkest)
+  gray900: '#FFFFFF',
+  gray800: '#EBEBEB',
+  gray700: '#CCCCCC',
+  gray600: '#A3A3A3',
+  gray500: '#8A8A8A',
+  gray400: '#525252',
+  gray300: '#3A3A3A',
+  gray200: '#252525',
+  gray100: '#121212',
+  gray0: '#000000',
 
   // Brand
   brand: '#FFAF03',
 
   // CTA
   ctaPrimaryBg: '#FFBC25',
-  ctaPrimaryText: '#1E1E1E',
+  ctaPrimaryText: '#0A0A0A',
   ctaPrimaryHover: '#FAB000',
-  ctaSecondaryBorder: '#CCCCCC',
-  ctaSecondaryText: '#333333',
+  ctaSecondaryBorder: '#2A2A2A',
+  ctaSecondaryText: '#FFFFFF',
   ctaDangerBg: '#C83E3B',
   ctaDangerText: '#FFFFFF',
-  ctaGhostText: '#808080',
-  ctaGhostHoverBg: '#F2F2F2',
+  ctaGhostText: '#A3A3A3',
+  ctaGhostHoverBg: '#1A1A1A',
 
   // Semantic
   success: '#10B981',
-  successLight: '#ECFF8F',
+  successLight: '#0A2E1F',
   warning: '#FF6B00',
-  warningLight: '#FFF3D6',
+  warningLight: '#2E1A00',
   error: '#C83E3B',
-  errorLight: '#FEE2E2',
+  errorLight: '#2E0A0A',
   info: '#2563EB',
-  infoLight: '#E6E6FF',
+  infoLight: '#0A0E2E',
 
   // Spacing
   spaceXs: '4px',

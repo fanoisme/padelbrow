@@ -89,7 +89,7 @@ const onInput = (e) => {
 .li-slider-label {
   font-size: var(--text-sm, 16px);
   font-weight: 500;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .li-slider-value {
@@ -127,7 +127,7 @@ const onInput = (e) => {
   transform: translateY(-50%);
   width: 100%;
   height: 4px;
-  background-color: var(--color-gray-200, #E6E6E6);
+  background-color: var(--color-gray-200, #1A1A1A);
   border-radius: var(--radius-pill, 999px);
   overflow: hidden;
   z-index: 1;
@@ -146,7 +146,7 @@ const onInput = (e) => {
   width: 20px;
   height: 20px;
   background-color: var(--color-gray-0, #FFFFFF);
-  border: 1.5px solid var(--color-gray-300, #CCCCCC);
+  border: 1.5px solid var(--color-gray-300, #2A2A2A);
   border-radius: 50%;
   z-index: 2;
   transition: left 0.1s linear, box-shadow var(--dur-micro, 120ms);

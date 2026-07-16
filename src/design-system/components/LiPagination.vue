@@ -135,7 +135,7 @@ function goTo(page) {
   font-size: 13px;
   font-weight: 500;
   line-height: 1;
-  color: var(--color-gray-700, #666666);
+  color: var(--color-gray-700, #B3B3B3);
   cursor: pointer;
   transition: background 0.15s cubic-bezier(0.4, 0, 0.2, 1),
               color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
@@ -143,8 +143,8 @@ function goTo(page) {
 }
 
 .li-pagination__btn:hover:not(:disabled):not(.li-pagination__btn--active) {
-  background: var(--color-gray-100, #F2F2F2);
-  color: var(--color-gray-900, #333333);
+  background: var(--color-gray-100, #121212);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .li-pagination__btn--active {

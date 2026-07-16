@@ -131,7 +131,7 @@ onUnmounted(() => {
   margin: 0;
   font-size: var(--text-lg, 24px);
   font-weight: 700;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .li-modal-close {
@@ -148,15 +148,15 @@ onUnmounted(() => {
 }
 
 .li-modal-close:hover {
-  color: var(--color-gray-900, #333333);
-  background-color: var(--color-gray-100, #F2F2F2);
+  color: var(--color-gray-900, #FFFFFF);
+  background-color: var(--color-gray-100, #121212);
 }
 
 .li-modal-body {
   padding: 0 var(--space-xl, 24px) var(--space-xl, 24px);
   overflow-y: auto;
   font-size: var(--text-sm, 16px);
-  color: var(--color-gray-700, #666666);
+  color: var(--color-gray-700, #B3B3B3);
   line-height: var(--leading-body, 1.5);
 }
 

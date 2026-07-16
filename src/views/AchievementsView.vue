@@ -81,7 +81,7 @@ onMounted(async () => {
 
 <style scoped>
 .achievements-view { display: flex; flex-direction: column; gap: var(--space-l, 24px); }
-.achievements-view__xp { font-weight: 700; font-size: 1.1rem; color: var(--color-on-surface, #333333); }
+.achievements-view__xp { font-weight: 700; font-size: 1.1rem; color: var(--color-on-surface, #FFFFFF); }
 .achievements-view__head { display: flex; flex-direction: column; gap: var(--space-s, 8px); }
 .achievements-view__next { font-size: 0.85rem; opacity: 0.7; }
 .achievements-view__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--space-s, 8px); }

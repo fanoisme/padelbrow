@@ -104,7 +104,7 @@ const dismiss = () => {
   margin: 0;
   font-size: var(--text-sm, 16px);
   font-weight: 600;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .li-banner-message {
@@ -154,7 +154,7 @@ const dismiss = () => {
 
 .li-banner-close:hover {
   background-color: rgba(0, 0, 0, 0.05);
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 /* Transitions */

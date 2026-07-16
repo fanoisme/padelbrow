@@ -72,9 +72,9 @@ defineProps({
 
 /* Variants */
 .li-badge-neutral {
-  background-color: var(--color-gray-100, #F2F2F2);
+  background-color: var(--color-gray-100, #121212);
   color: var(--color-gray-800, #4D4D4D);
-  border: 1px solid var(--color-gray-300, #CCCCCC);
+  border: 1px solid var(--color-gray-300, #2A2A2A);
 }
 
 .li-badge-success {
@@ -99,6 +99,6 @@ defineProps({
 
 .li-badge-brand {
   background-color: var(--color-yellow-200, #FFEB3B);
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
 }
 </style>

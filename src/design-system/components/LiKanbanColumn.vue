@@ -27,7 +27,7 @@ defineProps({
   display: flex;
   flex-direction: column;
   background: var(--color-gray-0, #FFFFFF);
-  border: 1px solid var(--color-outline-variant, #E6E6E6);
+  border: 1px solid var(--color-outline-variant, #1A1A1A);
   border-radius: var(--radius-lg, 16px);
   min-height: 300px;
 }
@@ -37,7 +37,7 @@ defineProps({
   align-items: center;
   gap: var(--space-s, 8px);
   padding: var(--space-m, 12px) var(--space-l, 16px);
-  border-bottom: 1px solid var(--color-outline-variant, #E6E6E6);
+  border-bottom: 1px solid var(--color-outline-variant, #1A1A1A);
 }
 
 .li-kanban-column__dot {
@@ -51,7 +51,7 @@ defineProps({
   font-family: var(--font-display, 'Inter', system-ui, sans-serif);
   font-size: var(--text-sm, 16px);
   font-weight: 600;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   flex: 1 1 auto;
   min-width: 0;
 }

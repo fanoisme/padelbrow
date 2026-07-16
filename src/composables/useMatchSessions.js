@@ -22,9 +22,19 @@ export function useMatchSessions() {
   async function getSession(id) {
     const { data, error } = await supabase
       .from('match_sessions')
-      .select('*, meet:meets(id, title)')
+      .select('*, meet:meets(id, title, venue_name, starts_at, max_players)')
       .eq('id', id)
       .single()
+    if (error) throw error
+    return data
+  }
+
+  async function getSessionByCode(code) {
+    const { data, error } = await supabase
+      .from('match_sessions')
+      .select('*, meet:meets(id, title, venue_name, starts_at, max_players)')
+      .eq('join_code', String(code).trim().toUpperCase())
+      .maybeSingle()
     if (error) throw error
     return data
   }
@@ -50,5 +60,5 @@ export function useMatchSessions() {
     return data
   }
 
-  return { createSession, getSession, listSessionsByMeet, setStatus }
+  return { createSession, getSession, getSessionByCode, listSessionsByMeet, setStatus }
 }

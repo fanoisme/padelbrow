@@ -106,7 +106,7 @@ defineEmits(['step-click'])
 /* Connector */
 .li-stepper__connector {
   flex-shrink: 0;
-  background: var(--color-gray-200, #E6E6E6);
+  background: var(--color-gray-200, #1A1A1A);
   transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -138,7 +138,7 @@ defineEmits(['step-click'])
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 2px solid var(--color-gray-300, #CCCCCC);
+  border: 2px solid var(--color-gray-300, #2A2A2A);
   background: var(--color-gray-0, #FFFFFF);
   color: var(--color-gray-500, #999999);
   flex-shrink: 0;
@@ -205,11 +205,11 @@ defineEmits(['step-click'])
   font-size: 13px;
   font-weight: 500;
   line-height: 18px;
-  color: var(--color-gray-700, #666666);
+  color: var(--color-gray-700, #B3B3B3);
 }
 
 .li-stepper__step--active .li-stepper__label {
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   font-weight: 600;
 }
 

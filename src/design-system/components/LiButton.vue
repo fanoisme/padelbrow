@@ -122,7 +122,7 @@ const handleClick = (e) => {
 
 .li-btn-secondary {
   background: rgba(0, 0, 0, 0.03);
-  color: var(--cta-secondary-text, #333333);
+  color: var(--cta-secondary-text, #E5E5E5);
   border: none;
   backdrop-filter: blur(8px);
 }
@@ -149,12 +149,12 @@ const handleClick = (e) => {
 
 .li-btn-ghost:hover:not(:disabled) {
   background: rgba(0, 0, 0, 0.04);
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 /* Disabled overrides */
 .li-btn:disabled {
-  background: var(--cta-disabled-bg, #EDF0F2);
+  background: var(--cta-disabled-bg, #1C1C1C);
   color: var(--cta-disabled-text, #999999);
   box-shadow: none;
 }
@@ -189,7 +189,7 @@ const handleClick = (e) => {
   border-radius: 50%;
   transform: scale(0);
   animation: ripple var(--dur-medium, 300ms) linear;
-  background-color: rgba(255, 255, 255, 0.35);
+  background-color: rgba(255, 255, 255, 0.08);
   pointer-events: none;
 }
 

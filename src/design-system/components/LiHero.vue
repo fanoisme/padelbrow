@@ -72,10 +72,10 @@ function onSpotlight(e) {
 .li-hero__eyebrow {
   display: inline-block; padding: 6px 14px; border-radius: var(--radius-pill, 999px);
   background: var(--glass-bg-light-soft, rgba(255,255,255,0.35)); border: 1px solid var(--glass-border, rgba(255,255,255,0.12));
-  font-size: 0.8rem; font-weight: 600; color: var(--color-on-surface-variant, #666); letter-spacing: 0.02em;
+  font-size: 0.8rem; font-weight: 600; color: var(--color-on-surface-variant, #A3A3A3); letter-spacing: 0.02em;
 }
 .li-hero__title { font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; margin: 0; }
-.li-hero__subtitle { font-size: clamp(1rem, 2vw, 1.25rem); color: var(--color-on-surface-variant, #666); max-width: 560px; margin: 0; }
+.li-hero__subtitle { font-size: clamp(1rem, 2vw, 1.25rem); color: var(--color-on-surface-variant, #A3A3A3); max-width: 560px; margin: 0; }
 .li-hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-m, 12px); justify-content: center; margin-top: var(--space-s, 8px); }
 @media (max-width: 768px) { .li-hero { padding: var(--space-3xl, 48px) var(--space-l, 16px); border-radius: var(--radius-xl, 32px); } }
 </style>

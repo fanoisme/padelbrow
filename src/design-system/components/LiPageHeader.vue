@@ -47,7 +47,7 @@ defineProps({
   border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--color-on-surface-variant, #666666);
+  color: var(--color-on-surface-variant, #B3B3B3);
   letter-spacing: 0.02em;
 }
 
@@ -56,12 +56,12 @@ defineProps({
   font-weight: 800;
   letter-spacing: -0.02em;
   margin: 0;
-  color: var(--color-on-surface, #333333);
+  color: var(--color-on-surface, #FFFFFF);
 }
 
 .li-page-header__subtitle {
   margin: 0;
-  color: var(--color-on-surface-variant, #666666);
+  color: var(--color-on-surface-variant, #B3B3B3);
   font-size: 0.95rem;
 }
 

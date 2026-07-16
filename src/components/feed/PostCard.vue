@@ -155,17 +155,17 @@ function isVideo(url) {
 .post-card__avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
 .post-card__avatar--fallback {
   display: flex; align-items: center; justify-content: center;
-  background: var(--color-gray-200, #E6E6E6); color: var(--color-gray-700, #444);
+  background: var(--color-gray-200, #1A1A1A); color: var(--color-gray-700, #A3A3A3);
   font-weight: 600;
 }
 .post-card__meta { display: flex; flex-direction: column; }
-.post-card__when { font-size: var(--text-xs, 12px); color: var(--color-gray-500, #888); }
+.post-card__when { font-size: var(--text-xs, 12px); color: var(--color-gray-500, #A3A3A3); }
 .post-card__media { display: flex; flex-wrap: wrap; gap: var(--space-s, 8px); }
 .post-card__media img { max-width: 100%; border-radius: var(--radius-m, 8px); }
 .post-card__actions { display: flex; gap: var(--space-s, 8px); }
 .post-card__action {
   background: none; border: none; cursor: pointer; font-size: var(--text-sm, 14px);
-  color: var(--color-gray-600, #555);
+  color: var(--color-gray-600, #A3A3A3);
 }
 .post-card__action--on { color: var(--color-red-500, #A33129); font-weight: 600; }
 .post-card__comments { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }

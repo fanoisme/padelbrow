@@ -42,7 +42,7 @@ const colorMap = {
 .li-spinner__arc {
   display: block;
   border-radius: 50%;
-  border: 2.5px solid var(--color-gray-200, #E6E6E6);
+  border: 2.5px solid var(--color-gray-200, #1A1A1A);
   border-top-color: var(--color-brand, #FFAF03);
   animation: li-spin 0.7s linear infinite;
 }

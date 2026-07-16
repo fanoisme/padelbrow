@@ -3,6 +3,7 @@ import {
   generateAmericanoRound,
   generateMexicanoRound,
   generateTeamAmericanoRound,
+  generateTeamMexicanoRound,
   generateSinglesRound,
   computeStandings,
 } from './matchFormatGenerators.js'
@@ -91,6 +92,41 @@ describe('generateTeamAmericanoRound', () => {
 
   it('returns [] for fewer than 2 teams', () => {
     expect(generateTeamAmericanoRound([{ id: 't1', playerIds: ['p1', 'p2'] }], 0)).toEqual([])
+  })
+})
+
+describe('generateTeamMexicanoRound', () => {
+  it('pairs fixed teams dynamically and is deterministic per roundIndex', () => {
+    const teams = [
+      { id: 't1', playerIds: ['p1', 'p2'] },
+      { id: 't2', playerIds: ['p3', 'p4'] },
+      { id: 't3', playerIds: ['p5', 'p6'] },
+      { id: 't4', playerIds: ['p7', 'p8'] },
+    ]
+    const a = generateTeamMexicanoRound(teams, 0)
+    const b = generateTeamMexicanoRound(teams, 0)
+    expect(a).toEqual(b)
+    expect(a).toHaveLength(2)
+    // teams stay intact — both members travel together
+    const allTeams = a.flatMap((m) => [m.team_a, m.team_b])
+    for (const roster of allTeams) expect(roster).toHaveLength(2)
+  })
+
+  it('differs from team_americano (dynamic vs round-robin pairing)', () => {
+    const teams = [
+      { id: 't1', playerIds: ['p1', 'p2'] },
+      { id: 't2', playerIds: ['p3', 'p4'] },
+      { id: 't3', playerIds: ['p5', 'p6'] },
+      { id: 't4', playerIds: ['p7', 'p8'] },
+    ]
+    const mex = generateTeamMexicanoRound(teams, 1)
+    const am = generateTeamAmericanoRound(teams, 1)
+    const key = (r) => r.map((m) => [m.team_a[0], m.team_b[0]].join('|')).join(',')
+    expect(key(mex)).not.toBe(key(am))
+  })
+
+  it('returns [] for fewer than 2 teams', () => {
+    expect(generateTeamMexicanoRound([{ id: 't1', playerIds: ['p1', 'p2'] }], 0)).toEqual([])
   })
 })
 

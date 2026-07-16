@@ -17,7 +17,7 @@ defineProps({
 
 <style scoped>
 .li-skeleton {
-  background: var(--color-gray-200, #E6E6E6);
+  background: var(--color-gray-200, #1A1A1A);
   border-radius: 6px;
   position: relative;
   overflow: hidden;

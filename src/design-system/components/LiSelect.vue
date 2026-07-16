@@ -91,7 +91,7 @@ const onBlur = (e) => {
   display: flex;
   align-items: center;
   background: var(--color-gray-0, #FFFFFF);
-  border: 1.5px solid var(--color-gray-300, #CCCCCC);
+  border: 1.5px solid var(--color-gray-300, #2A2A2A);
   border-radius: var(--radius-sm, 4px);
   transition: border-color var(--dur-short, 200ms) var(--ease-out);
 }
@@ -105,8 +105,8 @@ const onBlur = (e) => {
 }
 
 .li-select-disabled .li-select-input-group {
-  background: var(--color-gray-100, #F2F2F2);
-  border-color: var(--color-gray-200, #E6E6E6);
+  background: var(--color-gray-100, #121212);
+  border-color: var(--color-gray-200, #1A1A1A);
 }
 
 .li-select-input {
@@ -115,7 +115,7 @@ const onBlur = (e) => {
   background: transparent;
   padding: 12px 36px 12px 16px; /* extra padding on right for chevron */
   font-size: var(--text-sm, 16px);
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   outline: none;
   width: 100%;
   appearance: none;

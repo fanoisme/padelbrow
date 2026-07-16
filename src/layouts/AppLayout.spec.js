@@ -33,27 +33,21 @@ describe('AppLayout', () => {
     expect(wrapper.text()).toContain('Sign in')
   })
 
-  it('shows primary nav links when logged in', () => {
+  it('shows sidebar nav links when logged in', () => {
     useAuth.mockReturnValue({ user: ref({ id: 'u1' }), signOut })
     const wrapper = mount(AppLayout, { global: { stubs: { RouterLink: RouterLinkStub, NotificationsBell: true } } })
+    // Sidebar primary nav
+    expect(wrapper.text()).toContain('Feed')
+    expect(wrapper.text()).toContain('Meets')
     expect(wrapper.text()).toContain('Clubs')
+    expect(wrapper.text()).toContain('Leaderboard')
+    // Sidebar secondary nav
+    expect(wrapper.text()).toContain('Competitions')
+    expect(wrapper.text()).toContain('Network')
+    expect(wrapper.text()).toContain('Stats')
+    // Sidebar footer
     expect(wrapper.text()).toContain('Profile')
-    expect(wrapper.text()).toContain('More')
-  })
-
-  it('reveals secondary destinations and sign-out from the desktop More dropdown', async () => {
-    useAuth.mockReturnValue({ user: ref({ id: 'u1' }), signOut })
-    const wrapper = mount(AppLayout, {
-      global: { stubs: { RouterLink: RouterLinkStub, NotificationsBell: true } },
-      attachTo: document.body,
-    })
-    await wrapper.find('.li-dropdown__trigger').trigger('click')
-    // LiDropdown renders its menu via <Teleport to="body">, so assert against body.
-    expect(document.body.textContent).toContain('Network')
-    expect(document.body.textContent).toContain('Stats')
-    expect(document.body.textContent).toContain('Challenges')
-    expect(document.body.textContent).toContain('Sign out')
-    wrapper.unmount()
+    expect(wrapper.text()).toContain('Sign out')
   })
 
   it('opens the mobile More sheet and shows the secondary destinations', async () => {

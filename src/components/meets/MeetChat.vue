@@ -72,7 +72,7 @@ async function handleSend() {
   display: inline-block;
   padding: var(--space-xs, 4px) var(--space-s, 8px);
   border-radius: var(--radius-md, 12px);
-  background: var(--color-gray-100, #F2F2F2);
+  background: var(--color-gray-100, #121212);
 }
 
 .meet-chat__composer {

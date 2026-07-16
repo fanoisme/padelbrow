@@ -69,7 +69,7 @@ defineEmits(['navigate'])
 }
 
 .li-breadcrumb__sep {
-  color: var(--color-gray-300, #CCCCCC);
+  color: var(--color-gray-300, #2A2A2A);
   flex-shrink: 0;
 }
 
@@ -96,7 +96,7 @@ defineEmits(['navigate'])
 
 .li-breadcrumb__link:hover {
   color: var(--color-orange-400, #FF6B00);
-  background: var(--color-gray-100, #F2F2F2);
+  background: var(--color-gray-100, #121212);
 }
 
 .li-breadcrumb__link:focus-visible {
@@ -108,7 +108,7 @@ defineEmits(['navigate'])
   font-size: 13px;
   font-weight: 600;
   line-height: 20px;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   white-space: nowrap;
 }
 </style>

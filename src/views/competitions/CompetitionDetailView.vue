@@ -348,6 +348,6 @@ function formatWhen(iso) {
 .comp-detail-view__standings-table td {
   padding: var(--space-s, 8px);
   text-align: left;
-  border-bottom: 1px solid var(--color-gray-200, #E6E6E6);
+  border-bottom: 1px solid var(--color-gray-200, #1A1A1A);
 }
 </style>

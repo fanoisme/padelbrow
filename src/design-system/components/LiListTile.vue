@@ -80,7 +80,7 @@ onMounted(() => {
 }
 
 .li-list-tile-interactive:hover {
-  background-color: var(--color-gray-100, #F2F2F2);
+  background-color: var(--color-gray-100, #121212);
 }
 
 .li-list-tile-leading {
@@ -95,7 +95,7 @@ onMounted(() => {
   height: 40px;
   border-radius: 50%;
   overflow: hidden;
-  background-color: var(--color-gray-200, #E6E6E6);
+  background-color: var(--color-gray-200, #1A1A1A);
 }
 
 .li-list-tile-avatar img {
@@ -108,7 +108,7 @@ onMounted(() => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: var(--color-gray-100, #F2F2F2);
+  background-color: var(--color-gray-100, #121212);
   color: var(--color-gray-600, #808080);
   display: flex;
   align-items: center;
@@ -131,7 +131,7 @@ onMounted(() => {
 .li-list-tile-title {
   font-size: var(--text-sm, 16px);
   font-weight: 600;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

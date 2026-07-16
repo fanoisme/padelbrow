@@ -7,9 +7,8 @@ vi.mock('../../composables/useAuth.js', () => ({
   useAuth: vi.fn(() => ({ user: ref({ id: 'u1' }) })),
 }))
 
-const listClubs = vi.fn().mockResolvedValue([{ id: 'c1', name: 'Padel Brow' }])
 vi.mock('../../composables/useClubs.js', () => ({
-  useClubs: vi.fn(() => ({ listClubs })),
+  useClubs: vi.fn(() => ({ listClubs: vi.fn().mockResolvedValue([]) })),
 }))
 
 const createMeet = vi.fn().mockResolvedValue({ id: 'm-new', title: 'Tue Night' })
@@ -17,55 +16,99 @@ vi.mock('../../composables/useMeets.js', () => ({
   useMeets: vi.fn(() => ({ createMeet })),
 }))
 
+const createSession = vi.fn().mockResolvedValue({ id: 's-new' })
+vi.mock('../../composables/useMatchSessions.js', () => ({
+  useMatchSessions: vi.fn(() => ({ createSession, getSessionByCode: vi.fn().mockResolvedValue(null) })),
+}))
+
+vi.mock('../../composables/useMeetParticipants.js', () => ({
+  useMeetParticipants: vi.fn(() => ({ joinMeet: vi.fn() })),
+}))
+
+vi.mock('../../design-system/components/index.js', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() }),
+  }
+})
+
 import CreateMeetView from './CreateMeetView.vue'
 
-const RouterLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
-
 describe('CreateMeetView', () => {
-  it('renders step 1 first and advances to a review/create step', async () => {
+  function mountView() {
     const router = createRouter({
       history: createWebHashHistory(),
       routes: [
         { path: '/meets/new', name: 'meet-new', component: CreateMeetView },
         { path: '/meets/:id', name: 'meet-detail', component: { template: '<div />' } },
+        { path: '/meets/:meetId/match-session/:sessionId?', name: 'match-session', component: { template: '<div />' } },
       ],
     })
     router.push('/meets/new')
-    await router.isReady()
-    const wrapper = mount(CreateMeetView, { global: { plugins: [router], stubs: { RouterLink: RouterLinkStub } } })
-    await flushPromises()
+    return router.isReady().then(() =>
+      mount(CreateMeetView, { global: { plugins: [router] } })
+    )
+  }
 
-    // Step 1 shows club + sport + format
-    expect(wrapper.text()).toContain('Create a meet')
-    expect(wrapper.text()).toContain('Padel Brow')
+  it('starts at step 1 (game type selection) in standalone mode', async () => {
+    const wrapper = await mountView()
+    await flushPromises()
+    expect(wrapper.text()).toContain('Choose your game type')
+    expect(wrapper.text()).toContain('Americano')
+    expect(wrapper.text()).toContain('Mexicano')
+    // no hero/join screen
+    expect(wrapper.text()).not.toContain('Create Room')
+    expect(wrapper.text()).not.toContain('Join Match')
   })
 
-  it('calls createMeet with the wizard payload and creator id on final submit', async () => {
-    const router = createRouter({
-      history: createWebHashHistory(),
-      routes: [
-        { path: '/meets/new', name: 'meet-new', component: CreateMeetView },
-        { path: '/meets/:id', name: 'meet-detail', component: { template: '<div />' } },
-      ],
-    })
-    router.push('/meets/new')
-    await router.isReady()
-    const wrapper = mount(CreateMeetView, { global: { plugins: [router], stubs: { RouterLink: RouterLinkStub } } })
+  it('drives through 4 steps and calls createMeet + createSession', async () => {
+    createMeet.mockClear()
+    createSession.mockClear()
+
+    const wrapper = await mountView()
     await flushPromises()
 
-    // Drive the wizard to the end by clicking Next through each step, then Create.
-    const nextButtons = () => wrapper.findAll('button').filter((b) => b.text().match(/next/i))
-    while (nextButtons().length > 0) {
-      await nextButtons()[0].trigger('click')
-      await flushPromises()
-    }
-    const createBtn = wrapper.findAll('button').find((b) => b.text().match(/create meet/i))
-    expect(createBtn).toBeTruthy()
+    // Step 1: select americano (default), click Next
+    await wrapper.find('[data-testid="wizard-next"]').trigger('click')
+    await flushPromises()
+
+    // Step 2: fill required fields
+    const inputs = wrapper.findAll('input')
+    // title input
+    await inputs[0].setValue('Tuesday Night Social')
+    // datetime-local input
+    await inputs[2].setValue('2026-07-20T19:00')
+    await flushPromises()
+
+    // Next to step 3
+    await wrapper.find('[data-testid="wizard-next"]').trigger('click')
+    await flushPromises()
+
+    // Step 3: rules — click Next
+    await wrapper.find('[data-testid="wizard-next"]').trigger('click')
+    await flushPromises()
+
+    // Step 4: review — click Create meet
+    const createBtn = wrapper.find('[data-testid="create-meet-btn"]')
+    expect(createBtn.exists()).toBe(true)
     await createBtn.trigger('click')
     await flushPromises()
 
-    // creator_id is intentionally absent from the view's payload (useMeets adds it);
-    // objectContaining({}) matches any object, and 'u1' is the load-bearing creator-id arg.
-    expect(createMeet).toHaveBeenCalledWith(expect.objectContaining({}), 'u1')
+    // createMeet called with meet payload + user id
+    expect(createMeet).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Tuesday Night Social',
+        sport: 'padel',
+        format: 'americano',
+      }),
+      'u1'
+    )
+
+    // createSession called with format + meet id
+    expect(createSession).toHaveBeenCalledWith(
+      expect.objectContaining({ format: 'americano' }),
+      'm-new'
+    )
   })
 })

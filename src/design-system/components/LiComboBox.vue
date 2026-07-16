@@ -15,7 +15,7 @@
     <div class="li-combobox__input-wrap">
       <!-- Left icon -->
       <span v-if="iconLeft" class="li-combobox__icon li-combobox__icon--left">
-        <LiIcon :name="iconLeft" size="md" color="var(--color-gray-600, #666666)" />
+        <LiIcon :name="iconLeft" size="md" color="var(--color-gray-600, #B3B3B3)" />
       </span>
 
       <!-- Text input -->
@@ -41,7 +41,7 @@
         <LiIcon
           :name="isOpen ? 'expand_less' : 'expand_more'"
           size="md"
-          color="var(--color-gray-600, #666666)"
+          color="var(--color-gray-600, #B3B3B3)"
         />
       </span>
     </div>
@@ -336,7 +336,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
   font-size: 12px;
   line-height: 16px;
   font-weight: 600;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .li-combobox__input-wrap {
@@ -367,7 +367,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
 }
 
 .li-combobox--disabled .li-combobox__input {
-  color: var(--color-gray-500, #888888);
+  color: var(--color-gray-500, #A3A3A3888);
   cursor: not-allowed;
 }
 
@@ -378,7 +378,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 16px;
   line-height: 24px;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   outline: none;
   min-width: 0;
 }
@@ -435,7 +435,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
   padding: 10px 16px;
   font-size: 14px;
   line-height: 24px;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   cursor: pointer;
   transition: background 0.15s ease;
   display: flex;

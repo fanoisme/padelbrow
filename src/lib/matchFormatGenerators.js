@@ -98,6 +98,21 @@ export function generateTeamAmericanoRound(teams, roundIndex, history = []) {
   })
 }
 
+// Team Mexicano: fixed teams (you keep your partner), but matchups are dynamic
+// per round — a seeded shuffle of team order, paired adjacent. Same input shape
+// as team_americano ({ id, playerIds }[]). Odd team count sits the last out.
+export function generateTeamMexicanoRound(teams, roundIndex, history = []) {
+  if (teams.length < 2) return []
+  const order = seededShuffle(teams.map((t) => t.id), roundIndex * 7919 + 31)
+  const matches = []
+  for (let c = 0; c + 1 < order.length; c += 2) {
+    const ta = teams.find((t) => t.id === order[c])
+    const tb = teams.find((t) => t.id === order[c + 1])
+    matches.push({ court: matches.length + 1, team_a: ta.playerIds, team_b: tb.playerIds })
+  }
+  return matches
+}
+
 export function generateSinglesRound(playerIds, roundIndex, history = []) {
   if (playerIds.length < 2) return []
   const pairs = circleMethodPairs(playerIds, roundIndex)

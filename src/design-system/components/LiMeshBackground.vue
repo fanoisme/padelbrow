@@ -167,7 +167,7 @@ defineProps({
    DARK variant — dark base + gold orbs
    ═══════════════════════════════════════════════════════════ */
 .li-mesh--dark {
-  background: var(--color-gray-900, #333333);
+  background: var(--color-gray-900, #FFFFFF);
 }
 
 .li-mesh--dark .li-mesh__orb--1 {

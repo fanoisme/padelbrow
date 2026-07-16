@@ -134,7 +134,7 @@ const removeFile = (index) => {
   align-items: center;
   justify-content: center;
   padding: var(--space-2xl, 32px);
-  border: 1.5px dashed var(--color-gray-300, #CCCCCC);
+  border: 1.5px dashed var(--color-gray-300, #2A2A2A);
   border-radius: var(--radius-md, 8px);
   background-color: var(--color-gray-0, #FFFFFF);
   cursor: pointer;
@@ -153,7 +153,7 @@ const removeFile = (index) => {
 }
 
 .li-upload.is-disabled .li-upload-dropzone {
-  background-color: var(--color-gray-100, #F2F2F2);
+  background-color: var(--color-gray-100, #121212);
   cursor: not-allowed;
   opacity: 0.7;
 }
@@ -169,7 +169,7 @@ const removeFile = (index) => {
 
 .li-upload-text {
   font-size: var(--text-sm, 16px);
-  color: var(--color-gray-700, #666666);
+  color: var(--color-gray-700, #B3B3B3);
   text-align: center;
 }
 
@@ -195,7 +195,7 @@ const removeFile = (index) => {
   display: flex;
   align-items: center;
   padding: var(--space-s, 8px) var(--space-m, 12px);
-  background-color: var(--color-gray-100, #F2F2F2);
+  background-color: var(--color-gray-100, #121212);
   border-radius: var(--radius-sm, 4px);
   gap: var(--space-s, 8px);
 }
@@ -207,7 +207,7 @@ const removeFile = (index) => {
 .li-file-name {
   flex: 1;
   font-size: var(--text-sm, 16px);
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -225,7 +225,7 @@ const removeFile = (index) => {
 }
 
 .li-file-remove:hover {
-  background-color: var(--color-gray-200, #E6E6E6);
+  background-color: var(--color-gray-200, #1A1A1A);
   color: var(--color-red-500, #A33129);
 }
 

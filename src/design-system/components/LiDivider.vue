@@ -28,7 +28,7 @@ defineProps({
 .li-divider::after {
   content: '';
   flex: 1;
-  border-top: 1px solid var(--color-gray-200, #E6E6E6);
+  border-top: 1px solid var(--color-gray-200, #1A1A1A);
 }
 
 /* With label — line on both sides */
@@ -70,7 +70,7 @@ defineProps({
 .li-divider--vertical::before {
   display: block;
   border-top: none;
-  border-left: 1px solid var(--color-gray-200, #E6E6E6);
+  border-left: 1px solid var(--color-gray-200, #1A1A1A);
   height: 100%;
   width: 0;
 }

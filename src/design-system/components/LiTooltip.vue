@@ -77,7 +77,7 @@ onBeforeUnmount(() => {
   z-index: 9999;
   padding: 6px 12px;
   border-radius: 6px;
-  background: var(--color-gray-900, #333333);
+  background: var(--color-gray-900, #FFFFFF);
   color: var(--color-gray-0, #FFFFFF);
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 12px;
@@ -97,7 +97,7 @@ onBeforeUnmount(() => {
   position: absolute;
   width: 6px;
   height: 6px;
-  background: var(--color-gray-900, #333333);
+  background: var(--color-gray-900, #FFFFFF);
   transform: rotate(45deg);
 }
 

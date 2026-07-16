@@ -70,7 +70,7 @@ defineProps({
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: var(--color-gray-100, #F2F2F2);
+  background: var(--color-gray-100, #121212);
   color: var(--color-gray-400, #B3B3B3);
 }
 
@@ -88,7 +88,7 @@ defineProps({
   font-size: 16px;
   font-weight: 600;
   line-height: 24px;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .li-empty-state--sm .li-empty-state__title { font-size: 14px; }

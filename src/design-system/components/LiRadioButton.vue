@@ -116,7 +116,7 @@ const handleChange = () => {
 
 .li-radio-label {
   font-size: var(--text-sm, 16px);
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   line-height: 24px;
 }
 

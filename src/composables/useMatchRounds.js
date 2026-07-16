@@ -3,6 +3,7 @@ import {
   generateAmericanoRound,
   generateMexicanoRound,
   generateTeamAmericanoRound,
+  generateTeamMexicanoRound,
   generateSinglesRound,
 } from '../lib/matchFormatGenerators.js'
 
@@ -14,6 +15,8 @@ function generateForFormat(format, input, roundIndex) {
       return generateMexicanoRound(input.playerIds, roundIndex, input.history || [])
     case 'team_americano':
       return generateTeamAmericanoRound(input.teams, roundIndex, input.history || [])
+    case 'team_mexicano':
+      return generateTeamMexicanoRound(input.teams, roundIndex, input.history || [])
     case 'singles':
       return generateSinglesRound(input.playerIds, roundIndex, input.history || [])
     default:

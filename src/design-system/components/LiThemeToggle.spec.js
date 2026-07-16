@@ -1,28 +1,22 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import LiThemeToggle from './LiThemeToggle.vue'
 
-describe('LiThemeToggle', () => {
-  beforeEach(() => {
-    localStorage.clear()
-    document.documentElement.removeAttribute('data-theme')
-    vi.resetModules()
-    vi.unstubAllGlobals()
-  })
-
-  it('renders a 44x44 button with an accessible label and pressed state', () => {
+describe('LiThemeToggle (dark-only, toggle is no-op)', () => {
+  it('renders a button with an accessible label', () => {
     const wrapper = mount(LiThemeToggle)
     const btn = wrapper.find('button')
     expect(btn.exists()).toBe(true)
     expect(btn.attributes('aria-label')).toMatch(/theme/i)
-    expect(btn.attributes('aria-pressed')).toBeDefined()
   })
 
-  it('flips the theme on click', async () => {
+  it('always reports dark state', async () => {
     const wrapper = mount(LiThemeToggle)
-    const before = wrapper.find('button').attributes('aria-pressed') === 'true'
-    await wrapper.find('button').trigger('click')
-    const after = wrapper.find('button').attributes('aria-pressed') === 'true'
-    expect(after).toBe(!before)
+    const btn = wrapper.find('button')
+    // dark-only: aria-pressed reflects isDark=true
+    expect(btn.attributes('aria-pressed')).toBe('true')
+    // toggle is no-op, state unchanged
+    await btn.trigger('click')
+    expect(btn.attributes('aria-pressed')).toBe('true')
   })
 })

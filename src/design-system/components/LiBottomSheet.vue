@@ -125,7 +125,7 @@ onUnmounted(() => {
 .li-bottomsheet-drag-bar {
   width: 40px;
   height: 4px;
-  background-color: var(--color-gray-300, #CCCCCC);
+  background-color: var(--color-gray-300, #2A2A2A);
   border-radius: 2px;
 }
 
@@ -140,7 +140,7 @@ onUnmounted(() => {
   margin: 0;
   font-size: var(--text-md, 20px);
   font-weight: 700;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .li-bottomsheet-close {
@@ -157,20 +157,20 @@ onUnmounted(() => {
 }
 
 .li-bottomsheet-close:hover {
-  color: var(--color-gray-900, #333333);
-  background-color: var(--color-gray-100, #F2F2F2);
+  color: var(--color-gray-900, #FFFFFF);
+  background-color: var(--color-gray-100, #121212);
 }
 
 .li-bottomsheet-body {
   padding: 0 var(--space-l, 16px) var(--space-l, 16px);
   overflow-y: auto;
   font-size: var(--text-sm, 16px);
-  color: var(--color-gray-700, #666666);
+  color: var(--color-gray-700, #B3B3B3);
 }
 
 .li-bottomsheet-footer {
   padding: var(--space-l, 16px);
-  border-top: 1px solid var(--color-gray-200, #E6E6E6);
+  border-top: 1px solid var(--color-gray-200, #1A1A1A);
   display: flex;
   flex-direction: column;
   gap: var(--space-m, 12px);

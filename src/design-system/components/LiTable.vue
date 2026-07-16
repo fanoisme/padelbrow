@@ -162,7 +162,7 @@ watch(selectedRows, (newVal) => {
 }
 
 .li-table th.is-sortable:hover {
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .li-table-row {
@@ -175,7 +175,7 @@ watch(selectedRows, (newVal) => {
 
 .li-table td {
   border-bottom: 1px solid rgba(0, 0, 0, 0.03);
-  color: var(--color-gray-800, #333333);
+  color: var(--color-gray-800, #FFFFFF);
 }
 
 .li-table tbody tr:last-child td {
@@ -191,7 +191,7 @@ watch(selectedRows, (newVal) => {
 .li-table-sort-icon {
   display: flex;
   align-items: center;
-  color: var(--color-gray-300, #CCCCCC);
+  color: var(--color-gray-300, #2A2A2A);
   transition: color 0.2s ease;
 }
 

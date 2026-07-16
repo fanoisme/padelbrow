@@ -219,11 +219,11 @@ onUnmounted(() => {
   height: 40px; /* Base height */
   padding: 0 var(--space-m, 12px) 0 40px;
   background-color: var(--color-gray-0, #FFFFFF);
-  border: 1px solid var(--color-gray-300, #CCCCCC);
+  border: 1px solid var(--color-gray-300, #2A2A2A);
   border-radius: var(--radius-md, 8px);
   font-family: inherit;
   font-size: var(--text-sm, 16px);
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   transition: all var(--dur-short, 200ms) var(--ease-out);
   cursor: pointer;
 }
@@ -241,7 +241,7 @@ onUnmounted(() => {
 }
 
 .li-datepicker.is-disabled .li-datepicker-input {
-  background-color: var(--color-gray-100, #F2F2F2);
+  background-color: var(--color-gray-100, #121212);
   color: var(--color-gray-500, #999999);
   cursor: not-allowed;
 }
@@ -268,7 +268,7 @@ onUnmounted(() => {
   background-color: var(--color-gray-0, #FFFFFF);
   border-radius: var(--radius-md, 8px);
   box-shadow: var(--shadow-dropdown, 0 8px 24px rgba(0, 0, 0, 0.1));
-  border: 1px solid var(--color-gray-200, #E6E6E6);
+  border: 1px solid var(--color-gray-200, #1A1A1A);
   padding: var(--space-m, 12px);
   z-index: 1000;
 }
@@ -283,7 +283,7 @@ onUnmounted(() => {
 .li-calendar-title {
   font-size: var(--text-sm, 16px);
   font-weight: 600;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .li-calendar-nav {
@@ -297,8 +297,8 @@ onUnmounted(() => {
 }
 
 .li-calendar-nav:hover {
-  background-color: var(--color-gray-100, #F2F2F2);
-  color: var(--color-gray-900, #333333);
+  background-color: var(--color-gray-100, #121212);
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .li-calendar-weekdays {
@@ -323,7 +323,7 @@ onUnmounted(() => {
   border: none;
   border-radius: var(--radius-sm, 4px);
   font-size: var(--text-sm, 14px);
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -332,7 +332,7 @@ onUnmounted(() => {
 }
 
 .li-calendar-day:hover:not(.is-empty):not(.is-selected) {
-  background-color: var(--color-gray-100, #F2F2F2);
+  background-color: var(--color-gray-100, #121212);
 }
 
 .li-calendar-day.is-empty {

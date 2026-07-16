@@ -70,12 +70,12 @@ watch(expanded, async (val) => {
 
 <style scoped>
 .li-accordion-item {
-  border-bottom: 1px solid var(--color-gray-200, #E6E6E6);
+  border-bottom: 1px solid var(--color-gray-200, #1A1A1A);
   font-family: 'Inter', system-ui, sans-serif;
 }
 
 .li-accordion-item:first-child {
-  border-top: 1px solid var(--color-gray-200, #E6E6E6);
+  border-top: 1px solid var(--color-gray-200, #1A1A1A);
 }
 
 .li-accordion-item--disabled {
@@ -93,14 +93,14 @@ watch(expanded, async (val) => {
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-gray-900, #333333);
+  color: var(--color-gray-900, #FFFFFF);
   text-align: left;
   cursor: pointer;
   transition: background 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .li-accordion-item__trigger:hover:not(:disabled) {
-  background: var(--color-gray-100, #F2F2F2);
+  background: var(--color-gray-100, #121212);
   margin: 0 -12px;
   padding-left: 12px;
   padding-right: 12px;
@@ -145,7 +145,7 @@ watch(expanded, async (val) => {
 
 .li-accordion-item--expanded .li-accordion-item__chevron {
   transform: rotate(180deg);
-  color: var(--color-gray-700, #666666);
+  color: var(--color-gray-700, #B3B3B3);
 }
 
 .li-accordion-item__body-wrapper {
@@ -157,7 +157,7 @@ watch(expanded, async (val) => {
   padding: 0 0 16px 0;
   font-size: 14px;
   line-height: 22px;
-  color: var(--color-gray-700, #666666);
+  color: var(--color-gray-700, #B3B3B3);
 }
 
 /* Icon spacing adjustment */

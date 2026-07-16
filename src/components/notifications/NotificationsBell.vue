@@ -76,7 +76,7 @@ function describe(n) {
   right: 0;
   top: 100%;
   background: var(--color-gray-0, #FFFFFF);
-  border: 1px solid var(--color-gray-200, #E6E6E6);
+  border: 1px solid var(--color-gray-200, #1A1A1A);
   border-radius: var(--radius-md, 12px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   min-width: 260px;
@@ -100,7 +100,7 @@ function describe(n) {
 }
 
 .notifications-bell__panel li.is-unread {
-  background: var(--color-gray-100, #F2F2F2);
+  background: var(--color-gray-100, #121212);
   font-weight: 600;
 }
 

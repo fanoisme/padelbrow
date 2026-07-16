@@ -31,9 +31,22 @@ describe('useMatchSessions', () => {
     const result = await getSession('ms1')
 
     expect(supabase.from).toHaveBeenCalledWith('match_sessions')
-    expect(select).toHaveBeenCalledWith('*, meet:meets(id, title)')
+    expect(select).toHaveBeenCalledWith('*, meet:meets(id, title, venue_name, starts_at, max_players)')
     expect(eq).toHaveBeenCalledWith('id', 'ms1')
     expect(result.meet.title).toBe('T')
+  })
+
+  it('getSessionByCode looks up by uppercased join_code and resolves single-or-null', async () => {
+    const maybeSingle = vi.fn().mockResolvedValue({ data: { id: 'ms1', join_code: 'AB12CD34' }, error: null })
+    const eq = vi.fn(() => ({ maybeSingle }))
+    const select = vi.fn(() => ({ eq }))
+    supabase.from.mockReturnValue({ select })
+
+    const { getSessionByCode } = useMatchSessions()
+    const result = await getSessionByCode('ab12cd34')
+
+    expect(eq).toHaveBeenCalledWith('join_code', 'AB12CD34')
+    expect(result.id).toBe('ms1')
   })
 
   it('listSessionsByMeet filters by meet and orders desc', async () => {

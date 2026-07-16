@@ -11,7 +11,7 @@ const getSession = vi.fn().mockResolvedValue({ id: 'ms1', meet_id: 'meet1', form
 const createSession = vi.fn().mockResolvedValue({ id: 'ms-new', meet_id: 'meet1' })
 const setStatus = vi.fn()
 vi.mock('../../composables/useMatchSessions.js', () => ({
-  useMatchSessions: vi.fn(() => ({ getSession, createSession, setStatus, listSessionsByMeet: vi.fn() })),
+  useMatchSessions: vi.fn(() => ({ getSession, createSession, getSessionByCode: vi.fn(), setStatus, listSessionsByMeet: vi.fn() })),
 }))
 
 const generateRound = vi.fn().mockResolvedValue([{ id: 'm1' }])
@@ -30,7 +30,15 @@ vi.mock('../../composables/useMatchScoring.js', () => ({
 }))
 
 vi.mock('../../composables/useMeetParticipants.js', () => ({
-  useMeetParticipants: vi.fn(() => ({ listParticipants: vi.fn().mockResolvedValue([{ user_id: 'p1' }, { user_id: 'p2' }, { user_id: 'p3' }, { user_id: 'p4' }]) })),
+  useMeetParticipants: vi.fn(() => ({
+    listParticipants: vi.fn().mockResolvedValue([{ user_id: 'p1' }, { user_id: 'p2' }, { user_id: 'p3' }, { user_id: 'p4' }]),
+    joinMeet: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
+
+const getMeet = vi.fn().mockResolvedValue({ id: 'meet1', title: 'Kamis with Allo Bank', venue_name: 'Rana Grounds', starts_at: '2026-07-17T18:00:00Z' })
+vi.mock('../../composables/useMeets.js', () => ({
+  useMeets: vi.fn(() => ({ getMeet })),
 }))
 
 import MatchSessionView from './MatchSessionView.vue'
@@ -74,10 +82,13 @@ describe('MatchSessionView', () => {
     expect(input.playerIds).toEqual(['p1', 'p2', 'p3', 'p4'])
   })
 
-  it('shows the setup form + creates a session when no sessionId is given', async () => {
+  it('drives the create wizard + creates a session when no sessionId is given', async () => {
     const router = createRouter({
       history: createWebHashHistory(),
-      routes: [{ path: '/meets/:meetId/match-session/:sessionId?', name: 'match-session', component: MatchSessionView }],
+      routes: [
+        { path: '/meets/:meetId/match-session/:sessionId?', name: 'match-session', component: MatchSessionView },
+        { path: '/meets/:id', name: 'meet-detail', component: { template: '<div/>' } },
+      ],
     })
     router.push('/meets/meet1/match-session')
     await router.isReady()
@@ -85,6 +96,15 @@ describe('MatchSessionView', () => {
     await flushPromises()
 
     expect(getSession).not.toHaveBeenCalled()
+    expect(getMeet).toHaveBeenCalledWith('meet1')
+
+    // hero → wizard step 1
+    await wrapper.find('[data-testid="hero-create"]').trigger('click')
+    // step 1 → 2 → 3 → 4
+    for (let i = 0; i < 3; i++) {
+      await wrapper.find('[data-testid="wizard-next"]').trigger('click')
+    }
+    // step 4 → create
     const createBtn = wrapper.find('[data-testid="create-session-btn"]')
     expect(createBtn.exists()).toBe(true)
     await createBtn.trigger('click')

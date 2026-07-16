@@ -269,12 +269,12 @@ const features = [
   display: inline-block;
   padding: 6px 14px;
   border-radius: var(--radius-pill, 999px);
-  background: var(--glass-bg-light, rgba(255,255,255,0.5));
+  background: var(--glass-bg-light, rgba(10,10,10,0.8));
   backdrop-filter: var(--glass-blur-light, blur(12px));
-  border: 1px solid var(--glass-border, rgba(255,255,255,0.12));
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.08));
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--color-on-surface-variant, #666);
+  color: var(--color-on-surface-variant, #D4D4D4);
   letter-spacing: 0.02em;
 }
 .hero__title {
@@ -286,7 +286,7 @@ const features = [
 }
 .hero__tagline {
   font-size: clamp(1.05rem, 2vw, 1.35rem);
-  color: var(--color-on-surface-variant, #666);
+  color: var(--color-on-surface-variant, #D4D4D4);
   line-height: 1.5;
   max-width: 640px;
   margin: 0;
@@ -312,7 +312,7 @@ const features = [
   border: 1px solid var(--glass-border, rgba(255,255,255,0.12));
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--color-on-surface-variant, #666);
+  color: var(--color-on-surface-variant, #D4D4D4);
 }
 .hero__orbs { position: absolute; inset: 0; pointer-events: none; }
 .hero__orb {
@@ -350,7 +350,7 @@ const features = [
 }
 .section__sub {
   text-align: center;
-  color: var(--color-on-surface-variant, #666);
+  color: var(--color-on-surface-variant, #D4D4D4);
   font-size: 1.05rem;
   margin: 0 0 var(--space-3xl, 48px);
 }
@@ -399,7 +399,7 @@ const features = [
   margin: 0 0 var(--space-xs, 4px);
 }
 .feature-card__body {
-  color: var(--color-on-surface-variant, #666);
+  color: var(--color-on-surface-variant, #D4D4D4);
   line-height: 1.5;
   margin: 0;
   font-size: 0.95rem;
@@ -438,7 +438,7 @@ const features = [
   margin: 0 0 var(--space-s, 8px);
 }
 .step p {
-  color: var(--color-on-surface-variant, #666);
+  color: var(--color-on-surface-variant, #D4D4D4);
   line-height: 1.5;
   margin: 0;
 }
@@ -615,9 +615,9 @@ const features = [
   flex-shrink: 0;
   padding: 8px 16px;
   border-radius: var(--radius-pill, 999px);
-  border: 1.5px solid var(--color-gray-900, #1A1A1A);
-  background: #FFFFFF;
-  color: var(--color-gray-900, #1A1A1A);
+  border: 1.5px solid var(--color-gray-300, #2A2A2A);
+  background: var(--color-gray-100, #121212);
+  color: var(--color-gray-900, #FFFFFF);
   font-weight: 700;
   font-size: var(--text-xs, 14px);
   cursor: pointer;
@@ -640,7 +640,7 @@ const features = [
   border: none;
   background: transparent;
   cursor: pointer;
-  color: var(--color-gray-900, #333);
+  color: var(--color-gray-900, #FFFFFF);
   transition: transform var(--dur-short, 200ms) var(--ease-smooth, cubic-bezier(0.16, 1, 0.3, 1));
 }
 .dash__action:active { transform: scale(0.95); }
@@ -651,7 +651,7 @@ const features = [
   width: 52px;
   height: 52px;
   border-radius: var(--radius-md, 16px);
-  background: var(--color-gray-100, #F2F2F2);
+  background: var(--color-gray-100, #121212);
   color: var(--color-brand, #FFAF03);
 }
 .dash__action-label {
@@ -686,6 +686,7 @@ const features = [
   margin: 0;
   font-size: var(--text-md, 16px);
   font-weight: 800;
+  color: var(--color-gray-900, #FFFFFF);
 }
 .dash__hl-more {
   font-size: var(--text-xs, 14px);
@@ -700,7 +701,7 @@ const features = [
   padding: 0;
   display: flex;
   flex-direction: column;
-  background: var(--color-gray-100, #F2F2F2);
+  background: var(--color-gray-100, #121212);
   border-radius: var(--radius-lg, 16px);
 }
 .dash__hl-list li {
@@ -708,7 +709,7 @@ const features = [
   align-items: center;
   gap: var(--space-m, 12px);
   padding: var(--space-m, 14px) var(--space-l, 16px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 .dash__hl-list li:last-child { border-bottom: none; }
 .dash__hl-icon {
@@ -731,10 +732,11 @@ const features = [
 .dash__hl-title {
   font-size: var(--text-xs, 14px);
   font-weight: 600;
+  color: var(--color-gray-900, #FFFFFF);
 }
 .dash__hl-sub {
   font-size: var(--text-xxs, 12px);
-  color: var(--color-on-surface-variant, #666);
+  color: var(--color-on-surface-variant, #D4D4D4);
 }
 .dash__hl-amount {
   font-size: var(--text-xs, 14px);
@@ -742,7 +744,7 @@ const features = [
   white-space: nowrap;
 }
 .dash__hl-amount.pos { color: var(--color-green-500, #4CAF50); }
-.dash__hl-amount.neg { color: var(--color-gray-900, #333); }
+.dash__hl-amount.neg { color: var(--color-gray-900, #FFFFFF); }
 
 @media (prefers-reduced-motion: reduce) {
   .dash__action:active, .dash__promo-cta:active { transform: none; }

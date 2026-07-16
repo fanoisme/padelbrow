@@ -35,7 +35,7 @@ function lineWidth(i) {
   padding: 16px;
   background: var(--color-gray-0, #FFFFFF);
   border-radius: 8px;
-  border: 1px solid var(--color-gray-200, #E6E6E6);
+  border: 1px solid var(--color-gray-200, #1A1A1A);
   font-family: 'Inter', system-ui, sans-serif;
 }
 
@@ -61,6 +61,6 @@ function lineWidth(i) {
 .li-skeleton-card__footer {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid var(--color-gray-200, #E6E6E6);
+  border-top: 1px solid var(--color-gray-200, #1A1A1A);
 }
 </style>
