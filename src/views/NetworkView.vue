@@ -43,7 +43,7 @@
 
       <form data-testid="discovery-form" class="discovery-form" @submit.prevent="handleSearch">
         <LiTextField v-model="searchArea" placeholder="Search by area..." />
-        <LiButton type="submit">
+        <LiButton type="submit" icon-left="search">
           <template #iconLeft><LiIcon name="search" size="sm" /></template>
           Search
         </LiButton>
