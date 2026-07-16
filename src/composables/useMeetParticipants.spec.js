@@ -64,7 +64,7 @@ describe('useMeetParticipants', () => {
     let insertCall = 0
     const pSingle = vi.fn().mockImplementation(() => {
       insertCall += 1
-      if (insertCall === 1) return Promise.resolve({ data: null, error: { message: 'Meet is at capacity' } })
+      if (insertCall === 1) return Promise.resolve({ data: null, error: { message: 'Meet is at capacity (max 4)', code: '23514' } })
       return Promise.resolve({ data: { id: 'p2', status: 'waitlisted' }, error: null })
     })
     const pSelect = vi.fn(() => ({ single: pSingle }))
@@ -185,5 +185,27 @@ describe('useMeetParticipants', () => {
     const result = await listClubMembersNotInMeet('m1', null)
     expect(result).toEqual([])
     expect(supabase.from).not.toHaveBeenCalled()
+  })
+
+  it('addExistingMember does not retry as waitlisted on a non-capacity error (e.g. duplicate member)', async () => {
+    // count looks like there's room, but the insert fails with a real unique
+    // violation (23505) — the member is already in the meet. This must
+    // surface as-is, not be silently swallowed into a wrong-cause waitlist retry.
+    const countEq2 = vi.fn().mockResolvedValue({ count: 2, error: null })
+    const countEq = vi.fn(() => ({ eq: countEq2 }))
+    const countSelect = vi.fn(() => ({ eq: countEq }))
+
+    const pSingle = vi.fn().mockResolvedValue({
+      data: null,
+      error: { message: 'duplicate key value violates unique constraint "meet_participants_meet_id_user_id_key"', code: '23505' },
+    })
+    const pSelect = vi.fn(() => ({ single: pSingle }))
+    const pInsert = vi.fn(() => ({ select: pSelect }))
+
+    supabase.from.mockReturnValue({ select: countSelect, insert: pInsert })
+
+    const { addExistingMember } = useMeetParticipants()
+    await expect(addExistingMember({ id: 'm1', max_players: 4 }, 'u5', 'u1')).rejects.toThrow(/duplicate key/)
+    expect(pInsert).toHaveBeenCalledTimes(1)
   })
 })

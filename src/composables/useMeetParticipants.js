@@ -38,9 +38,11 @@ export function useMeetParticipants() {
       return await insertRow(meet.id, { ...row, status: preferred })
     } catch (err) {
       // Race: another user took the last confirmed slot between our count and
-      // insert (the DB capacity trigger rejected the over-fill). Fall back to
-      // waitlisted rather than surfacing a capacity error to the user.
-      if (preferred === 'confirmed') {
+      // insert — the DB capacity trigger raises a check_violation (23514) in
+      // that case. Fall back to waitlisted rather than surfacing a capacity
+      // error to the user. Any other error (e.g. 23505 duplicate member) is a
+      // real problem and must surface, not be silently retried as a waitlist.
+      if (preferred === 'confirmed' && err.code === '23514') {
         return await insertRow(meet.id, { ...row, status: 'waitlisted' })
       }
       throw err
