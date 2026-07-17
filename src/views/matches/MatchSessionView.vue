@@ -445,7 +445,7 @@ async function handleFinalize(m) {
 .msv__rank[data-rank="1"] { background: var(--color-brand); color: #1A1A1A; }
 .msv__rank[data-rank="2"] { background: rgba(192,192,192,0.25); color: #E0E0E0; }
 .msv__rank[data-rank="3"] { background: rgba(205,127,50,0.3); color: #E8B98C; }
-.msv__rank-name { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--color-gray-800, #EEE); }
+.msv__rank-name { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--color-gray-800, #EBEBEB); }
 .msv__row--top td { color: var(--color-brand); font-weight: 800; }
 .msv__w { color: #34D399; font-weight: 700; }
 .msv__l { color: #999; }
