@@ -133,7 +133,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   LiButton, LiBadge, LiTabs, LiEmptyState, LiCard, LiListTile, LiBottomSheet, LiTextField,
@@ -207,7 +207,9 @@ async function handleJoin() {
   try {
     await joinMeet(meet.value, user.value.id)
     await reloadParticipants()
-    confettiTrigger.value = !confettiTrigger.value
+    confettiTrigger.value = false
+    await nextTick()
+    confettiTrigger.value = true
   } catch (err) {
     toast.error(err.message || 'Could not join the meet.')
   }
