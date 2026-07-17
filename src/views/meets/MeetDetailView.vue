@@ -1,30 +1,50 @@
 <template>
   <section v-if="meet" class="meet-detail-view">
-    <LiPageHeader :title="meet.title">
+    <LiHero
+      variant="warm"
+      intensity="subtle"
+      :eyebrow="meet.venue_name || 'Venue TBD'"
+      :title="meet.title"
+      :subtitle="formatWhen(meet.starts_at)"
+    >
       <template #actions>
-        <LiButton v-if="myParticipation === 'none'" @click="handleJoin">Join</LiButton>
-        <LiButton v-else-if="myParticipation === 'confirmed'" variant="secondary" @click="handleLeave">Leave</LiButton>
-        <LiBadge v-else-if="myParticipation === 'waitlisted'" label="Waitlisted" variant="warning" />
+        <LiConfetti :trigger="confettiTrigger" :count="18" :lifespan="1000">
+          <LiMagneticButton v-if="myParticipation === 'none'" variant="primary" @click="handleJoin">Join</LiMagneticButton>
+          <LiButton v-else-if="myParticipation === 'confirmed'" variant="secondary" @click="handleLeave">Leave</LiButton>
+          <LiBadge v-else-if="myParticipation === 'waitlisted'" label="Waitlisted" variant="warning" />
+        </LiConfetti>
       </template>
-    </LiPageHeader>
+    </LiHero>
 
     <LiTabs v-model="activeTab" :tabs="tabs" />
     <div class="meet-detail-view__panel">
       <!-- Details -->
       <div v-show="activeTab === 0">
-        <LiCard>
+        <LiGlassCard variant="light" size="md">
           <p>{{ formatWhen(meet.starts_at) }} · {{ meet.venue_name || 'Venue TBD' }}</p>
           <p v-if="meet.venue_address">{{ meet.venue_address }}</p>
           <p>Format: {{ meet.format }} · Max {{ meet.max_players }} players</p>
           <p v-if="meet.fee_amount > 0">Fee: Rp{{ meet.fee_amount.toLocaleString('id-ID') }}</p>
-        </LiCard>
+        </LiGlassCard>
       </div>
 
       <!-- Participants -->
       <div v-show="activeTab === 1">
+        <div class="meet-detail-view__avatar-stack" aria-hidden="true">
+          <LiAvatar
+            v-for="p in participants.slice(0, 8)"
+            :key="p.id"
+            size="sm"
+            :initials="participantInitials(p)"
+            class="meet-detail-view__avatar-stack-item"
+          />
+        </div>
         <LiButton v-if="isOrganizer" variant="secondary" size="sm" @click="openAddPlayer">+ Add player</LiButton>
         <LiCard flush>
           <LiListTile v-for="p in participants" :key="p.id" :title="p.profiles?.full_name || p.guest_name">
+            <template #leading>
+              <LiAvatar size="sm" :initials="participantInitials(p)" />
+            </template>
             <template #trailing>
               <LiBadge v-if="!p.user_id" label="Guest" variant="neutral" />
               <LiBadge v-else :label="p.status" :variant="statusVariant(p.status)" />
@@ -52,7 +72,7 @@
       <!-- Matches -->
       <div v-show="activeTab === 3" class="meet-detail-view__matches">
         <div class="meet-detail-view__matches-actions">
-          <LiButton variant="secondary" @click="goToMatches">{{ sessions.length ? 'Open match session' : '+ New match session' }}</LiButton>
+          <LiMagneticButton variant="secondary" @click="goToMatches">{{ sessions.length ? 'Open match session' : '+ New match session' }}</LiMagneticButton>
           <LiButton v-if="sessions.length" variant="ghost" size="sm" @click="startNewSession">+ Start another session</LiButton>
         </div>
         <LiCard v-if="sessions.length" flush>
@@ -71,7 +91,7 @@
         </LiCard>
         <LiEmptyState v-else title="Ready to play?" description="Start a live match session to generate rounds and track scores." icon="trophy">
           <template #action>
-            <LiButton @click="goToMatches">Open match session</LiButton>
+            <LiMagneticButton @click="goToMatches">Open match session</LiMagneticButton>
           </template>
         </LiEmptyState>
       </div>
@@ -115,7 +135,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { LiButton, LiBadge, LiTabs, LiEmptyState, LiCard, LiListTile, LiPageHeader, LiBottomSheet, LiTextField, LiIcon, LiSpinner, useToast } from '../../design-system/components/index.js'
+import {
+  LiButton, LiBadge, LiTabs, LiEmptyState, LiCard, LiListTile, LiBottomSheet, LiTextField,
+  LiIcon, LiSpinner, LiHero, LiGlassCard, LiMagneticButton, LiConfetti, LiAvatar, useToast,
+} from '../../design-system/components/index.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { useMeets } from '../../composables/useMeets.js'
 import { useMeetParticipants } from '../../composables/useMeetParticipants.js'
@@ -136,6 +159,7 @@ const showAddPlayer = ref(false)
 const clubMembersToAdd = ref([])
 const loadingClubMembers = ref(false)
 const guestName = ref('')
+const confettiTrigger = ref(false)
 
 const meet = ref(null)
 const participants = ref([])
@@ -183,6 +207,7 @@ async function handleJoin() {
   try {
     await joinMeet(meet.value, user.value.id)
     await reloadParticipants()
+    confettiTrigger.value = !confettiTrigger.value
   } catch (err) {
     toast.error(err.message || 'Could not join the meet.')
   }
@@ -202,6 +227,11 @@ function statusVariant(status) {
   if (status === 'waitlisted') return 'warning'
   if (status === 'invited') return 'info'
   return 'neutral'
+}
+
+function participantInitials(p) {
+  const name = p.profiles?.full_name || p.guest_name || '?'
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0] || '').join('').toUpperCase() || '?'
 }
 
 function formatWhen(iso) {
@@ -305,6 +335,20 @@ function formatDate(iso) {
   display: flex;
   flex-direction: column;
   gap: var(--space-m, 16px);
+}
+
+.meet-detail-view__avatar-stack {
+  display: flex;
+  margin-bottom: var(--space-s, 8px);
+}
+
+.meet-detail-view__avatar-stack-item {
+  margin-left: -8px;
+  border: 2px solid var(--color-surface, #121212);
+}
+
+.meet-detail-view__avatar-stack-item:first-child {
+  margin-left: 0;
 }
 
 .meet-detail-view__matches {
