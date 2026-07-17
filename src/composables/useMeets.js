@@ -5,7 +5,7 @@ export function useMeets() {
     const nowIso = new Date().toISOString()
     const { data, error } = await supabase
       .from('meets')
-      .select('*')
+      .select('*, meet_participants(count)')
       .gte('starts_at', nowIso)
       .order('starts_at', { ascending: true })
     if (error) throw error
