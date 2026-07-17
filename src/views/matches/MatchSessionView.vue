@@ -61,9 +61,13 @@
             <!-- CENTER: score / entry -->
             <div class="msv__center">
               <template v-if="m.status === 'completed'">
-                <span class="msv__score" :class="{ 'is-win': (m.score_a ?? 0) > (m.score_b ?? 0) }">{{ m.score_a }}</span>
+                <span class="msv__score" :class="{ 'is-win': (m.score_a ?? 0) > (m.score_b ?? 0) }">
+                  <LiCountUp :end-val="m.score_a ?? 0" :duration="500" />
+                </span>
                 <span class="msv__colon">:</span>
-                <span class="msv__score" :class="{ 'is-win': (m.score_b ?? 0) > (m.score_a ?? 0) }">{{ m.score_b }}</span>
+                <span class="msv__score" :class="{ 'is-win': (m.score_b ?? 0) > (m.score_a ?? 0) }">
+                  <LiCountUp :end-val="m.score_b ?? 0" :duration="500" />
+                </span>
               </template>
               <template v-else>
                 <div class="msv__entry">
@@ -113,12 +117,12 @@
                   {{ playerName(s.player_id) }}
                 </span>
               </td>
-              <td>{{ s.played }}</td>
-              <td class="msv__w">{{ s.won }}</td>
-              <td class="msv__l">{{ s.lost }}</td>
-              <td>{{ s.points_for }}</td>
-              <td>{{ s.points_against }}</td>
-              <td :class="diffClass(s)">{{ diff(s) }}</td>
+              <td><LiCountUp :end-val="s.played" :duration="600" /></td>
+              <td class="msv__w"><LiCountUp :end-val="s.won" :duration="600" /></td>
+              <td class="msv__l"><LiCountUp :end-val="s.lost" :duration="600" /></td>
+              <td><LiCountUp :end-val="s.points_for" :duration="600" /></td>
+              <td><LiCountUp :end-val="s.points_against" :duration="600" /></td>
+              <td :class="diffClass(s)"><LiCountUp :end-val="diff(s)" :duration="600" /></td>
             </tr>
           </tbody>
         </table>
@@ -139,7 +143,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { LiIcon, useToast } from '../../design-system/components/index.js'
+import { LiIcon, LiCountUp, useToast } from '../../design-system/components/index.js'
 import { useMatchSessions } from '../../composables/useMatchSessions.js'
 import { useMatchRounds } from '../../composables/useMatchRounds.js'
 import { useMatchScoring } from '../../composables/useMatchScoring.js'
@@ -227,6 +231,12 @@ function scoreOf(m) {
   return scoreCache[m.id]
 }
 
+function hapticTick() {
+  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+    navigator.vibrate(15)
+  }
+}
+
 // Team formats pair the player pool into fixed teams; the others take the flat
 // playerIds list. Without this, team_* rounds crash (generator expects `teams`).
 function buildRoundInput(format, ids) {
@@ -286,6 +296,7 @@ async function handleFinalize(m) {
     toast.error('Enter both scores first.')
     return
   }
+  hapticTick()
   try {
     await enterScore(m.id, a, b)
     await finalizeMatch(m.id)
@@ -312,18 +323,18 @@ async function handleFinalize(m) {
 .msv__title { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.01em; }
 .msv__x {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 36px; height: 36px; border: none; background: #1E1E1E; color: #FFFFFF;
+  width: 36px; height: 36px; border: none; background: var(--color-surface-panel, #1E1E1E); color: var(--color-on-surface, #FFFFFF);
   cursor: pointer; border-radius: 50%; flex-shrink: 0;
 }
-.msv__x:hover { background: #2A2A2A; }
+.msv__x:hover { background: var(--color-surface-panel-hover, #2A2A2A); }
 .msv__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .msv__chip {
   display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 999px;
-  font-size: 12px; font-weight: 600; background: #1E1E1E; color: #DDD;
+  font-size: 12px; font-weight: 600; background: var(--color-surface-panel, #1E1E1E); color: var(--color-chip-text, #DDD);
 }
 .msv__chip--format { background: rgba(255,175,3,0.14); color: var(--color-brand); }
 .msv__chip[data-variant="in_progress"] { background: rgba(16,185,129,0.18); color: #34D399; }
-.msv__chip[data-variant="completed"] { background: rgba(255,255,255,0.08); color: #CCC; }
+.msv__chip[data-variant="completed"] { background: rgba(255,255,255,0.08); color: var(--color-gray-700, #CCC); }
 .msv__chip--code { background: rgba(255,255,255,0.06); color: var(--color-brand); border: 1px dashed rgba(255,175,3,0.4); }
 .msv__dot { width: 6px; height: 6px; border-radius: 50%; background: #34D399; box-shadow: 0 0 0 0 rgba(52,211,153,0.6); animation: msv-pulse 1.6s infinite; }
 @keyframes msv-pulse {
@@ -340,28 +351,28 @@ async function handleFinalize(m) {
   transition: filter var(--dur-short) var(--ease-out);
 }
 .msv__cta:hover { filter: brightness(1.05); }
-.msv__empty { color: #A3A3A3; font-size: 14px; margin: 0; }
+.msv__empty { color: var(--color-gray-600, #A3A3A3); font-size: 14px; margin: 0; }
 
 /* ─── round ─── */
 .msv__round { display: flex; flex-direction: column; gap: 10px; }
 .msv__round-head { display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px; }
-.msv__round-title { margin: 0; font-size: 14px; font-weight: 700; color: #A3A3A3; text-transform: uppercase; letter-spacing: 0.06em; }
-.msv__round-meta { font-size: 12px; color: #6B6B6B; }
+.msv__round-title { margin: 0; font-size: 14px; font-weight: 700; color: var(--color-gray-600, #A3A3A3); text-transform: uppercase; letter-spacing: 0.06em; }
+.msv__round-meta { font-size: 12px; color: var(--color-gray-500, #6B6B6B); }
 .msv__round-grid { display: flex; flex-direction: column; gap: 10px; }
 
 /* ─── match card ─── */
 .msv__match {
-  background: #181818; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px;
+  background: var(--color-surface-panel-deep, #181818); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px;
   padding: 12px 14px; display: flex; flex-direction: column; gap: 10px;
 }
-.msv__match[data-state="completed"] { background: #161616; }
+.msv__match[data-state="completed"] { background: var(--color-surface-panel-deepest, #161616); }
 
 .msv__match-bar { display: flex; align-items: center; justify-content: space-between; }
-.msv__court { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #B0B0B0; }
+.msv__court { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--color-on-surface-muted, #B0B0B0); }
 .msv__court :deep(.li-icon) { color: var(--color-brand); }
 .msv__pill {
   font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
-  padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,0.07); color: #B0B0B0;
+  padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,0.07); color: var(--color-on-surface-muted, #B0B0B0);
 }
 .msv__pill[data-state="in_progress"] { background: rgba(16,185,129,0.2); color: #34D399; }
 .msv__pill[data-state="completed"] { background: rgba(255,175,3,0.16); color: var(--color-brand); }
@@ -374,16 +385,16 @@ async function handleFinalize(m) {
 .msv__player { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .msv__team--b .msv__player { flex-direction: row-reverse; }
 .msv__pname {
-  font-size: 13px; font-weight: 600; color: #C8C8C8; white-space: nowrap;
+  font-size: 13px; font-weight: 600; color: var(--color-pname-text, #C8C8C8); white-space: nowrap;
   overflow: hidden; text-overflow: ellipsis; max-width: 110px;
 }
-.msv__team.is-win .msv__pname { color: #FFFFFF; font-weight: 800; }
-.msv__team.is-loss .msv__pname { color: #6B6B6B; }
+.msv__team.is-win .msv__pname { color: var(--color-on-surface, #FFFFFF); font-weight: 800; }
+.msv__team.is-loss .msv__pname { color: var(--color-gray-500, #6B6B6B); }
 
 .msv__avatar {
   width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 800; color: #FFFFFF; overflow: hidden;
+  font-size: 12px; font-weight: 800; color: var(--color-on-surface, #FFFFFF); overflow: hidden;
   border: 2px solid rgba(255,255,255,0.1);
 }
 .msv__avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -392,18 +403,18 @@ async function handleFinalize(m) {
 
 /* center score */
 .msv__center { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 72px; }
-.msv__score { font-size: 30px; font-weight: 800; color: #888; font-variant-numeric: tabular-nums; line-height: 1; }
+.msv__score { font-size: 30px; font-weight: 800; color: var(--color-score-muted, #888); font-variant-numeric: tabular-nums; line-height: 1; }
 .msv__score.is-win { color: var(--color-brand); }
-.msv__colon { font-size: 20px; font-weight: 700; color: #555; line-height: 1; }
-.msv__vs { font-size: 10px; font-weight: 700; color: #6B6B6B; letter-spacing: 0.1em; }
+.msv__colon { font-size: 20px; font-weight: 700; color: var(--color-score-dim, #555); line-height: 1; }
+.msv__vs { font-size: 10px; font-weight: 700; color: var(--color-gray-500, #6B6B6B); letter-spacing: 0.1em; }
 
 .msv__entry { display: flex; align-items: center; gap: 6px; }
 .msv__score-input {
   width: 44px; padding: 7px 0; text-align: center; font: inherit; font-weight: 800; font-size: 18px;
-  color: #FFFFFF; background: #0E0E0E; border: 1px solid rgba(255,255,255,0.18); border-radius: 10px;
+  color: var(--color-on-surface, #FFFFFF); background: var(--color-gray-950, #0E0E0E); border: 1px solid rgba(255,255,255,0.18); border-radius: 10px;
 }
 .msv__score-input:focus { outline: none; border-color: var(--color-brand); }
-.msv__score-input::placeholder { color: #555; }
+.msv__score-input::placeholder { color: var(--color-score-dim, #555); }
 /* hide spinner */
 .msv__score-input::-webkit-outer-spin-button, .msv__score-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .msv__score-input { -moz-appearance: textfield; }
@@ -417,24 +428,24 @@ async function handleFinalize(m) {
 .msv__finalize:hover { background: rgba(255,175,3,0.24); }
 
 /* ─── standings ─── */
-.msv__standings { background: #181818; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px; }
+.msv__standings { background: var(--color-surface-panel-deep, #181818); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px; }
 .msv__standings h2 { margin: 0 0 12px; font-size: 15px; font-weight: 800; }
 .msv__standings-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .msv__standings table { width: 100%; border-collapse: collapse; }
 .msv__standings th, .msv__standings td { padding: 9px 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
-.msv__standings th { color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
+.msv__standings th { color: var(--color-score-muted, #888); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
 .msv__standings th:nth-child(2), .msv__standings td:nth-child(2) { text-align: left; }
-.msv__standings td { color: #DDD; font-variant-numeric: tabular-nums; }
+.msv__standings td { color: var(--color-chip-text, #DDD); font-variant-numeric: tabular-nums; }
 .msv__standings tbody tr:last-child td { border-bottom: none; }
 .msv__rank {
   display: inline-flex; align-items: center; justify-content: center;
   width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 800;
-  background: rgba(255,255,255,0.07); color: #CCC;
+  background: rgba(255,255,255,0.07); color: var(--color-gray-700, #CCC);
 }
 .msv__rank[data-rank="1"] { background: var(--color-brand); color: #1A1A1A; }
 .msv__rank[data-rank="2"] { background: rgba(192,192,192,0.25); color: #E0E0E0; }
 .msv__rank[data-rank="3"] { background: rgba(205,127,50,0.3); color: #E8B98C; }
-.msv__rank-name { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: #EEE; }
+.msv__rank-name { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--color-gray-800, #EEE); }
 .msv__row--top td { color: var(--color-brand); font-weight: 800; }
 .msv__w { color: #34D399; font-weight: 700; }
 .msv__l { color: #999; }
