@@ -58,7 +58,7 @@
     </aside>
 
     <!-- Main content area -->
-    <div class="app-content">
+    <div class="app-content" :class="{ 'app-content--sidebar': user }">
       <header class="app-header" :class="{ 'app-header--scrolled': scrolled }">
         <router-link to="/" class="app-header__brand">
           <img class="app-header__mark" src="../assets/padel-brow-mark.svg" alt="PADEL BROW" />
@@ -337,7 +337,7 @@ async function handleSignOutFromSheet() {
 }
 
 @media (min-width: 769px) {
-  .app-content {
+  .app-content--sidebar {
     margin-left: 240px;
   }
 }
