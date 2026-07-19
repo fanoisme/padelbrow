@@ -156,6 +156,7 @@ async function handleSubmit() {
   letter-spacing: -0.01em;
   line-height: 1.2;
   margin: 0 0 var(--space-xs, 4px);
+  color: var(--color-gray-900, #FFFFFF);
 }
 .signup__head p {
   color: var(--color-on-surface-variant, #A3A3A3);
@@ -250,6 +251,7 @@ async function handleSubmit() {
   text-align: center;
   font-size: var(--text-xs, 14px);
   margin-top: var(--space-l, 20px);
+  color: var(--color-on-surface-variant, #A3A3A3);
 }
 .signup__alt a {
   color: var(--color-brand, #FFAF03);
