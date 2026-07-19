@@ -121,7 +121,7 @@ async function handleSubmit() {
   inset: 0;
   z-index: var(--z-overlay, 80);
   overflow-y: auto;
-  background: var(--color-gray-0, #FFFFFF);
+  background: var(--color-page-bg, #000000);
 }
 .signup__inner {
   width: 100%;
