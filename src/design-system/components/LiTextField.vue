@@ -103,7 +103,7 @@ const onBlur = (e) => {
 .li-textfield-input-group {
   display: flex;
   align-items: center;
-  background: var(--color-gray-0, #FFFFFF);
+  background: var(--color-surface-bright, #141414);
   border: 1.5px solid var(--color-gray-300, #2A2A2A);
   border-radius: var(--radius-sm, 4px);
   transition: border-color var(--dur-short, 200ms) var(--ease-out);

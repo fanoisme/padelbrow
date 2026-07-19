@@ -99,11 +99,12 @@ defineExpose({ open, close, toggle })
   z-index: 9998;
   min-width: 180px;
   padding: 4px;
-  background: var(--color-gray-0, #FFFFFF);
+  background: var(--color-surface-bright, #141414);
   border: 1px solid var(--color-gray-200, #1A1A1A);
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.06);
   font-family: 'Inter', system-ui, sans-serif;
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .li-dropdown__backdrop {

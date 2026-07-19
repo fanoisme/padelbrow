@@ -78,7 +78,7 @@ onBeforeUnmount(() => {
   padding: 6px 12px;
   border-radius: 6px;
   background: var(--color-gray-900, #FFFFFF);
-  color: var(--color-gray-0, #FFFFFF);
+  color: var(--color-gray-100, #121212);
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 12px;
   font-weight: 500;

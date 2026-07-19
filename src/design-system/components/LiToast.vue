@@ -68,7 +68,7 @@ const { toasts, removeToast } = useToast();
   align-items: flex-start;
   padding: var(--space-m, 12px) var(--space-l, 16px);
   background-color: var(--color-gray-900, #FFFFFF);
-  color: var(--color-gray-0, #FFFFFF);
+  color: var(--color-gray-100, #121212);
   border-radius: var(--radius-md, 8px);
   box-shadow: var(--shadow-dropdown, 0 8px 24px rgba(0,0,0,0.1));
   gap: var(--space-s, 8px);
@@ -98,8 +98,8 @@ const { toasts, removeToast } = useToast();
 }
 
 .li-toast-close:hover {
-  color: var(--color-gray-0, #FFFFFF);
-  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-gray-100, #121212);
+  background-color: rgba(0, 0, 0, 0.08);
 }
 
 /* Variants */

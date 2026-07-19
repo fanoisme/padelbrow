@@ -342,7 +342,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
 .li-combobox__input-wrap {
   display: flex;
   align-items: center;
-  background: var(--color-gray-0, #ffffff);
+  background: var(--color-surface-bright, #141414);
   border: 1px solid var(--color-gray-300, #d1d5db);
   border-radius: var(--radius-md, 8px);
   min-height: 44px;

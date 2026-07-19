@@ -90,7 +90,7 @@ const selectTab = (index, event) => {
   display: flex;
   position: relative;
   border-bottom: 1px solid var(--color-gray-200, #1A1A1A);
-  background: var(--color-gray-0, #FFFFFF);
+  background: var(--color-surface-bright, #141414);
   overflow-x: auto;
   scrollbar-width: none; /* Firefox */
 }

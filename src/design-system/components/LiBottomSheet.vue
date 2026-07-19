@@ -105,7 +105,7 @@ onUnmounted(() => {
 }
 
 .li-bottomsheet {
-  background-color: var(--color-gray-0, #FFFFFF);
+  background-color: var(--color-surface-bright, #141414);
   border-radius: var(--radius-lg, 16px) var(--radius-lg, 16px) 0 0;
   box-shadow: var(--shadow-modal, 0 -8px 24px rgba(0, 0, 0, 0.1));
   font-family: var(--font-family, 'Inter', sans-serif);

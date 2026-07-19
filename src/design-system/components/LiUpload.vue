@@ -136,7 +136,7 @@ const removeFile = (index) => {
   padding: var(--space-2xl, 32px);
   border: 1.5px dashed var(--color-gray-300, #2A2A2A);
   border-radius: var(--radius-md, 8px);
-  background-color: var(--color-gray-0, #FFFFFF);
+  background-color: var(--color-surface-bright, #141414);
   cursor: pointer;
   transition: all var(--dur-short, 200ms) var(--ease-out);
   gap: var(--space-s, 8px);
@@ -147,9 +147,17 @@ const removeFile = (index) => {
   background-color: var(--color-yellow-100, #FFF3D6); /* Using lightest yellow/orange for hover bg */
 }
 
+.li-upload-dropzone:hover:not(.is-disabled) .li-upload-text {
+  color: var(--color-gray-100, #121212);
+}
+
 .li-upload.is-dragging .li-upload-dropzone {
   border-color: var(--color-orange-400, #FF6B00);
   background-color: var(--color-yellow-100, #FFF3D6);
+}
+
+.li-upload.is-dragging .li-upload-text {
+  color: var(--color-gray-100, #121212);
 }
 
 .li-upload.is-disabled .li-upload-dropzone {

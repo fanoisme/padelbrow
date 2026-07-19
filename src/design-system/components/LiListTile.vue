@@ -68,7 +68,7 @@ onMounted(() => {
   align-items: center;
   padding: var(--space-l, 16px);
   gap: var(--space-m, 12px);
-  background-color: var(--color-gray-0, #FFFFFF);
+  background-color: var(--color-surface-bright, #141414);
   font-family: var(--font-family, 'Inter', sans-serif);
   position: relative;
   overflow: hidden;

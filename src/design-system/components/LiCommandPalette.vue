@@ -184,7 +184,7 @@ const executeSelected = (command) => {
 .li-command-palette {
   width: 100%;
   max-width: 600px;
-  background-color: var(--color-gray-0, #FFFFFF);
+  background-color: var(--color-surface-bright, #141414);
   border-radius: var(--radius-lg, 16px);
   box-shadow: var(--shadow-modal, 0 16px 48px rgba(0, 0, 0, 0.15));
   font-family: var(--font-family, 'Inter', sans-serif);
@@ -289,8 +289,8 @@ const executeSelected = (command) => {
   font-family: inherit;
   font-size: var(--text-xs, 14px);
   color: var(--color-gray-500, #999999);
-  background: var(--color-gray-0, #FFFFFF);
-  border: 1px solid var(--color-gray-200, #1A1A1A);
+  background: var(--color-gray-200, #1C1C1C);
+  border: 1px solid var(--color-gray-300, #2E2E2E);
   padding: 2px 6px;
   border-radius: var(--radius-sm, 4px);
   box-shadow: 0 1px 1px rgba(0,0,0,0.05);

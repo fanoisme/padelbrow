@@ -38,7 +38,7 @@ const paddingMap = {
 
 <style scoped>
 .li-card {
-  background: var(--color-gray-0, #FFFFFF);
+  background: var(--color-surface-bright, #141414);
   border-radius: var(--radius-lg, 24px);
   font-family: 'Inter', system-ui, sans-serif;
   border: none;

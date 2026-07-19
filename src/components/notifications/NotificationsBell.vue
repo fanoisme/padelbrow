@@ -75,13 +75,14 @@ function describe(n) {
   position: absolute;
   right: 0;
   top: 100%;
-  background: var(--color-gray-0, #FFFFFF);
+  background: var(--color-surface-bright, #141414);
   border: 1px solid var(--color-gray-200, #1A1A1A);
   border-radius: var(--radius-md, 12px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   min-width: 260px;
   padding: var(--space-s, 8px);
   z-index: 10;
+  color: var(--color-gray-900, #FFFFFF);
 }
 
 .notifications-bell__panel ul {

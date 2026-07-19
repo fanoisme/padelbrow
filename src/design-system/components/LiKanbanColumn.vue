@@ -26,7 +26,7 @@ defineProps({
 .li-kanban-column {
   display: flex;
   flex-direction: column;
-  background: var(--color-gray-0, #FFFFFF);
+  background: var(--color-surface-bright, #141414);
   border: 1px solid var(--color-outline-variant, #1A1A1A);
   border-radius: var(--radius-lg, 16px);
   min-height: 300px;

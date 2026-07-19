@@ -122,7 +122,7 @@ onBeforeUnmount(() => {
 .li-drawer {
   position: fixed;
   z-index: 10000;
-  background: var(--color-gray-0, #FFFFFF);
+  background: var(--color-surface-bright, #141414);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;

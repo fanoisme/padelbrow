@@ -139,7 +139,7 @@ defineEmits(['step-click'])
   height: 28px;
   border-radius: 50%;
   border: 2px solid var(--color-gray-300, #2A2A2A);
-  background: var(--color-gray-0, #FFFFFF);
+  background: var(--color-surface-bright, #141414);
   color: var(--color-gray-500, #999999);
   flex-shrink: 0;
   cursor: pointer;

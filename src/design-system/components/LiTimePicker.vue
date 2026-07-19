@@ -215,7 +215,7 @@ onUnmounted(() => {
   width: 100%;
   height: 40px;
   padding: 0 var(--space-m, 12px) 0 40px;
-  background-color: var(--color-gray-0, #FFFFFF);
+  background-color: var(--color-surface-bright, #141414);
   border: 1px solid var(--color-gray-300, #2A2A2A);
   border-radius: var(--radius-md, 8px);
   font-family: inherit;
@@ -262,7 +262,7 @@ onUnmounted(() => {
   top: calc(100% + var(--space-xs, 4px));
   left: 0;
   width: 200px;
-  background-color: var(--color-gray-0, #FFFFFF);
+  background-color: var(--color-surface-bright, #141414);
   border-radius: var(--radius-md, 8px);
   box-shadow: var(--shadow-dropdown, 0 8px 24px rgba(0, 0, 0, 0.1));
   border: 1px solid var(--color-gray-200, #1A1A1A);
@@ -318,7 +318,7 @@ onUnmounted(() => {
   padding: var(--space-s, 8px);
   gap: var(--space-s, 8px);
   justify-content: flex-end;
-  background-color: var(--color-gray-0, #FFFFFF);
+  background-color: var(--color-surface-bright, #141414);
 }
 
 .li-time-btn {

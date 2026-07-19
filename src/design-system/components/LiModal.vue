@@ -106,7 +106,7 @@ onUnmounted(() => {
 }
 
 .li-modal {
-  background-color: var(--color-gray-0, #FFFFFF);
+  background-color: var(--color-surface-bright, #141414);
   border-radius: var(--radius-lg, 16px);
   box-shadow: var(--shadow-modal, 0 16px 48px rgba(0, 0, 0, 0.15));
   font-family: var(--font-family, 'Inter', sans-serif);

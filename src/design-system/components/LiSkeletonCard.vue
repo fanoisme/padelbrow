@@ -33,7 +33,7 @@ function lineWidth(i) {
 <style scoped>
 .li-skeleton-card {
   padding: 16px;
-  background: var(--color-gray-0, #FFFFFF);
+  background: var(--color-surface-bright, #141414);
   border-radius: 8px;
   border: 1px solid var(--color-gray-200, #1A1A1A);
   font-family: 'Inter', system-ui, sans-serif;
