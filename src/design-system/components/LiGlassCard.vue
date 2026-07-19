@@ -101,7 +101,7 @@ const cardStyle = computed(() => ({
 /* ── Variant: Dark ── */
 .li-glass-card--dark .li-glass-card__surface {
   background: rgba(33, 35, 36, 0.6);
-  color: var(--color-gray-0, #FFFFFF);
+  color: var(--color-on-surface, #FFFFFF);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.15),
     0 2px 8px rgba(0, 0, 0, 0.08);
@@ -110,6 +110,7 @@ const cardStyle = computed(() => ({
 /* ── Variant: Accent (brand tint) ── */
 .li-glass-card--accent .li-glass-card__surface {
   background: rgba(255, 175, 3, 0.06);
+  color: var(--color-on-surface, #FFFFFF);
   box-shadow:
     0 8px 32px rgba(255, 175, 3, 0.08),
     0 2px 8px rgba(255, 175, 3, 0.04);

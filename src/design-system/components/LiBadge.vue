@@ -99,6 +99,6 @@ defineProps({
 
 .li-badge-brand {
   background-color: var(--color-yellow-200, #FFEB3B);
-  color: var(--color-gray-900, #FFFFFF);
+  color: var(--color-gray-100, #121212);
 }
 </style>
