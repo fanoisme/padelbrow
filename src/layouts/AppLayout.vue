@@ -333,6 +333,7 @@ async function handleSignOutFromSheet() {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-width: 0;
 }
 
 @media (min-width: 769px) {
