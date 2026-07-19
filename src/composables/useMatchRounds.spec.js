@@ -13,7 +13,7 @@ vi.mock('../lib/matchFormatGenerators.js', () => ({
 vi.mock('../lib/supabase.js', () => ({ supabase: { from: vi.fn() } }))
 
 import { supabase } from '../lib/supabase.js'
-import { generateAmericanoRound } from '../lib/matchFormatGenerators.js'
+import { generateAmericanoRound, generateMexicanoRound } from '../lib/matchFormatGenerators.js'
 import { useMatchRounds } from './useMatchRounds.js'
 
 describe('useMatchRounds', () => {
@@ -67,6 +67,24 @@ describe('useMatchRounds', () => {
       { match_id: 'm1', team: 'b', user_id: 'u4' },
     ])
     expect(result).toHaveLength(1)
+  })
+
+  it('generateRound passes history and ranking criteria through to generateMexicanoRound', async () => {
+    mockPersistence()
+    generateMexicanoRound.mockReturnValue([{ court: 1, team_a: ['p1', 'p4'], team_b: ['p2', 'p3'] }])
+
+    const { generateRound } = useMatchRounds()
+    const history = [
+      { team_a: ['p1', 'p2'], team_b: ['p3', 'p4'], score_a: 21, score_b: 5, status: 'completed' },
+    ]
+    await generateRound(
+      { id: 'ms1', format: 'mexicano' },
+      { playerIds: ['p1', 'p2', 'p3', 'p4'], history, criteria: 'points_won' },
+      1,
+      participants
+    )
+
+    expect(generateMexicanoRound).toHaveBeenCalledWith(['p1', 'p2', 'p3', 'p4'], 1, history, 'points_won')
   })
 
   it('generateRound throws for an unsupported format', async () => {

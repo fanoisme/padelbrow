@@ -239,15 +239,19 @@ function hapticTick() {
 
 // Team formats pair the player pool into fixed teams; the others take the flat
 // playerIds list. Without this, team_* rounds crash (generator expects `teams`).
+// history + criteria let mexicano rank-pair off the standings so far — without
+// them the generator always falls back to its no-history random seeding.
 function buildRoundInput(format, ids) {
+  const history = rounds.value.flatMap((r) => r.matches || [])
+  const criteria = session.value?.ranking_criteria
   if (format === 'team_americano' || format === 'team_mexicano') {
     const teams = []
     for (let i = 0; i + 1 < ids.length; i += 2) {
       teams.push({ id: `t${i}`, playerIds: [ids[i], ids[i + 1]] })
     }
-    return { teams }
+    return { teams, history, criteria }
   }
-  return { playerIds: ids }
+  return { playerIds: ids, history, criteria }
 }
 
 async function reload() {

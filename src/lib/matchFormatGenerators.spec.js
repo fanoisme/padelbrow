@@ -62,6 +62,26 @@ describe('generateAmericanoRound', () => {
     }
     expect(partners.size).toBe(3) // partnered p2, p3, p4 — everyone once
   })
+
+  it('gives every player full partner coverage across multiple courts (8 players, 7 rounds)', () => {
+    const ids = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8']
+    const partnersOf = {}
+    for (const id of ids) partnersOf[id] = new Set()
+    for (let r = 0; r < 7; r++) {
+      const round = generateAmericanoRound(ids, r)
+      for (const m of round) {
+        const [a1, a2] = m.team_a
+        const [b1, b2] = m.team_b
+        partnersOf[a1].add(a2)
+        partnersOf[a2].add(a1)
+        partnersOf[b1].add(b2)
+        partnersOf[b2].add(b1)
+      }
+    }
+    for (const id of ids) {
+      expect(partnersOf[id].size).toBe(7) // partnered with all 7 others exactly once, not just the players sharing court 1
+    }
+  })
 })
 
 describe('generateMexicanoRound', () => {
@@ -75,6 +95,40 @@ describe('generateMexicanoRound', () => {
       expect(m.team_a).toHaveLength(2)
       expect(m.team_b).toHaveLength(2)
     }
+  })
+
+  it('pairs by current rank once history exists — best+worst vs the middle two, per quartet', () => {
+    const ids = ['p1', 'p2', 'p3', 'p4']
+    // p1+p2 blew out p3+p4 in round 0, so rank order is p1, p2 (tied, id tiebreak), then p3, p4.
+    const history = [
+      { team_a: ['p1', 'p2'], team_b: ['p3', 'p4'], score_a: 21, score_b: 5, status: 'completed' },
+    ]
+    const round = generateMexicanoRound(ids, 1, history, 'points_won')
+    expect(round).toHaveLength(1)
+    expect(round[0].team_a.slice().sort()).toEqual(['p1', 'p4']) // rank 1 + rank 4
+    expect(round[0].team_b.slice().sort()).toEqual(['p2', 'p3']) // rank 2 + rank 3
+  })
+
+  it('applies the same 1+4 vs 2+3 rule per quartet across multiple courts (8 players: 1+4/2+3 on court 1, 5+8/6+7 on court 2)', () => {
+    const ids = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8']
+    const history = [
+      { team_a: ['p1', 'p2'], team_b: ['p3', 'p4'], score_a: 40, score_b: 30, status: 'completed' },
+      { team_a: ['p5', 'p6'], team_b: ['p7', 'p8'], score_a: 20, score_b: 10, status: 'completed' },
+    ]
+    const round = generateMexicanoRound(ids, 1, history, 'points_won')
+    expect(round).toHaveLength(2)
+    expect(round[0].team_a.slice().sort()).toEqual(['p1', 'p4'])
+    expect(round[0].team_b.slice().sort()).toEqual(['p2', 'p3'])
+    expect(round[1].team_a.slice().sort()).toEqual(['p5', 'p8'])
+    expect(round[1].team_b.slice().sort()).toEqual(['p6', 'p7'])
+  })
+
+  it('falls back to random shuffling when there is no history yet (round 0)', () => {
+    const ids = ['p1', 'p2', 'p3', 'p4']
+    const round = generateMexicanoRound(ids, 0, [], 'points_won')
+    expect(round).toHaveLength(1)
+    expect(round[0].team_a).toHaveLength(2)
+    expect(round[0].team_b).toHaveLength(2)
   })
 })
 

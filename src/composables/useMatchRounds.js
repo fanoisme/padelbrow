@@ -12,7 +12,7 @@ function generateForFormat(format, input, roundIndex) {
     case 'americano':
       return generateAmericanoRound(input.playerIds, roundIndex, input.history || [])
     case 'mexicano':
-      return generateMexicanoRound(input.playerIds, roundIndex, input.history || [])
+      return generateMexicanoRound(input.playerIds, roundIndex, input.history || [], input.criteria)
     case 'team_americano':
       return generateTeamAmericanoRound(input.teams, roundIndex, input.history || [])
     case 'team_mexicano':

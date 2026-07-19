@@ -56,34 +56,47 @@ function circleMethodPairs(ids, roundIndex) {
 export function generateAmericanoRound(playerIds, roundIndex, history = []) {
   const n = playerIds.length
   if (n < 4) return []
-  const matchesPerRound = Math.floor(n / 4)
-  // Fix player 0, rotate the rest. For a single 4-player group this is the
-  // classic americano: across N-1 rounds, player 0 partners every other player
-  // exactly once. Rotating the whole array (earlier version) left player 0
-  // partnering only 2 of the 3 others. Byes (n%4 != 0) still rotate evenly.
-  const fixed = playerIds[0]
-  const rest = playerIds.slice(1)
-  const rotatedRest = rotate(rest, roundIndex)
-  const playing = [fixed, ...rotatedRest.slice(0, matchesPerRound * 4 - 1)]
+  // Partnerships rotate via the circle method (the same round-robin used for
+  // singles opponents below), so across N-1 rounds every player partners every
+  // other player exactly once — not just player 0. An earlier version fixed
+  // player 0 and rotated the rest as one flat list sliced into courts, which
+  // only guaranteed fair rotation for court 1; players on court 2+ repeated
+  // partners. Pairing court c's two partnerships against each other spreads
+  // that same fairness across every court.
+  const pairs = circleMethodPairs(playerIds, roundIndex)
+  const half = Math.floor(pairs.length / 2)
   const matches = []
-  for (let c = 0; c < matchesPerRound; c++) {
-    const g = playing.slice(c * 4, c * 4 + 4)
-    matches.push({ court: c + 1, team_a: [g[0], g[1]], team_b: [g[2], g[3]] })
+  for (let c = 0; c < half; c++) {
+    matches.push({ court: c + 1, team_a: pairs[c], team_b: pairs[c + half] })
   }
   return matches
 }
 
-export function generateMexicanoRound(playerIds, roundIndex, history = []) {
+export function generateMexicanoRound(playerIds, roundIndex, history = [], criteria = 'points_won') {
   const n = playerIds.length
   if (n < 4) return []
   const matchesPerRound = Math.floor(n / 4)
-  const shuffled = seededShuffle(playerIds, roundIndex * 7919 + 31)
-  const playing = shuffled.slice(0, matchesPerRound * 4)
+  // Round 0 has no results yet, so seed randomly. From round 1 on, real
+  // Mexicano ranks players by their running standings and regroups them into
+  // quartets by rank, pairing best+worst against the middle two — this keeps
+  // every match competitive instead of pairing at random every round.
+  if (history.length === 0) {
+    const shuffled = seededShuffle(playerIds, roundIndex * 7919 + 31)
+    const playing = shuffled.slice(0, matchesPerRound * 4)
+    const matches = []
+    for (let c = 0; c < matchesPerRound; c++) {
+      const g = playing.slice(c * 4, c * 4 + 4)
+      const split = seededShuffle(g, roundIndex * 100 + c + 7)
+      matches.push({ court: c + 1, team_a: [split[0], split[1]], team_b: [split[2], split[3]] })
+    }
+    return matches
+  }
+  const ranked = computeStandings(history, playerIds, criteria).map((s) => s.player_id)
+  const playing = ranked.slice(0, matchesPerRound * 4)
   const matches = []
   for (let c = 0; c < matchesPerRound; c++) {
-    const g = playing.slice(c * 4, c * 4 + 4)
-    const split = seededShuffle(g, roundIndex * 100 + c + 7)
-    matches.push({ court: c + 1, team_a: [split[0], split[1]], team_b: [split[2], split[3]] })
+    const [r1, r2, r3, r4] = playing.slice(c * 4, c * 4 + 4)
+    matches.push({ court: c + 1, team_a: [r1, r4], team_b: [r2, r3] })
   }
   return matches
 }

@@ -87,6 +87,28 @@ describe('MatchSessionView', () => {
     expect(input.playerIds).toEqual(['p1', 'p2', 'p3', 'p4'])
   })
 
+  it('passes prior-round match history and the session ranking criteria to generateRound (needed for mexicano rank-pairing)', async () => {
+    getSession.mockResolvedValueOnce({ id: 'ms1', meet_id: 'meet1', format: 'mexicano', ranking_criteria: 'points_won', status: 'in_progress' })
+    const router = createRouter({
+      history: createWebHashHistory(),
+      routes: [{ path: '/meets/:meetId/match-session/:sessionId', name: 'match-session', component: MatchSessionView }],
+    })
+    router.push('/meets/meet1/match-session/ms1')
+    await router.isReady()
+    const wrapper = mount(MatchSessionView, { global: { plugins: [router] } })
+    await flushPromises()
+
+    const btn = wrapper.find('[data-testid="generate-round-btn"]')
+    await btn.trigger('click')
+    await flushPromises()
+
+    const input = generateRound.mock.calls[0][1]
+    expect(input.history).toEqual([
+      { id: 'm1', court_number: 1, status: 'pending', score_a: null, score_b: null, team_a: ['p1', 'p2'], team_b: ['p3', 'p4'] },
+    ])
+    expect(input.criteria).toBe('points_won')
+  })
+
   it('drives the create wizard + creates a session when no sessionId is given', async () => {
     const router = createRouter({
       history: createWebHashHistory(),
